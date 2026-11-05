@@ -29,7 +29,7 @@ export class CrawlItem extends Item {
 
   /** The skill used to attack with a weapon: its named skill if the actor has it. */
   weaponSkill() {
-    if (this.type !== 'weapon' || !this.actor) return null
+    if (!['weapon', 'consumable'].includes(this.type) || !this.actor) return null
     const names = [this.system.skill, this.name, `${this.name} Training`].map((name) => String(name || '').trim().toLowerCase()).filter(Boolean)
     for (const name of names) {
       const skill = this.actor.items.find((item: any) => item.type === 'skill' && item.name.toLowerCase() === name)
@@ -84,6 +84,7 @@ export class CrawlItem extends Item {
       case 'weapon':
         return this.#useWeapon(options)
       case 'consumable':
+        if (this.system.consumableType === 'explosives') return attackWithRow(actor, rowForItem(this), options)
         return this.#useConsumable()
       default:
         return this.toMessage()

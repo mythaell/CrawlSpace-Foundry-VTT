@@ -1,3 +1,4 @@
+import { openGrinding } from './grinding'
 /** GM time controls and shared countdowns (partyTimers.ts); all game timers use core world time. */
 import { advanceTime } from '../time'
 import { formatTime, restSeconds, timeParts, timePartsSeconds, type TimeParts } from '../rules/time'
@@ -177,6 +178,7 @@ export class CrawlTime extends HandlebarsApplicationMixin(ApplicationV2) {
       if (!Number.isSafeInteger(hours) || hours < 0 || hours > 30000) throw new Error(game.i18n.localize('CRAWLSPACE.Time.InvalidDuration'))
       const actors = [...this.element.querySelectorAll('[name=actor]:checked')].map((input: any) => game.actors.get(input.value)).filter(Boolean)
       if (kind !== 'skip' && !actors.length) throw new Error(game.i18n.localize('CRAWLSPACE.Time.SelectActors'))
+      if (kind === 'grinding') return await openGrinding(actors, hours)
       const recovery = ['short', 'long', 'full', 'hourly'].includes(kind)
       const seconds = recovery ? restSeconds(kind, hours) : hours * 3600
       await advanceTime(seconds)

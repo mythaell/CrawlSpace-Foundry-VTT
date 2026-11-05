@@ -26,10 +26,10 @@ export const pendingStatPoints = (level: number, allocatedThroughLevel: number) 
 export const canAssignStats = (floor: number) => floor >= 3
 
 /** Whether a marked rank is eligible for this kind of advancement, and its cap. */
-export function advancementCheck(rank: number, kind: AdvancementKind, floor: number) {
+export function advancementCheck(rank: number, kind: AdvancementKind, floor: number, exception = false) {
   if (!Number.isSafeInteger(rank) || rank < 0) return { eligible: false, cap: 0 }
   if (kind !== 'floor' && rank > 4) return { eligible: false, cap: 0 }
-  const cap = floor < 7 ? 15 : 20
+  const cap = floor >= 7 && exception ? 20 : 15
   return { eligible: rank < cap, cap }
 }
 

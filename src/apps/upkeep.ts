@@ -1,3 +1,8 @@
+import { clearKillingBlows } from '../effects/killing-blows'
+import { rankCap } from '../effects/rank-cap'
+import { upkeepAction } from '../socket'
+import { openGrinding } from './grinding'
+import { openAwards } from './awards'
 import { advanceTime, expireActorEvent } from '../time'
 import { restSeconds } from '../rules/time'
 import { openTime } from './time'
@@ -11,8 +16,8 @@ async function report(actor: any, title: string, lines: string[]) {
 }
 
 export async function rest(actor: any, kind: RecoveryKind, hours = 1, options: { advance?: boolean } = {}) {
+  if (!game.user.isGM) return upkeepAction([actor.uuid], kind, hours)
   if (options.advance !== false) {
-    if (!game.user.isGM) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Time.GMOnly'))
     await advanceTime(restSeconds(kind, hours))
   }
   const before = { health: actor.system.health.value, mana: actor.system.mana.value }
@@ -29,7 +34,10 @@ export async function rest(actor: any, kind: RecoveryKind, hours = 1, options: {
       await actor.deleteEmbeddedDocuments('ActiveEffect', effects.map((effect: any) => effect.id))
     }
   }
-  if (kind === 'long' || kind === 'full') await expireActorEvent('longRest', [actor])
+  if (kind === 'long' || kind === 'full') {
+    await expireActorEvent('longRest', [actor])
+    await clearKillingBlows(actor, 'longRest')
+  }
   if (result.health > before.health) await expireActorEvent('healed', [actor])
   const restored = (result.health - before.health) / 10
   await report(actor, game.i18n.localize(`CRAWLSPACE.Upkeep.${kind}`), [
@@ -40,13 +48,30 @@ export async function rest(actor: any, kind: RecoveryKind, hours = 1, options: {
 
 /** Roll a d20 for each marked skill/spell; meeting its rank advances it (abilityAdvancement.ts). */
 export async function advanceMarked(actor: any, kind: AdvancementKind) {
+  if (!game.user.isGM) return upkeepAction([actor.uuid], kind)
   const floor = Number(actor.system.details.floor) || 1
   const lines: string[] = []
   const updates: any[] = []
+  const untrained = actor.items.filter((item: any) => item.type === 'skill' && item.system.rank.base === 0)
+  const candidates = floor <= 3 ? untrained.filter((item: any) => item.system.marked && item.name.trim()) : []
+  if (candidates.length) {
+    const chosen = candidates.length === 1 ? candidates[0].id : await foundry.applications.api.DialogV2.prompt({
+      window: { title: game.i18n.localize('CRAWLSPACE.Upkeep.Untrained') }, classes: ['crawlspace'], rejectClose: false,
+      content: `<p>${game.i18n.localize('CRAWLSPACE.Upkeep.UntrainedHint')}</p><select name="skill">${candidates.map((item: any) => `<option value="${item.id}">${foundry.utils.escapeHTML(item.name)}</option>`).join('')}</select>`,
+      ok: { callback: (_event: Event, button: any) => button.form.elements.skill.value },
+    })
+    if (!chosen) return
+    await actor.updateEmbeddedDocuments('Item', [{ _id: chosen, 'system.rank.value': 1, 'system.marked': false }])
+    const removed = untrained.filter((item: any) => item.id !== chosen).map((item: any) => item.id)
+    if (removed.length) await actor.deleteEmbeddedDocuments('Item', removed)
+    lines.push(game.i18n.format('CRAWLSPACE.Upkeep.Learned', { name: actor.items.get(chosen).name }))
+  }
   for (const item of actor.items) {
     if (!['skill', 'spell'].includes(item.type) || !item.system.marked) continue
-    const rank = Number(item.system.rank.value) || 0
-    const { eligible } = advancementCheck(rank, kind, floor)
+    const rank = Number(item.system.rank.base) || 0
+    if (item.type === 'skill' && rank === 0) continue
+    const { eligible: allowed } = advancementCheck(rank, kind, floor, rankCap(actor, item.name) === 20)
+    const eligible = allowed && rank < rankCap(actor, item.name)
     if (!eligible) {
       if (kind === 'floor' || rank <= 4) {
         lines.push(game.i18n.format('CRAWLSPACE.Upkeep.Capped', { name: item.name, rank }))
@@ -57,12 +82,13 @@ export async function advanceMarked(actor: any, kind: AdvancementKind) {
     const roll = await new Roll('1d20').evaluate()
     const advanced = advances(roll.total, rank)
     lines.push(game.i18n.format(advanced ? 'CRAWLSPACE.Upkeep.Advanced' : 'CRAWLSPACE.Upkeep.NotAdvanced', { name: item.name, roll: roll.total, rank, next: rank + 1 }))
-    updates.push({ _id: item.id, 'system.marked': false, ...(advanced ? { 'system.rank.value': rank + 1 } : {}) })
+    updates.push({ _id: item.id, 'system.marked': false, ...(advanced ? { 'system.rank.value': item.system.rank.value + 1 } : {}) })
   }
   if (updates.length) await actor.updateEmbeddedDocuments('Item', updates)
   if (kind === 'safeRoom') await expireActorEvent('safeRoom', [actor])
   if (kind === 'floor') {
     await expireActorEvent('leaveFloor', [actor])
+    await clearKillingBlows(actor, 'leaveFloor')
     await actor.update({ 'system.details.floor': floor + 1 })
     lines.push(game.i18n.format('CRAWLSPACE.Upkeep.FloorAdvanced', { floor: floor + 1 }))
   }
@@ -71,6 +97,7 @@ export async function advanceMarked(actor: any, kind: AdvancementKind) {
 }
 
 export async function levelUp(actor: any) {
+  if (!game.user.isGM) return upkeepAction([actor.uuid], 'level')
   const level = (Number(actor.system.details.level) || 1) + 1
   await actor.update({ 'system.details.level': level })
   const pending = pendingStatPoints(level, actor.system.upkeep.allocatedThroughLevel)
@@ -99,38 +126,56 @@ export async function assignStats(actor: any) {
   await actor.update(update)
 }
 
-export async function openUpkeep(actor: any) {
-  const action = await foundry.applications.api.DialogV2.wait({
-    window: { title: game.i18n.format('CRAWLSPACE.Upkeep.Title', { name: actor.name }) },
-    content: `<p>${game.i18n.localize('CRAWLSPACE.Upkeep.Hint')}</p>`,
-    rejectClose: false,
-    classes: ['crawlspace', 'upkeep-dialog'],
-    buttons: [
-      { action: 'time', label: game.i18n.localize('CRAWLSPACE.Time.Title'), icon: 'fa-solid fa-clock' },
-      { action: 'short', label: game.i18n.localize('CRAWLSPACE.Upkeep.short'), icon: 'fa-solid fa-mug-hot' },
-      { action: 'long', label: game.i18n.localize('CRAWLSPACE.Upkeep.long'), icon: 'fa-solid fa-bed' },
-      { action: 'full', label: game.i18n.localize('CRAWLSPACE.Upkeep.full'), icon: 'fa-solid fa-sun' },
-      { action: 'safeRoom', label: game.i18n.localize('CRAWLSPACE.Upkeep.safeRoom'), icon: 'fa-solid fa-door-closed' },
-      { action: 'session', label: game.i18n.localize('CRAWLSPACE.Upkeep.session'), icon: 'fa-solid fa-flag-checkered' },
-      { action: 'floor', label: game.i18n.localize('CRAWLSPACE.Upkeep.floor'), icon: 'fa-solid fa-stairs' },
-      { action: 'level', label: game.i18n.localize('CRAWLSPACE.Upkeep.LevelUp'), icon: 'fa-solid fa-arrow-up' },
-      { action: 'assign', label: game.i18n.localize('CRAWLSPACE.Upkeep.Assign'), icon: 'fa-solid fa-chart-simple' },
-    ],
-  })
-  switch (action) {
-    case 'time':
-      return openTime()
-    case 'short':
-    case 'long':
-    case 'full':
-      return rest(actor, action)
-    case 'safeRoom':
-    case 'session':
-    case 'floor':
-      return advanceMarked(actor, action)
-    case 'level':
-      return levelUp(actor)
-    case 'assign':
-      return assignStats(actor)
+/** One GM session advances time once, regardless of the number of participating crawlers. */
+export async function performUpkeep(uuids: string[], kind: string, hours = 1, skipTime = false) {
+  if (!game.user.isGM) return
+  const actors = (await Promise.all([...new Set(uuids)].map((uuid) => fromUuid(uuid)))).filter((actor) => actor?.type === 'crawler')
+  if (!actors.length) return
+  if (['short', 'long', 'full', 'hourly'].includes(kind)) {
+    const seconds = restSeconds(kind as RecoveryKind, hours)
+    if (!skipTime) await advanceTime(seconds)
+    for (const actor of actors) await rest(actor, kind as RecoveryKind, hours, { advance: false })
+  } else if (['safeRoom', 'session', 'floor'].includes(kind)) {
+    for (const actor of actors) await advanceMarked(actor, kind as AdvancementKind)
+  } else if (kind === 'grinding') {
+    await openGrinding(actors, hours, { advance: !skipTime })
+  } else if (kind === 'level') {
+    for (const actor of actors) await levelUp(actor)
   }
+}
+
+export async function openUpkeep(actor?: any) {
+  const gm = game.user.isGM
+  if (!gm && !game.settings.get('crawlspace', 'playerUpkeep')) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Upkeep.GMRequired'))
+  const actors = actor ? [actor] : game.actors.filter((entry: any) => entry.type === 'crawler')
+  const esc = foundry.utils.escapeHTML
+  const labels = ['short', 'long', 'full', 'hourly', 'safeRoom', 'session', 'floor', 'grinding', 'assign', ...(gm ? ['level', 'awards', 'time'] : [])]
+  const content = `<p>${game.i18n.localize(gm ? 'CRAWLSPACE.Upkeep.Hint' : 'CRAWLSPACE.Upkeep.NoTime')}</p>
+    ${actors.map((entry: any) => `<label class="upkeep-participant"><input type="checkbox" name="actor" value="${esc(entry.uuid)}" checked> ${esc(entry.name)}</label>`).join('')}
+    <div class="form-group"><label>${game.i18n.localize('CRAWLSPACE.Time.Hours')}</label><input name="hours" type="number" min="1" max="30" value="1"></div>`
+  const answer = await foundry.applications.api.DialogV2.wait({
+    window: { title: game.i18n.localize('CRAWLSPACE.Upkeep.Party') }, position: { width: 560 }, content, rejectClose: false,
+    classes: ['crawlspace', 'upkeep-dialog'],
+    buttons: labels.map((kind) => ({ action: kind, label: game.i18n.localize(`CRAWLSPACE.Upkeep.Actions.${kind}`), callback: (_event: Event, button: any) => ({ kind, hours: Number(button.form.elements.hours.value), uuids: [...button.form.querySelectorAll('[name=actor]:checked')].map((input: any) => input.value) }) })),
+  })
+  if (!answer) return
+  if (answer.kind === 'time') return openTime()
+  const chosen = actors.filter((entry: any) => answer.uuids.includes(entry.uuid))
+  if (!chosen.length) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Time.SelectActors'))
+  try {
+    if (answer.kind === 'awards') return openAwards(chosen)
+    if (answer.kind === 'assign') { for (const entry of chosen) await assignStats(entry); return }
+    return await upkeepAction(answer.uuids, answer.kind, answer.hours)
+  } catch (error: any) { ui.notifications.error(error.message) }
+}
+
+export function registerUpkeep() {
+  game.settings.register('crawlspace', 'playerUpkeep', {
+    name: 'CRAWLSPACE.Upkeep.PlayerSetting', hint: 'CRAWLSPACE.Upkeep.PlayerSettingHint',
+    scope: 'world', config: true, restricted: true, type: Boolean, default: false,
+  })
+  Hooks.on('getSceneControlButtons', (controls: any) => {
+    if (!game.user.isGM || !controls.tokens) return
+    controls.tokens.tools.crawlspaceUpkeep = { name: 'crawlspaceUpkeep', title: 'CRAWLSPACE.Upkeep.Party', icon: 'fa-solid fa-campground', button: true, onChange: () => openUpkeep() }
+  })
 }

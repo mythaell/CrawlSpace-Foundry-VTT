@@ -15,6 +15,11 @@
     "checkType": "Attack",
     "cooldown": "",
     "marked": false,
+    "killingBlowStacking": false,
+    "killingBlowStacks": 0,
+    "killingBlowAt": null,
+    "killingBlowGameClock": null,
+    "killingBlowFloor": "",
     "isAttack": false,
     "isUnarmed": false,
     "damage": {

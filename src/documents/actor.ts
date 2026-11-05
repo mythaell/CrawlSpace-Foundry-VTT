@@ -1,3 +1,5 @@
+import { announceImmunity } from '../effects/immunity'
+import { creditKillingBlow, spellKillBonus } from '../effects/killing-blows'
 import { expireActorEvent } from '../time'
 import { HEALTH_MAX } from '../config'
 import { applySlotDamage, dyingAfterHealthChange, type ConditionShield } from '../rules/core'
@@ -15,6 +17,7 @@ export type DamageOptions = {
   /** Skill or spell damage, for magicDamageCap targets. */
   damageKind?: 'skill' | 'spell'
   /** The spell's Rank 1 base damage, rolled with the card (magicDamageCap). */
+  killingBlowSpell?: string
   magicBase?: number
   shieldBlock?: { rank: number; strength: number }
   /** Post a health-change card with an Undo button. */
@@ -150,6 +153,7 @@ export class CrawlActor extends Actor {
       await this.update({ 'system.health.value': health, 'system.shield.slots': result.shieldStates })
       await this.#updateConditionShields(shields, result.conditionShields)
       await this.#syncDying(before.health, health)
+      if (before.health > 0 && health <= 0) await creditKillingBlow(options.killingBlowSpell)
       const summary = this.#describe(result, types, incoming)
       return this.#postHealthCard(`${this.name} lost ${result.slotsLost} health slot${result.slotsLost === 1 ? '' : 's'}. ${summary}`, before, options)
     }
@@ -168,9 +172,18 @@ export class CrawlActor extends Actor {
     })
     await this.update({ 'system.slotsLost': system.slotsLost + result.slotsLost })
     await this.#updateConditionShields(shields, result.conditionShields)
-    if (system.slotsLost + result.slotsLost >= system.health.max) await this.#markDefeated()
+    if (result.slotsLost >= remaining) await this.#markDefeated()
+    if (remaining > 0 && result.slotsLost >= remaining) await creditKillingBlow(options.killingBlowSpell)
     const summary = this.#describe(result, types, incoming)
     return this.#postHealthCard(`${this.name} lost ${result.slotsLost} health slot${result.slotsLost === 1 ? '' : 's'}. ${summary}`, before, options)
+  }
+
+  /** Each lethal hit credits its source spell once; subsequent damage to a defeated target gives nothing. */
+  async awardKillingBlow(itemId: string) {
+    const item = this.items.get(itemId)
+    if (item?.type !== 'spell' || !item.system.killingBlowStacking) return
+    const rank = item.system.rank.total
+    await item.update({ 'system.killingBlowStacks': Math.min(rank, spellKillBonus(item, rank) + 1), 'system.killingBlowFloor': String(this.system.details.floor), 'system.killingBlowAt': Date.now(), 'flags.crawlspace.killingBlowTime': game.time.worldTime })
   }
 
   /** Mana and health regeneration effects, for in-game seconds that passed (combat rounds or the clock). */
@@ -277,7 +290,7 @@ export class CrawlActor extends Actor {
     if (!definition) return
     const immune = this.system.traits?.conditionImmunities
     if (immune && [...immune].some((name: string) => name.toLowerCase() === definition.name.toLowerCase())) {
-      ui.notifications.info(game.i18n.format('CRAWLSPACE.Info.Immune', { name: this.name, debuff: definition.name }))
+      await announceImmunity(this, definition.name)
       return
     }
     const existing = this.effects.find((effect: any) => effect.active && effect.statuses.has(statusId))

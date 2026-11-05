@@ -1,3 +1,4 @@
+import { bladeClapAllowed, bladeClapSkill } from '../rules/blade-clap'
 import { expireActorEvent, expireCombatConditions, settleTime } from '../time'
 import { COMBAT_PHASES } from '../config'
 import { attackOutcome, outcomeLabel, resolveFormulaTokens, SUCCESS_OUTCOMES } from '../rules/core'
@@ -6,7 +7,7 @@ import { naturalD20, penaltyModifiers, rollD20, rollDamage } from '../dice/rolls
 import { combatAction } from '../socket'
 import { shieldBlockAllowed, shieldBlockFor, shieldBlockSkill } from '../rules/shield-block'
 
-export type DefenseKind = 'evade' | 'tank' | 'block'
+export type DefenseKind = 'evade' | 'tank' | 'block' | 'clap'
 export type DeclarationTarget = {
   combatantId: string
   actorUuid: string
@@ -20,7 +21,7 @@ export type Declaration = {
   mobCombatantId: string
   mobActorUuid: string
   mobName: string
-  attack: { id: string; name: string; toHit: number | null; damage: string; damageTypes: string[]; isArea: boolean; armorPiercing: boolean; magic: boolean; failedDebuff: string; notes: string }
+  attack: { id: string; name: string; toHit: number | null; damage: string; damageTypes: string[]; isArea: boolean; armorPiercing: boolean; magic: boolean; ranged?: boolean; failedDebuff: string; notes: string }
   targets: DeclarationTarget[]
   messageId?: string
   damageRolled?: boolean
@@ -87,18 +88,21 @@ export class CrawlCombat extends Combat {
   }
 
   async nextTurn() {
+    if (!game.user.isGM) return
     const phase = this.crawl.phase
     if (phase >= COMBAT_PHASES.length - 1) return this.nextRound()
     return this.setPhase(phase + 1)
   }
 
   async previousTurn() {
+    if (!game.user.isGM) return
     const phase = this.crawl.phase
     if (phase <= 0) return this.previousRound()
     return this.update({ 'flags.crawlspace.phase': phase - 1, 'flags.crawlspace.done': [] })
   }
 
   async nextRound() {
+    if (!game.user.isGM) return
     await this.update({ 'flags.crawlspace.phase': 0, 'flags.crawlspace.done': [] }, { render: false })
     const result = await super.nextRound()
     await settleTime()
@@ -107,6 +111,7 @@ export class CrawlCombat extends Combat {
   }
 
   async previousRound() {
+    if (!game.user.isGM) return
     await this.update({ 'flags.crawlspace.phase': COMBAT_PHASES.length - 1, 'flags.crawlspace.done': [] }, { render: false })
     return super.previousRound()
   }
@@ -160,6 +165,7 @@ export class CrawlCombat extends Combat {
         isArea: !!attack.aoeType,
         armorPiercing: !!attack.armorPiercing,
         magic: !!attack.magic,
+        ranged: !!attack.ranged,
         failedDebuff: attack.failedDebuff ?? '',
         notes: attack.notes ?? '',
       },
@@ -198,13 +204,13 @@ export class CrawlCombat extends Combat {
         { messageMode: game.settings.get('core', 'messageMode') },
       )
     }
-    if (kind === 'block') {
+    if (kind === 'block' || kind === 'clap') {
       // A Shield Block check: the Shield Block skill against the attack's to-hit.
-      const skill = shieldBlockSkill(actor)
-      const block = shieldBlockFor(actor)
-      if (!skill || !block || !shieldBlockAllowed({ area: declaration.attack.isArea, types: declaration.attack.damageTypes }, block.rank))
+      const skill = kind === 'clap' ? bladeClapSkill(actor) : shieldBlockSkill(actor)
+      const block = kind === 'clap' ? { rank: skill?.system.rank.total } : shieldBlockFor(actor)
+      if (!skill || !block || !(kind === 'clap' ? bladeClapAllowed(declaration.attack, block.rank) : shieldBlockAllowed({ area: declaration.attack.isArea, types: declaration.attack.damageTypes }, block.rank)))
         return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Combat.CannotBlock'))
-      const label = game.i18n.format('CRAWLSPACE.Combat.BlockAgainst', { attack: declaration.attack.name })
+      const label = game.i18n.format(kind === 'clap' ? 'CRAWLSPACE.Combat.ClapAgainst' : 'CRAWLSPACE.Combat.BlockAgainst', { attack: declaration.attack.name })
       const result = await rollD20(actor, { label, kind: 'check', modifiers: skill.checkModifiers(), sources: [skill.name] })
       if (!result) return
       total = result.roll.total
@@ -230,6 +236,8 @@ export class CrawlCombat extends Combat {
     const combatant = this.combatants.get(combatantId)
     const user = game.users.get(context.userId ?? game.user.id)
     if (!user?.isGM && !combatant?.actor?.testUserPermission(user, 'OWNER')) return
+    if (!['evade', 'tank', 'block', 'clap'].includes(kind)) return
+    if (kind === 'clap' && (!bladeClapSkill(combatant?.actor) || !bladeClapAllowed(declaration.attack, bladeClapSkill(combatant.actor).system.rank.total))) return
     if (kind === 'tank' || declaration.attack.toHit === null || total === null) {
       target.response = { kind, hit: true, half: false }
     } else {
@@ -243,8 +251,8 @@ export class CrawlCombat extends Combat {
         total,
         natural: natural ?? undefined,
         outcome: outcomeLabel(outcome, true),
-        hit: !success || declaration.attack.isArea,
-        half: success && declaration.attack.isArea,
+        hit: !success || !!declaration.attack.isArea,
+        half: success && !!declaration.attack.isArea,
       }
     }
     await this.update({ 'flags.crawlspace.declarations': declarations })
@@ -290,6 +298,7 @@ export class CrawlCombat extends Combat {
         ...target,
         halfNote: target.response?.half,
         canBlock: canBlock(target.actorUuid, declaration),
+        canClap: !!bladeClapSkill(fromUuidSync(target.actorUuid)) && bladeClapAllowed(declaration.attack, bladeClapSkill(fromUuidSync(target.actorUuid)).system.rank.total),
         failedDebuff: target.response?.hit && declaration.attack.failedDebuff ? declaration.attack.failedDebuff : '',
       })),
     })

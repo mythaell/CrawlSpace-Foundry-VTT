@@ -1,3 +1,4 @@
+import { floorCheckDc } from '../rules/floor-checks'
 import { attackOutcome, doubleDice, outcomeLabel, resolveFormulaTokens, SUCCESS_OUTCOMES, type AttackOutcome } from '../rules/core'
 import { debuffById } from '../rules/debuffs'
 import type { AttackDamage } from '../actors/attacks'
@@ -12,6 +13,7 @@ export type CheckOptions = {
   modifiers: Modifier[]
   /** Names the effect targets can match, e.g. the skill name, `Spells`, `Ranged`. */
   sources?: string[]
+  floorDifficulty?: number
   difficulty?: number | null
   /** Skip the dialog (shift-click). */
   fast?: boolean
@@ -64,7 +66,7 @@ export function penaltyModifiers(actor: any): Modifier[] {
 async function promptCheck(options: CheckOptions, mode: RollModeName) {
   const content = await foundry.applications.handlebars.renderTemplate(
     'systems/crawlspace/templates/dialogs/roll-check.hbs',
-    { modifiers: options.modifiers.map((modifier, index) => ({ ...modifier, index, enabled: modifier.enabled !== false })), mode, difficulty: options.difficulty },
+    { modifiers: options.modifiers.map((modifier, index) => ({ ...modifier, index, enabled: modifier.enabled !== false })), mode, difficulty: options.difficulty, floorDifficulty: options.floorDifficulty },
   )
   return foundry.applications.api.DialogV2.wait({
     window: { title: options.label },
@@ -80,7 +82,7 @@ async function promptCheck(options: CheckOptions, mode: RollModeName) {
           const enabled = options.modifiers.map((_m, index) => form.elements[`mod-${index}`]?.checked !== false)
           const extra = Number(form.elements.extra?.value) || 0
           const extraLabel = String(form.elements.extraLabel?.value || game.i18n.localize('CRAWLSPACE.Roll.Temporary'))
-          return { enabled, extra, extraLabel, mode: form.elements.mode.value as RollModeName }
+          return { enabled, extra, extraLabel, mode: form.elements.mode.value as RollModeName, difficulty: form.elements.floorCheck?.checked ? options.floorDifficulty : options.difficulty }
         },
       },
     ],
@@ -97,6 +99,7 @@ export async function rollD20(actor: any, options: CheckOptions) {
     modifiers = modifiers.filter((_modifier, index) => answer.enabled[index])
     if (answer.extra) modifiers.push({ label: answer.extraLabel, value: answer.extra })
     mode = answer.mode
+    options.difficulty = answer.difficulty
   }
   const terms = modifiers.map((modifier) => `${modifier.value >= 0 ? '+' : '-'} ${Math.abs(modifier.value)}[${modifier.label.replace(/[[\]]/g, '')}]`)
   const roll = new Roll(`${MODE_FORMULA[mode]} ${terms.join(' ')}`.trim())
@@ -118,6 +121,7 @@ const messageMode = () => game.settings.get('core', 'messageMode')
 
 /** A plain check (attribute, skill, spell): optional difficulty gives an outcome. */
 export async function rollCheck(actor: any, options: CheckOptions) {
+  options.floorDifficulty = floorCheckDc(actor.system.details?.floor ?? actor.system.floor, options.sources?.some((name) => /^(STR|INT|CON|DEX|CHA)$/.test(name)) ? 'stat' : 'skill')
   const result = await rollD20(actor, options)
   if (!result) return null
   if (options.pay && !(await options.pay())) return null
@@ -281,6 +285,7 @@ export async function rollDamage(
           area: !!damage.area,
           damageKind: damage.kind ?? null,
           magicBase,
+          killingBlowSpell: damage.killingBlowSpell,
           targets: options.targets ?? [],
           blocked: options.blocked ?? [],
         },

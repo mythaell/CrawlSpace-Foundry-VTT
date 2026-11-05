@@ -180,8 +180,8 @@ export class CrawlerData extends CrawlActorData {
         className: text(),
         deity: text(),
         sponsors: new fields.ArrayField(new fields.StringField({ blank: true }), { initial: ['', '', ''] }),
-        aiFavor: integer(0),
-        popularity: integer(0),
+        aiFavor: new fields.NumberField({ initial: 0, required: true, nullable: false }),
+        popularity: new fields.NumberField({ initial: 0, required: true, nullable: false }),
         gold: integer(0, { min: 0 }),
       }),
       background: new fields.SchemaField({

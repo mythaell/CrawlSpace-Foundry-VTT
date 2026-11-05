@@ -1,3 +1,4 @@
+import { expireKillingBlows } from './effects/killing-blows'
 /** World-time coordination: Foundry owns the clock, durations and expiry; upkeep advances it once. */
 import { regenAdvance, hasRegen } from './effects/specials'
 import { effectDuration } from './import/convert'
@@ -52,6 +53,9 @@ export async function advanceTime(seconds: number) {
 export function registerTime() {
   // Instantiate off-scene token actors so core registers their timed effects too.
   timedActors()
+  Hooks.on('updateActor', (actor: any, changes: any) => {
+    if (game.user.isActiveGM && foundry.utils.hasProperty(changes, 'system.details.floor')) void expireKillingBlows(actor)
+  })
   Hooks.on('preCreateActiveEffect', (effect: any) => {
     if (effect.parent?.documentName !== 'Actor' || effect._source.duration?.value != null || effect._source.duration?.expiry) return
     const duration = effectDuration(effect.system.durationText)
@@ -72,6 +76,7 @@ export function registerTime() {
       specials: foundry.utils.deepClone(actor.system.specials),
     }))
     updates = updates.catch(() => {}).then(async () => {
+      for (const actor of actors) await expireKillingBlows(actor)
       for (const { actor, specials } of snapshots) {
         const proxy = { system: Object.assign(Object.create(actor.system), { specials }), items: actor.items, effects: actor.effects }
         const result = regenAdvance(proxy, actor.getFlag('crawlspace', 'regen') ?? {}, delta, _worldTime)

@@ -1,3 +1,6 @@
+import { openGrinding } from './apps/grinding'
+import { openAwards } from './apps/awards'
+import { registerImmunity } from './effects/immunity'
 import { openTime, registerClock } from './apps/time'
 import { advanceTime, settleTime, registerTime } from './time'
 import * as config from './config'
@@ -17,7 +20,7 @@ import { registerSocket } from './socket'
 import { registerChatHandlers } from './chat/cards'
 import { characterToActor } from './import/convert'
 import { fillActorDamage, fillDamageData } from './import/fill-damage'
-import { openUpkeep, rest } from './apps/upkeep'
+import { registerUpkeep, openUpkeep, rest, performUpkeep } from './apps/upkeep'
 
 const TEMPLATES = [
   'chat/card-footer',
@@ -150,13 +153,15 @@ Hooks.once('init', () => {
   foundry.applications.handlebars.loadTemplates(TEMPLATES)
   registerChatHandlers()
   registerClock()
+  registerUpkeep()
 
-  game.crawlspace = { config, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
+  game.crawlspace = { config, openGrinding, openAwards, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
 })
 
 Hooks.once('ready', () => {
   registerSocket()
   registerTime()
+  registerImmunity()
 })
 
 /** Dragging an owned item to the hotbar makes a macro that uses it. */

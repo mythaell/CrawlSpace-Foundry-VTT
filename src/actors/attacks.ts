@@ -1,3 +1,4 @@
+import { spellKillBonus } from '../effects/killing-blows'
 /**
  * Crawler attacks: rows in `system.attacks`, plus automatic rows for equipped weapons, attack skills and
  * spells, and the unarmed strike. Every row resolves to the same AttackSource that rollAttack/rollDamage use.
@@ -35,7 +36,7 @@ const joinFormula = (...parts: (string | undefined)[]) =>
     .replace(/\+\s*-/g, '-')
     .replace(/\+\+/g, '+')
 
-export type AttackDamage = { formula: string; types: string[]; armorPiercing?: boolean; magic?: boolean; area?: boolean; baseFormula?: string; kind?: DamageKind }
+export type AttackDamage = { formula: string; types: string[]; armorPiercing?: boolean; magic?: boolean; area?: boolean; baseFormula?: string; kind?: DamageKind; killingBlowSpell?: string }
 
 /**
  * Add what the actor's effects give an attack: Damage Modifier bonuses (with their damage types) and Armor
@@ -44,9 +45,12 @@ export type AttackDamage = { formula: string; types: string[]; armorPiercing?: b
 export function withEffectBonuses(actor: any, damage: AttackDamage, context: { names: string[]; itemIds: string[]; weapon: boolean; kind: DamageKind; rank?: number }): AttackDamage {
   const names = [...new Set(context.names.filter(Boolean))]
   const bonuses = damage.formula ? damageBonuses(actor, names, context.weapon, context.kind, context.rank ?? 0) : []
+  const spell = context.kind === 'spell' ? actor.items.get(context.itemIds[0]) : null
+  const killBonus = spell ? spellKillBonus(spell, context.rank ?? 0) : 0
   return {
     ...damage,
-    formula: joinFormula(damage.formula, ...bonuses.map((bonus) => bonus.formula)),
+    killingBlowSpell: spell?.system.killingBlowStacking ? spell.uuid : undefined,
+    formula: joinFormula(damage.formula, killBonus ? String(killBonus) : '', ...bonuses.map((bonus) => bonus.formula)),
     types: [...new Set([...damage.types, ...bonuses.flatMap((bonus) => bonus.types)])],
     armorPiercing: !!damage.armorPiercing || piercesArmor(actor, context.itemIds.filter(Boolean), names, context.weapon, context.kind),
     kind: context.kind,
@@ -72,7 +76,7 @@ export function attackRows(actor: any): AttackRow[] {
   const saved: AttackRow[] = actor.system.attacks ?? []
   const used = new Set(saved.map((row) => row.sourceId).filter(Boolean))
   const automatic = [...actor.items]
-    .filter((item: any) => (item.type === 'weapon' && item.system.equipped) || ((item.type === 'skill' || item.type === 'spell') && item.system.isAttack))
+    .filter((item: any) => (item.type === 'weapon' && item.system.equipped) || (item.type === 'consumable' && item.system.consumableType === 'explosives') || ((item.type === 'skill' || item.type === 'spell') && item.system.isAttack))
     .filter((item: any) => !used.has(item.id))
     .sort((a: any, b: any) => (a.sort || 0) - (b.sort || 0))
     .map(rowForItem)
@@ -96,7 +100,7 @@ export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHi
   const linkedSkill = row.skillId ? items.get(row.skillId) : null
   const skill =
     linkedSkill ??
-    (source?.type === 'weapon' ? source.weaponSkill() : source && (source.type === 'skill' || source.type === 'spell') ? source : null)
+    (['weapon', 'consumable'].includes(source?.type) ? source.weaponSkill() : source && (source.type === 'skill' || source.type === 'spell') ? source : null)
   const ranged = row.ranged || (source?.type === 'weapon' && ['ranged', 'thrown'].includes(source.system.weaponType))
   const statLabel = ranged ? 'Dexterity' : 'Strength'
   const modifiers: Modifier[] = skill
@@ -108,6 +112,7 @@ export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHi
   const weapon = !source || source.type === 'weapon'
   const kind: DamageKind = source?.type === 'spell' ? 'spell' : source?.type === 'skill' ? 'skill' : undefined
   let formula = String(row.damage ?? '').trim()
+  if (!formula && source?.type === 'consumable') formula = source.system.damage?.formula ?? ''
   if (!formula && source?.type === 'weapon') formula = weaponDamage(source, skill)
   if (!formula && skill) formula = skill.system.damage?.atRank || skill.system.damage?.formula || ''
   if (!formula && source) formula = source.system.damage?.formula ?? ''
@@ -172,7 +177,7 @@ export function displayFormula(actor: any, formula: string) {
 
 export async function attackWithRow(actor: any, row: AttackRow, options: { fast?: boolean } = {}) {
   const source = actor.items.get(row.sourceId)
-  const skill = actor.items.get(row.skillId) ?? (source?.type === 'weapon' ? source.weaponSkill() : null)
+  const skill = actor.items.get(row.skillId) ?? (['weapon', 'consumable'].includes(source?.type) ? source.weaponSkill() : null)
   const uses = [source, skill].filter((item) => item && ['skill', 'spell'].includes(item.type)).map(itemCooldown)
   return withCooldowns(actor, uses, () => rollAttack(actor, resolveAttack(actor, row), options))
 }

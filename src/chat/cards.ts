@@ -51,6 +51,7 @@ async function onAction(message: any, button: HTMLElement) {
           area: flags.area,
           damageKind: flags.damageKind ?? undefined,
           magicBase: flags.magicBase ?? undefined,
+          killingBlowSpell: flags.killingBlowSpell,
           shieldBlock,
         })
       }

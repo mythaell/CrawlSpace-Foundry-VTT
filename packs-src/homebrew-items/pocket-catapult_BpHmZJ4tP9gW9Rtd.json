@@ -18,7 +18,8 @@
       "formula": "",
       "types": [],
       "armorPiercing": false,
-      "magic": false
+      "magic": false,
+      "area": false
     },
     "armorDr": 0,
     "source": {

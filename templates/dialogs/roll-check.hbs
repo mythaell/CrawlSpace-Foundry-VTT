@@ -1,5 +1,6 @@
 <div class="crawl-dialog roll-check">
   {{#if difficulty}}<p class="hint">DC {{difficulty}}</p>{{/if}}
+  {{#if floorDifficulty}}<label><input type="checkbox" name="floorCheck"> {{localize "CRAWLSPACE.Roll.FloorCheck" dc=floorDifficulty}}</label>{{/if}}
   <ul class="modifiers">
     {{#each modifiers}}
     <li><label><input type="checkbox" name="mod-{{index}}" {{checked enabled}}> {{label}} <b>{{crawlSigned value}}</b></label></li>

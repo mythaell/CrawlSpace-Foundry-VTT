@@ -1,3 +1,4 @@
+import { normalizeGrinding } from '../rules/grinding.ts'
 /**
  * CrawlSpace database rows and character backups → Foundry document data.
  *
@@ -160,6 +161,7 @@ export function rankedSystem(data: Record<string, any>, kind: 'skill' | 'spell')
     checkType: str(data.checkType) || 'Unopposed',
     cooldown: str(data.cooldown),
     marked: !!data.completed,
+    ...(kind === 'spell' ? { killingBlowStacking: !!data.killingBlowStacking, killingBlowStacks: int(data.killingBlowStacks), killingBlowAt: data.killingBlowAt ?? null, killingBlowGameClock: data.killingBlowGameClock ?? null, killingBlowFloor: str(data.killingBlowFloor) } : {}),
     isAttack: !!(kind === 'skill' ? data.isAttackSkill : data.isAttackSpell),
     isUnarmed: !!data.isUnarmed,
     damage: {
@@ -277,7 +279,7 @@ export function inventoryToItem(entry: Record<string, any>, contentType = '') {
     equipped: !!entry.equipped,
     tags: types(entry.tags),
   }
-  const damage = { formula: str(properties.damageFormula), types: types(properties.damageTypes), armorPiercing: !!properties.weapon?.damageModification?.armorPiercing, magic: !!properties.weapon?.magic }
+  const damage = { formula: str(properties.damageFormula), types: types(properties.damageTypes), armorPiercing: !!properties.weapon?.damageModification?.armorPiercing, magic: !!properties.weapon?.magic, area: hasArea(properties) }
   let system: Record<string, any>
   switch (type) {
     case 'weapon':
@@ -796,6 +798,11 @@ export function characterToActor(input: Record<string, any>) {
       personalSpace: { tier: str(data.personalSpace?.tier), size: str(data.personalSpace?.size) },
       upkeep: { allocatedThroughLevel: int(data.upkeep?.allocatedThroughLevel, 1), lastSafeRoomLevel: int(data.upkeep?.lastSafeRoomLevel, 0), pendingStatPoints: 0 },
     },
+    flags: { crawlspace: { grinding: normalizeGrinding({
+      ...data.upkeep?.grinding,
+      skillHours: Object.fromEntries(Object.entries(data.upkeep?.grinding?.skillHours ?? {}).flatMap(([id, value]) => mapped(id.replace(/^spell:/, '')) ? [[mapped(id.replace(/^spell:/, '')), Number(value)]] : [])),
+      attempted: Object.fromEntries(Object.entries(data.upkeep?.grinding?.attempted ?? {}).flatMap(([id, value]) => mapped(id.replace(/^spell:/, '')) ? [[mapped(id.replace(/^spell:/, '')), Number(value)]] : [])),
+    }) } },
     prototypeToken: { actorLink: true, disposition: 1, bar1: { attribute: 'healthBar' }, bar2: { attribute: 'mana' } },
     items,
     effects,

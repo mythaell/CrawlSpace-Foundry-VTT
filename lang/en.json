@@ -233,7 +233,9 @@
       "DamageBonus": "Damage Bonus",
       "Upgrade5": "Rank 5",
       "Upgrade10": "Rank 10",
-      "Upgrade15": "Rank 15"
+      "Upgrade15": "Rank 15",
+      "KillingBlowStacking": "Killing-blow stacking",
+      "KillingBlowStacks": "Killing-blow stacks"
     },
     "Usage": {
       "learned": "Learned",
@@ -353,7 +355,8 @@
       "RankOf": "{name} rank",
       "StatHint": "Roll a check. Shift-click to skip the dialog.",
       "EvadeHint": "Roll Evade. Shift-click to skip the dialog.",
-      "NoTargets": "No targets. Target tokens before attacking to see hit or miss."
+      "NoTargets": "No targets. Target tokens before attacking to see hit or miss.",
+      "FloorCheck": "Floor check · DC {dc}"
     },
     "Damage": {
       "Damage": "Damage",
@@ -405,7 +408,10 @@
       "AllAvoided": "Every target avoided the attack.",
       "MarkDone": "Done for this phase",
       "CleanupDamage": "{effect} damages {name}",
-      "CleanUpExpiry": "Clean Up phase"
+      "CleanUpExpiry": "Clean Up phase",
+      "Clap": "Blade Clap",
+      "ClapAgainst": "Blade Clap against {attack}",
+      "Clapped": "Blade Clap {total}"
     },
     "Upkeep": {
       "Button": "Upkeep",
@@ -432,7 +438,29 @@
       "PointsWaiting": "{points} stat points waiting to be assigned.",
       "NoPoints": "No stat points to assign.",
       "FloorThree": "Stat points can be assigned from floor 3.",
-      "hourly": "Calm hourly recovery"
+      "hourly": "Calm hourly recovery",
+      "GMRequired": "The GM has not enabled player upkeep.",
+      "NoTime": "Player upkeep changes recovery and progress without advancing time.",
+      "Party": "Party Upkeep",
+      "PlayerSetting": "Allow player upkeep without time skips",
+      "PlayerSettingHint": "Players may run upkeep for crawlers they own. Only the GM can advance the clock.",
+      "Actions": {
+        "short": "Short Rest - 2 hours",
+        "long": "Long Rest - 8 hours",
+        "full": "Full Rest - 30 hours",
+        "hourly": "Hourly Recovery",
+        "safeRoom": "Enter Safe Room",
+        "session": "End Session",
+        "floor": "End Floor",
+        "grinding": "Grinding",
+        "assign": "Assign Stat Points",
+        "level": "Level Up",
+        "awards": "Crawler Awards",
+        "time": "Time & Timers"
+      },
+      "Untrained": "Learn an untrained skill",
+      "UntrainedHint": "Choose one marked Rank 0 skill to learn at Rank 1. All other untrained skills are removed, as in CrawlSpace.",
+      "Learned": "Learned {name} at Rank 1; other untrained skills removed."
     },
     "Import": {
       "Character": "Import CrawlSpace character",
@@ -601,9 +629,9 @@
       "Skip": "Skip time",
       "SkipHint": "Advance time once for everyone. Select crawlers for recovery or safe-room advancement. Short, long, and full rests use fixed lengths; other activities use the hours below. Grinding here advances time only.",
       "Activity": "Activity",
-      "Short": "Short rest � 2 hours",
-      "Long": "Long rest � 8 hours",
-      "Full": "Full rest � 30 hours",
+      "Short": "Short rest · 2 hours",
+      "Long": "Long rest · 8 hours",
+      "Full": "Full rest · 30 hours",
       "Grinding": "Grinding time",
       "Hours": "Hours (other activities)",
       "Apply": "Apply time skip",
@@ -633,6 +661,48 @@
       "SetFloor": "Set floor-collapse timer",
       "FloorPrompt": "Set the remaining time before this floor collapses. A dungeon day lasts 30 hours.",
       "OverflowHint": "Overflow is converted automatically: 90 minutes becomes 1 hour 30 minutes; 30 hours becomes 1 day."
+    },
+    "Grinding": {
+      "Title": "Grinding",
+      "Hint": "The first five hours are productive. Additional hours require Endurance checks; failures add Fatigued. Assign the productive hours to skills and spells, then resolve daily advancement checks.",
+      "Aid": "Map / guide aid",
+      "Neighborhood": "Neighborhood · +1 hour after 5 hours",
+      "Borough": "Borough · +2 hours after 5 hours",
+      "NewDay": "Start a new grinding day (keep banked progress)",
+      "HoursError": "Enter 1–30 whole grinding hours.",
+      "DayError": "{name} would exceed 30 grinding hours today. Start a new grinding day first.",
+      "EnduranceError": "Add Endurance to {name} before overtime grinding.",
+      "Overtime": "Grinding · Endurance",
+      "Fatigue": "New Fatigue",
+      "HourResult": "Hour {hour}: Endurance {total} vs DC {dc}; {result}.",
+      "Productive": "productive",
+      "Failed": "no credit, +1 Fatigued",
+      "Allocate": "Assign {hours} hours. Level progress: {banked} hours.",
+      "Progress": "{hours} hours banked / Rank {rank}",
+      "AllocateError": "Assign exactly {hours} whole hours, within the displayed limits.",
+      "CheckResult": "{name}: {total} vs Rank {rank}; {result}.",
+      "Advanced": "advanced one rank",
+      "NotAdvanced": "no advancement",
+      "LevelResult": "Gained {gained} levels; now Level {level}. Stat points are banked.",
+      "Summary": "{hours} actual hours; {productive} productive hours today; {level} hours banked toward the next level.",
+      "None": "None",
+      "Changed": "Grinding progress changed while this session was open. Reopen upkeep before confirming."
+    },
+    "Awards": {
+      "Title": "Crawler Awards",
+      "Hint": "Leave favor/popularity blank to preserve them. Use +5 or -2 to modify, or an unsigned number to replace. Loot boxes remain sealed.",
+      "aiFavor": "AI Favor",
+      "popularity": "Popularity",
+      "name": "Achievement name",
+      "description": "Description",
+      "reward": "Reward",
+      "box": "Loot box name",
+      "quantity": "Box quantity",
+      "notes": "Box notes",
+      "Link": "Link this loot box to the achievement",
+      "Award": "Award",
+      "InvalidNumber": "Enter a number or a modifier such as +5 or -2.",
+      "InvalidQuantity": "Enter a whole loot box quantity from 1 to 9999."
     }
   }
 }

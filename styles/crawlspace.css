@@ -2499,3 +2499,30 @@
   .application.crawlspace.time-panel .timer-actions { display: flex; gap: 6px; }
   .application.crawlspace.time-panel .timer-actions > button { flex: 1 1 0; width: auto; min-width: 0; white-space: nowrap; }
 }
+
+@layer system {
+  .application.crawlspace .upkeep-participant { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+  .application.crawlspace.grinding-dialog .form-group,
+  .application.crawlspace.awards-dialog .form-group { display: flex; gap: 12px; align-items: center; margin: 8px 0; }
+  .application.crawlspace.grinding-dialog .form-group label,
+  .application.crawlspace.awards-dialog .form-group label { flex: 1; }
+  .application.crawlspace.grinding-dialog input[type=number] { width: 80px; flex: 0 0 80px; }
+  .application.crawlspace.awards-dialog textarea { min-height: 70px; }
+}
+
+@layer system {
+  .application.crawlspace.upkeep-dialog .upkeep-participant { flex-direction: row; justify-content: flex-start; padding: 2px 0; }
+  .application.crawlspace.upkeep-dialog .upkeep-participant input { flex: 0 0 auto; width: 16px; margin: 0; }
+}
+
+@layer system {
+  .application.crawlspace.awards-dialog .dialog-content,
+  .application.crawlspace.grinding-dialog .dialog-content,
+  .application.crawlspace.upkeep-dialog .dialog-content { gap: 6px; }
+  .application.crawlspace.awards-dialog .form-group,
+  .application.crawlspace.grinding-dialog .form-group { margin: 2px 0; }
+  .application.crawlspace .upkeep-participant { flex-direction: row; }
+  .application.crawlspace .upkeep-participant input { flex: 0 0 auto; width: 16px; }
+  .application.crawlspace.grinding-dialog { max-height: 85vh; }
+  .application.crawlspace.grinding-dialog .window-content { overflow-y: auto; }
+}

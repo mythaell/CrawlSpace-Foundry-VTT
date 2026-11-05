@@ -1,3 +1,4 @@
+import { rankCap } from '../effects/rank-cap'
 import { GEAR_SLOTS } from '../config'
 import { rankDie } from '../rules/core'
 
@@ -81,8 +82,9 @@ function prepareRanked(model: any, kind: 'skill' | 'spell') {
   const bonuses = actor?.system?.bonuses
   const baseBonus = Number(bonuses?.[kind === 'skill' ? 'baseSkillRanks' : 'baseSpellRanks']?.[name]) || 0
   const bonus = Number(bonuses?.[kind === 'skill' ? 'skillRanks' : 'spellRanks']?.[name]) || 0
-  model.rank.base = model.rank.value + baseBonus
-  model.rank.total = model.rank.override ?? model.rank.base + bonus
+  model.rank.cap = rankCap(actor, model.parent?.name ?? '')
+  model.rank.base = Math.min(model.rank.cap, model.rank.value + baseBonus)
+  model.rank.total = Math.max(0, Math.min(model.rank.cap, model.rank.override ?? model.rank.base + bonus))
   model.rank.mod = model.rank.modOverride ?? (actor?.system?.statMod?.(model.stat) ?? 0)
   const rank = model.rank.total
   const upgraded =
@@ -125,6 +127,11 @@ export class SpellData extends foundry.abstract.TypeDataModel {
       range: text(),
       duration: text(),
       cooldownUntil: optionalNumber(),
+      killingBlowStacking: new fields.BooleanField(),
+      killingBlowStacks: integer(0, { min: 0 }),
+      killingBlowAt: optionalNumber(),
+      killingBlowGameClock: optionalNumber(),
+      killingBlowFloor: text(),
       usage: new fields.StringField({ required: true, initial: 'learned', choices: ['learned', 'inherent', 'scroll', 'tome'] }),
     }
   }
@@ -187,6 +194,7 @@ export class ConsumableData extends foundry.abstract.TypeDataModel {
     return {
       ...physical(),
       consumableType: text('other'),
+      skill: text(),
       damage: damageSchema(),
       healing: new fields.SchemaField({ formula: text(), slots: new fields.BooleanField({ initial: true }) }),
       manaRestore: text(),
