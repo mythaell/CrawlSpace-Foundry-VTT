@@ -1,3 +1,6 @@
+import { advanceTime, expireActorEvent } from '../time'
+import { restSeconds } from '../rules/time'
+import { openTime } from './time'
 import { STATS, STAT_KEYS } from '../config'
 import { debuffByName } from '../rules/debuffs'
 import { advancementCheck, advances, canAssignStats, pendingStatPoints, recoverCrawler, type AdvancementKind, type RecoveryKind } from '../rules/upkeep'
@@ -7,7 +10,12 @@ async function report(actor: any, title: string, lines: string[]) {
   await ChatMessage.create({ content, speaker: ChatMessage.getSpeaker({ actor }) })
 }
 
-export async function rest(actor: any, kind: RecoveryKind, hours = 1) {
+export async function rest(actor: any, kind: RecoveryKind, hours = 1, options: { advance?: boolean } = {}) {
+  if (options.advance !== false) {
+    if (!game.user.isGM) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Time.GMOnly'))
+    await advanceTime(restSeconds(kind, hours))
+  }
+  const before = { health: actor.system.health.value, mana: actor.system.mana.value }
   const system = actor.system
   const result = recoverCrawler(kind, system.health.value, system.mana.value, system.mana.max, hours)
   await actor.update({ 'system.health.value': result.health, 'system.mana.value': result.mana, 'system.health.dyingCountdown': null })
@@ -21,9 +29,11 @@ export async function rest(actor: any, kind: RecoveryKind, hours = 1) {
       await actor.deleteEmbeddedDocuments('ActiveEffect', effects.map((effect: any) => effect.id))
     }
   }
-  const restored = (result.health - system.health.value) / 10
+  if (kind === 'long' || kind === 'full') await expireActorEvent('longRest', [actor])
+  if (result.health > before.health) await expireActorEvent('healed', [actor])
+  const restored = (result.health - before.health) / 10
   await report(actor, game.i18n.localize(`CRAWLSPACE.Upkeep.${kind}`), [
-    game.i18n.format('CRAWLSPACE.Upkeep.Restored', { slots: Math.max(0, restored), mana: result.mana - system.mana.value }),
+    game.i18n.format('CRAWLSPACE.Upkeep.Restored', { slots: Math.max(0, restored), mana: result.mana - before.mana }),
     ...(removed.length ? [game.i18n.format('CRAWLSPACE.Upkeep.Cleared', { list: removed.join(', ') })] : []),
   ])
 }
@@ -50,7 +60,9 @@ export async function advanceMarked(actor: any, kind: AdvancementKind) {
     updates.push({ _id: item.id, 'system.marked': false, ...(advanced ? { 'system.rank.value': rank + 1 } : {}) })
   }
   if (updates.length) await actor.updateEmbeddedDocuments('Item', updates)
+  if (kind === 'safeRoom') await expireActorEvent('safeRoom', [actor])
   if (kind === 'floor') {
+    await expireActorEvent('leaveFloor', [actor])
     await actor.update({ 'system.details.floor': floor + 1 })
     lines.push(game.i18n.format('CRAWLSPACE.Upkeep.FloorAdvanced', { floor: floor + 1 }))
   }
@@ -94,6 +106,7 @@ export async function openUpkeep(actor: any) {
     rejectClose: false,
     classes: ['crawlspace', 'upkeep-dialog'],
     buttons: [
+      { action: 'time', label: game.i18n.localize('CRAWLSPACE.Time.Title'), icon: 'fa-solid fa-clock' },
       { action: 'short', label: game.i18n.localize('CRAWLSPACE.Upkeep.short'), icon: 'fa-solid fa-mug-hot' },
       { action: 'long', label: game.i18n.localize('CRAWLSPACE.Upkeep.long'), icon: 'fa-solid fa-bed' },
       { action: 'full', label: game.i18n.localize('CRAWLSPACE.Upkeep.full'), icon: 'fa-solid fa-sun' },
@@ -105,6 +118,8 @@ export async function openUpkeep(actor: any) {
     ],
   })
   switch (action) {
+    case 'time':
+      return openTime()
     case 'short':
     case 'long':
     case 'full':

@@ -3,6 +3,8 @@
  * collects them into `actor.system.specials`; rolls, damage and the round tick read them here.
  */
 import { resolveFormulaTokens } from '../rules/core'
+import { durationSeconds } from '../rules/time'
+export { durationSeconds } from '../rules/time'
 
 export type Special = {
   type: string
@@ -85,24 +87,6 @@ export const capsMagicDamage = (actor: any, kind: DamageKind = 'spell') =>
 
 export const halvesAreaDamage = (actor: any) => specialsOf(actor, 'areaDamageHalf').length > 0
 
-/** effectDurations.ts parseEffectDuration, in seconds: `30 seconds`, `1 minute`, `2 rounds`. */
-export function durationSeconds(value: unknown): number | null {
-  const text = String(value ?? '').trim().toLowerCase().replace(/\.$/, '')
-  if (!text) return null
-  if (text === 'next round') return 10
-  const units: Record<string, number> = { d: 108000, day: 108000, days: 108000, h: 3600, hr: 3600, hrs: 3600, hour: 3600, hours: 3600, m: 60, min: 60, mins: 60, minute: 60, minutes: 60, s: 1, sec: 1, secs: 1, second: 1, seconds: 1, round: 10, rounds: 10 }
-  let seconds = 0
-  let found = false
-  const rest = text
-    .replace(/(\d+(?:\.\d+)?)\s*(days?|d|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s|rounds?)\b/g, (_match, amount: string, unit: string) => {
-      seconds += Number(amount) * units[unit]
-      found = true
-      return ''
-    })
-    .replace(/\band\b|[\s,]/g, '')
-  return found && !rest ? seconds : null
-}
-
 /** conditionEffects.ts regenAmount: a number, a stat code (its modifier), or a percentage of the maximum. */
 export function regenAmount(value: unknown, maximum: number, statMod: (code: string) => number) {
   const text = String(value ?? '').trim()
@@ -120,7 +104,7 @@ export const hasRegen = (actor: any) =>
  * Regen effects count in-game seconds (a round is 10). Given the seconds already counted per effect and the
  * seconds that just passed, returns the mana and health slots restored and the seconds to keep per effect.
  */
-export function regenAdvance(actor: any, elapsed: Record<string, number>, seconds: number) {
+export function regenAdvance(actor: any, elapsed: Record<string, number>, seconds: number, worldTime?: number) {
   const statMod = (code: string) => Number(actor.system.statMod?.(code)) || 0
   let mana = 0
   let slots = 0
@@ -131,7 +115,14 @@ export function regenAdvance(actor: any, elapsed: Record<string, number>, second
     const item = special.itemId ? actor.items.get(special.itemId) : null
     const fast = !!special.fastInterval && !!special.fastStat && !!item && (Number(item.system?.rank?.total) || 0) >= statMod(special.fastStat)
     const interval = Math.max(1, durationSeconds(fast ? special.fastInterval : special.interval) ?? 10)
-    const total = (elapsed[key] ?? 0) + seconds
+    const effect = item?.effects?.get(special.effectId) ?? actor.effects?.get(special.effectId)
+    const start = effect?.start?.time
+    const duration = effect?.duration?.seconds
+    // A two-minute regeneration effect cannot restore eight hours of resources during a long rest.
+    const activeSeconds = worldTime != null && Number.isFinite(start) && Number.isFinite(duration)
+      ? Math.max(0, Math.min(worldTime, start + duration) - Math.max(worldTime - seconds, start))
+      : seconds
+    const total = (elapsed[key] ?? 0) + activeSeconds
     const ticks = Math.floor(total / interval)
     next[key] = total - ticks * interval
     if (!ticks) continue

@@ -2,6 +2,7 @@
  * Crawler attacks: rows in `system.attacks`, plus automatic rows for equipped weapons, attack skills and
  * spells, and the unarmed strike. Every row resolves to the same AttackSource that rollAttack/rollDamage use.
  */
+import { itemCooldown, withCooldowns } from '../effects/cooldowns'
 import { penaltyModifiers, rollAttack, rollDamage, type AttackSource, type Modifier } from '../dice/rolls'
 import { resolveFormulaTokens } from '../rules/core'
 import { damageBonuses, piercesArmor, type DamageKind } from '../effects/specials'
@@ -170,7 +171,10 @@ export function displayFormula(actor: any, formula: string) {
 }
 
 export async function attackWithRow(actor: any, row: AttackRow, options: { fast?: boolean } = {}) {
-  return rollAttack(actor, resolveAttack(actor, row), options)
+  const source = actor.items.get(row.sourceId)
+  const skill = actor.items.get(row.skillId) ?? (source?.type === 'weapon' ? source.weaponSkill() : null)
+  const uses = [source, skill].filter((item) => item && ['skill', 'spell'].includes(item.type)).map(itemCooldown)
+  return withCooldowns(actor, uses, () => rollAttack(actor, resolveAttack(actor, row), options))
 }
 
 export async function damageWithRow(actor: any, row: AttackRow, tier: 'normal' | 'amazing' | 'critical') {

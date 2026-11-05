@@ -1,3 +1,4 @@
+import { expireActorEvent } from '../time'
 import { HEALTH_MAX } from '../config'
 import { applySlotDamage, dyingAfterHealthChange, type ConditionShield } from '../rules/core'
 import { debuffById } from '../rules/debuffs'
@@ -66,7 +67,7 @@ export class CrawlActor extends Actor {
   debuffStacks(statusId: string): number {
     let stacks = 0
     for (const effect of this.effects) {
-      if (!effect.disabled && effect.statuses.has(statusId)) stacks += Number(effect.system?.stacks) || 1
+      if (effect.active && effect.statuses.has(statusId)) stacks += Number(effect.system?.stacks) || 1
     }
     return stacks
   }
@@ -173,9 +174,9 @@ export class CrawlActor extends Actor {
   }
 
   /** Mana and health regeneration effects, for in-game seconds that passed (combat rounds or the clock). */
-  async regenerate(seconds: number) {
-    if (!(seconds > 0) || !hasRegen(this)) return
-    const result = regenAdvance(this, this.getFlag('crawlspace', 'regen') ?? {}, seconds)
+  async regenerate(seconds: number, prepared?: ReturnType<typeof regenAdvance>) {
+    if (!(seconds > 0) || (!prepared && !hasRegen(this))) return
+    const result = prepared ?? regenAdvance(this, this.getFlag('crawlspace', 'regen') ?? {}, seconds)
     const update: Record<string, unknown> = { 'flags.crawlspace.regen': result.elapsed }
     const mana = this.system.mana
     if (result.mana > 0 && mana && Number(mana.value) < Number(mana.max))
@@ -200,6 +201,7 @@ export class CrawlActor extends Actor {
       const healed = Math.floor((health - system.health.value) / 10)
       await this.update({ 'system.health.value': health, 'system.health.dyingCountdown': null })
       await this.#syncDying(before.health, health)
+      if (healed > 0) await expireActorEvent('healed', [this])
       return this.#postHealthCard(`${this.name} healed ${healed} health slot${healed === 1 ? '' : 's'}.`, before, options)
     }
     const before = { slotsLost: system.slotsLost }
@@ -278,7 +280,7 @@ export class CrawlActor extends Actor {
       ui.notifications.info(game.i18n.format('CRAWLSPACE.Info.Immune', { name: this.name, debuff: definition.name }))
       return
     }
-    const existing = this.effects.find((effect: any) => effect.statuses.has(statusId))
+    const existing = this.effects.find((effect: any) => effect.active && effect.statuses.has(statusId))
     if (existing && definition.stackable)
       return existing.update({ 'system.stacks': (Number(existing.system.stacks) || 1) + stacks })
     if (existing) return existing

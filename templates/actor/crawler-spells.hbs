@@ -38,7 +38,7 @@
     </div>
     <ol class="table-rows">
       {{#each inherent as |spell|}}
-      <li class="crawl-row {{#if spell.expanded}}expanded{{/if}} {{#if spell.missing}}missing{{/if}}" data-expand-key="{{spell.expandKey}}" {{#if spell.itemId}}data-item-id="{{spell.itemId}}"{{else}}data-inherent-name="{{spell.name}}" data-inherent-rank="{{spell.rank}}"{{/if}}
+      <li class="crawl-row {{#if spell.expanded}}expanded{{/if}} {{#if spell.missing}}missing{{/if}}" data-expand-key="{{spell.expandKey}}" {{#if spell.itemId}}data-item-id="{{spell.itemId}}"{{else}}data-inherent-key="{{spell.key}}" data-inherent-name="{{spell.name}}" data-inherent-rank="{{spell.rank}}"{{/if}}
           data-filter-row data-f-name="{{crawlLower spell.name}}" data-f-stat="{{spell.stat}}" data-f-check="{{spell.checkType}}">
         <div class="row-main">
           <img class="row-img" src="{{spell.img}}" alt="" data-action="{{#if spell.itemId}}useItem{{else}}castInherent{{/if}}" data-tooltip="{{localize 'CRAWLSPACE.Spell.CastInherent'}}">

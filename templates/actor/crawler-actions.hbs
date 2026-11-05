@@ -1,4 +1,14 @@
 <section class="tab actions {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  {{!-- Active native cooldown effects; deleting one resets it. --}}
+  {{#if cooldowns.length}}
+  <section class="crawl-table">
+    <div class="table-head plain-head"><span>{{localize "CRAWLSPACE.Time.Cooldowns"}}</span></div>
+    <ol class="table-rows">
+      {{#each cooldowns}}<li class="effect-row" data-effect-id="{{id}}"><span class="item-name">{{name}}</span><span data-cooldown-id="{{id}}">{{remaining}}</span>{{#if @root.editable}}<button type="button" data-action="deleteEffect">{{localize "CRAWLSPACE.Time.Reset"}}</button>{{/if}}</li>{{/each}}
+    </ol>
+  </section>
+  {{/if}}
+
   <section class="crawl-table hotlist-table" data-hotlist>
     <div class="table-head plain-head">
       <span class="head-name">{{localize "CRAWLSPACE.Section.Hotlist"}} <small>({{hotlist.length}}/{{system.hotlist.capacity}})</small></span>

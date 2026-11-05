@@ -1,0 +1,40 @@
+{{!-- Shared timers, GM clock controls, and crawlers participating in one time skip. --}}
+<div class="time-controls">
+  <p>{{localize "CRAWLSPACE.Time.Elapsed"}} <strong data-world-time>{{worldTime}}</strong> · {{#if running}}{{localize "CRAWLSPACE.Time.Running"}}{{else}}{{localize "CRAWLSPACE.Time.Stopped"}}{{/if}}</p>
+  <p class="hint">{{localize "CRAWLSPACE.Time.ClockHint"}}</p>
+  {{#if isGM}}<button type="button" data-action="clock">{{#if running}}{{localize "CRAWLSPACE.Time.Stop"}}{{else}}{{localize "CRAWLSPACE.Time.Start"}}{{/if}}</button>{{/if}}
+  {{#each timers}}
+  <section class="countdown {{#if floor}}floor-timer{{/if}} {{#if ended}}ended{{/if}}">
+    <strong>{{label}}{{#if floor}} · {{localize "CRAWLSPACE.Time.Floor"}}{{/if}}</strong>
+    <output data-timer="{{id}}">{{time}}</output>
+    {{#unless running}}<small>{{localize "CRAWLSPACE.Time.Stopped"}}</small>{{/unless}}
+    {{#if @root.isGM}}<div class="timer-actions"><button type="button" data-action="pause" data-id="{{id}}">{{#if running}}{{localize "CRAWLSPACE.Time.Stop"}}{{else}}{{localize "CRAWLSPACE.Time.Start"}}{{/if}}</button><button type="button" data-action="edit" data-id="{{id}}">{{localize "CRAWLSPACE.Time.Edit"}}</button><button type="button" data-action="remove" data-id="{{id}}">{{localize "CRAWLSPACE.Time.Remove"}}</button></div>{{/if}}
+  </section>
+  {{else}}<p>{{localize "CRAWLSPACE.Time.NoTimers"}}</p>{{/each}}
+  {{#if isGM}}
+  <fieldset>
+    <legend>{{localize "CRAWLSPACE.Time.Add"}}</legend>
+    <div class="form-group"><label>{{localize "CRAWLSPACE.Time.Label"}}</label><input type="text" name="label"></div>
+    {{> "systems/crawlspace/templates/dialogs/time-fields.hbs" days=1 hours=0 minutes=0 seconds=0}}
+    <label class="time-check"><input type="checkbox" name="floor"> {{localize "CRAWLSPACE.Time.Floor"}}</label>
+    <label class="time-check"><input type="checkbox" name="visible" checked> {{localize "CRAWLSPACE.Time.Visible"}}</label>
+    <button type="button" data-action="add">{{localize "CRAWLSPACE.Time.Add"}}</button>
+  </fieldset>
+  <fieldset>
+    <legend>{{localize "CRAWLSPACE.Time.Skip"}}</legend>
+    <p class="hint">{{localize "CRAWLSPACE.Time.SkipHint"}}</p>
+    <div class="form-group"><label>{{localize "CRAWLSPACE.Time.Activity"}}</label><select name="activity">
+      <option value="skip">{{localize "CRAWLSPACE.Time.Skip"}}</option>
+      <option value="short">{{localize "CRAWLSPACE.Time.Short"}}</option>
+      <option value="long">{{localize "CRAWLSPACE.Time.Long"}}</option>
+      <option value="full">{{localize "CRAWLSPACE.Time.Full"}}</option>
+      <option value="hourly">{{localize "CRAWLSPACE.Upkeep.hourly"}}</option>
+      <option value="grinding">{{localize "CRAWLSPACE.Time.Grinding"}}</option>
+      <option value="safeRoom">{{localize "CRAWLSPACE.Upkeep.safeRoom"}}</option>
+    </select></div>
+    <div class="form-group"><label>{{localize "CRAWLSPACE.Time.Hours"}}</label><input type="number" name="skipHours" min="0" max="30000" step="1" value="1"></div>
+    <div class="time-actors">{{#each actors}}<label class="time-check"><input type="checkbox" name="actor" value="{{id}}"> {{name}}</label>{{/each}}</div>
+    <button type="button" data-action="skip">{{localize "CRAWLSPACE.Time.Apply"}}</button>
+  </fieldset>
+  {{/if}}
+</div>

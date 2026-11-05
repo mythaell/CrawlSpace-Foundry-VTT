@@ -1,3 +1,4 @@
+import { cooldownFor, cooldownLabel } from '../effects/cooldowns'
 import { CHECK_TYPES, DAMAGE_TYPES, GEAR_SLOTS, STATS, STAT_KEYS } from '../config'
 import { DEBUFFS } from '../rules/debuffs'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage } from '../dice/rolls'
@@ -520,6 +521,10 @@ export class CrawlerSheet extends CrawlActorSheet {
             .filter(Boolean)
             .map((i: any) => this.itemRow(i)),
         )
+        context.cooldowns = actor.effects.filter((effect: any) => {
+          const key = effect.getFlag('crawlspace', 'cooldownKey')
+          return key && cooldownFor(actor, key) === effect
+        }).map((effect: any) => ({ id: effect.id, name: effect.name, remaining: cooldownLabel(effect) }))
         context.attacks = await this.#attackContext()
         context.actionGroups = await this.#actionContext()
         break
@@ -783,6 +788,7 @@ export class CrawlerSheet extends CrawlActorSheet {
     if (!row) return
     return castInherent(this.actor, row.dataset.inherentName as string, Number(row.dataset.inherentRank) || 1, {
       fast: event.shiftKey,
+      key: row.dataset.inherentKey,
       toChat: target.dataset.chat === 'true',
     })
   }

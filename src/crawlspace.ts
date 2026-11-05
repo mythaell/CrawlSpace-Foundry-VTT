@@ -1,3 +1,5 @@
+import { openTime, registerClock } from './apps/time'
+import { advanceTime, settleTime, registerTime } from './time'
 import * as config from './config'
 import { CrawlerData, MobData, NpcData } from './data/actors'
 import * as items from './data/items'
@@ -15,10 +17,12 @@ import { registerSocket } from './socket'
 import { registerChatHandlers } from './chat/cards'
 import { characterToActor } from './import/convert'
 import { fillActorDamage, fillDamageData } from './import/fill-damage'
-import { openUpkeep } from './apps/upkeep'
+import { openUpkeep, rest } from './apps/upkeep'
 
 const TEMPLATES = [
   'chat/card-footer',
+  'dialogs/time',
+  'dialogs/time-fields',
   'actor/crawler-sidebar',
   'actor/crawler-header',
   'actor/crawler-tabs',
@@ -66,6 +70,9 @@ Hooks.once('init', () => {
   CONFIG.CRAWLSPACE = config
   // A CrawlSpace round is 10 seconds of game time (regen effects count in it).
   CONFIG.time.roundTime = 10
+  CONFIG.time.turnTime = 0
+  CONFIG.time.worldCalendarConfig = foundry.utils.deepClone(CONFIG.time.worldCalendarConfig)
+  CONFIG.time.worldCalendarConfig.days.hoursPerDay = 30
 
   // Documents and data models.
   CONFIG.Actor.documentClass = CrawlActor
@@ -97,6 +104,7 @@ Hooks.once('init', () => {
   CONFIG.ActiveEffect.dataModels.base = createEffectDataModel()
   Object.assign(CONFIG.ActiveEffect.changeTypes, CHANGE_TYPE_HANDLERS)
   CONFIG.ActiveEffect.expiryEvents.cleanUp = 'CRAWLSPACE.Combat.CleanUpExpiry'
+  for (const event of ['safeRoom', 'longRest', 'leaveFloor', 'healed']) CONFIG.ActiveEffect.expiryEvents[event] = `CRAWLSPACE.Time.Event.${event}`
 
   // The 27 standard debuffs replace core's status list; "dead" stays for defeated tokens.
   const dead = CONFIG.statusEffects.find((status: any) => status.id === 'dead')
@@ -141,23 +149,14 @@ Hooks.once('init', () => {
   registerHandlebarsHelpers()
   foundry.applications.handlebars.loadTemplates(TEMPLATES)
   registerChatHandlers()
+  registerClock()
 
-  game.crawlspace = { config, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
+  game.crawlspace = { config, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
 })
 
 Hooks.once('ready', () => {
   registerSocket()
-})
-
-/**
- * Game time passing (combat rounds or the GM's clock) ticks mana and health regeneration. The active GM's
- * client does it once, for world actors and the unlinked tokens on the viewed scene.
- */
-Hooks.on('updateWorldTime', async (_worldTime: number, delta: number) => {
-  if (!game.user.isActiveGM || !(delta > 0)) return
-  const actors = new Set<any>(game.actors)
-  for (const token of canvas?.scene?.tokens ?? []) if (!token.actorLink && token.actor) actors.add(token.actor)
-  for (const actor of actors) await actor.regenerate?.(delta).catch?.((error: unknown) => console.error('CrawlSpace | regen', error))
+  registerTime()
 })
 
 /** Dragging an owned item to the hotbar makes a macro that uses it. */
@@ -178,6 +177,13 @@ async function createItemMacro(data: any, slot: number) {
 
 /** Actors directory gets an "Import CrawlSpace character" button. */
 Hooks.on('renderActorDirectory', (_app: any, html: HTMLElement) => {
+  if (!html.querySelector('.crawlspace-time')) {
+    const clock = document.createElement('button')
+    clock.className = 'crawlspace-time'
+    clock.innerText = game.i18n.localize('CRAWLSPACE.Time.Title')
+    clock.addEventListener('click', openTime)
+    html.querySelector('.header-actions')?.append(clock)
+  }
   if (!game.user.can('ACTOR_CREATE') || html.querySelector('.crawlspace-import')) return
   const button = document.createElement('button')
   button.type = 'button'

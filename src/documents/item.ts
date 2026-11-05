@@ -1,3 +1,5 @@
+import { effectDuration } from '../import/convert'
+import { itemCooldown, withCooldowns } from '../effects/cooldowns'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage, type Modifier } from '../dice/rolls'
 import { STATS, statKeyFromCode } from '../config'
 import { attackWithRow, rowForItem, withEffectBonuses } from '../actors/attacks'
@@ -78,7 +80,7 @@ export class CrawlItem extends Item {
     switch (this.type) {
       case 'skill':
       case 'spell':
-        return this.#useRanked(options)
+        return withCooldowns(actor, [itemCooldown(this)], () => this.#useRanked(options))
       case 'weapon':
         return this.#useWeapon(options)
       case 'consumable':
@@ -132,11 +134,14 @@ export class CrawlItem extends Item {
         { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, img: this.img, healing: true, targets: healTargets(this.actor) },
       )
     }
-    if (pay && !(await pay())) return null
-    if (system.checkType === 'Passive') return this.toMessage()
+    if (system.checkType === 'Passive') {
+      if (pay && !(await pay())) return null
+      return this.toMessage()
+    }
     return rollCheck(this.actor, {
       label: this.name,
       kind: 'check',
+      pay,
       modifiers: this.checkModifiers(),
       sources: [this.name],
       fast: options.fast,
@@ -173,6 +178,8 @@ export class CrawlItem extends Item {
         conditions.map((effect: any) => {
           const data = effect.toObject()
           delete data._id
+          delete data.start
+          data.duration = { ...data.duration, ...(effectDuration(data.system?.durationText) ? { expiry: null, ...effectDuration(data.system.durationText) } : {}), expired: false }
           return { ...data, transfer: true, disabled: false, origin: this.uuid }
         }),
       )

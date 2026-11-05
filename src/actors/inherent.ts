@@ -3,6 +3,7 @@
  * "Inherent Spell" rule, plus spell items whose usage is Inherent. Granted spells are looked up by name in
  * the world and in compendia, then cast as a temporary item at the granted Rank. They never cost mana.
  */
+import { withCooldowns } from '../effects/cooldowns'
 const cache = new Map<string, any>()
 
 export async function findSpellData(name: string) {
@@ -54,12 +55,12 @@ export async function inherentSpellRows(actor: any): Promise<InherentRow[]> {
       source: '',
     })
   }
-  for (const [index, special] of (actor.system.specials ?? []).entries()) {
+  for (const special of actor.system.specials ?? []) {
     if (special.type !== 'inherentSpell' || !String(special.target ?? '').trim()) continue
     const name = String(special.target).trim()
     const data = await findSpellData(name)
     rows.push({
-      key: `grant-${index}`,
+      key: `grant:${special.itemId ?? 'actor'}:${special.effectId}:${encodeURIComponent(name)}:${special.value}`,
       name: data?.name ?? name,
       img: data?.img ?? 'icons/svg/book.svg',
       rank: Number(special.value) || 1,
@@ -75,13 +76,17 @@ export async function inherentSpellRows(actor: any): Promise<InherentRow[]> {
 }
 
 /** Cast a granted spell: a temporary copy of the spell at the granted Rank, owned by the actor. */
-export async function castInherent(actor: any, name: string, rank: number, options: { fast?: boolean; toChat?: boolean } = {}) {
+export async function castInherent(actor: any, name: string, rank: number, options: { fast?: boolean; toChat?: boolean; key?: string } = {}) {
   const data = await findSpellData(name)
   if (!data) return ui.notifications.warn(game.i18n.format('CRAWLSPACE.Warn.SpellNotFound', { name }))
   const copy = foundry.utils.mergeObject(foundry.utils.deepClone(data), {
     _id: foundry.utils.randomID(),
-    system: { usage: 'inherent', rank: { value: rank, override: rank } },
+    system: { usage: 'inherent', cooldown: '', rank: { value: rank, override: rank } },
   })
   const item = new CONFIG.Item.documentClass(copy, { parent: actor })
-  return options.toChat ? item.toMessage() : item.use(options)
+  if (options.toChat) return item.toMessage()
+  const rows = await inherentSpellRows(actor)
+  const grant = options.key ? rows.find((row) => row.key === options.key) : rows.find((row) => row.name === name && row.rank === rank)
+  if (!grant) return null
+  return withCooldowns(actor, [{ key: grant.itemId ? `item:${grant.itemId}` : grant.key, name, duration: grant.cooldown, img: item.img }], () => item.use(options))
 }

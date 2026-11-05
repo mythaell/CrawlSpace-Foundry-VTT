@@ -1,4 +1,5 @@
 /** The CrawlSpace effect sheet: condition fields on one side, the shared rules editor for its changes. */
+import { effectDuration } from '../import/convert'
 import { bindRulesEditor, rulesContext, ruleTypeChoices } from '../effects/rules'
 import { documentIds } from './ids'
 
@@ -55,6 +56,11 @@ export class CrawlEffectSheet extends HandlebarsApplicationMixin(DocumentSheetV2
     if (typeof types === 'string') {
       data.system.cleanup.types = types.split(',').map((type: string) => type.trim()).filter(Boolean)
       delete data.system.cleanup.typesText
+    }
+    const durationText = data.system?.durationText
+    if (durationText !== undefined && durationText !== this.effect.system.durationText) {
+      data.duration = { value: null, units: 'seconds', expiry: null, ...effectDuration(durationText), expired: false }
+      if (this.effect.actor) data.start = foundry.documents.ActiveEffect.getEffectStart()
     }
     return data
   }

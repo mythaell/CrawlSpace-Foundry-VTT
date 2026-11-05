@@ -17,6 +17,8 @@ export type CheckOptions = {
   fast?: boolean
   flavor?: string
   flags?: Record<string, unknown>
+  /** Spend resources only after the check dialog is accepted. */
+  pay?: () => Promise<boolean>
   /** Attacked actors: their incomingAttackMode effects change an attack's mode. */
   targets?: any[]
 }
@@ -118,6 +120,7 @@ const messageMode = () => game.settings.get('core', 'messageMode')
 export async function rollCheck(actor: any, options: CheckOptions) {
   const result = await rollD20(actor, options)
   if (!result) return null
+  if (options.pay && !(await options.pay())) return null
   const { roll, mode } = result
   const outcome = options.difficulty != null ? outcomeFor(roll, options.difficulty) : null
   const flavor = await foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/chat/check.hbs', {

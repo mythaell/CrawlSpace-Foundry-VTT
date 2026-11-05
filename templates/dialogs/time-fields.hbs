@@ -1,0 +1,8 @@
+{{!-- Normalized time entry; days are thirty hours and each field accepts overflow. --}}
+<div class="time-fields">
+  <label>{{localize "CRAWLSPACE.Time.days"}}<input data-time-field type="number" name="days" min="0" step="1" value="{{days}}"></label>
+  <label>{{localize "CRAWLSPACE.Time.hours"}}<input data-time-field type="number" name="hours" min="0" step="1" value="{{hours}}"></label>
+  <label>{{localize "CRAWLSPACE.Time.minutes"}}<input data-time-field type="number" name="minutes" min="0" step="1" value="{{minutes}}"></label>
+  <label>{{localize "CRAWLSPACE.Time.seconds"}}<input data-time-field type="number" name="seconds" min="0" step="1" value="{{seconds}}"></label>
+</div>
+<p class="hint">{{localize "CRAWLSPACE.Time.OverflowHint"}}</p>

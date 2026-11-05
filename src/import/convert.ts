@@ -5,6 +5,7 @@
  */
 import { effectPropertiesToActiveEffects, type CrawlEffectProperty } from '../effects/mapping.ts'
 import { debuffByName } from '../rules/debuffs.ts'
+import { durationSeconds, durationEvent } from '../rules/time.ts'
 
 export type ContentRow = { id: number; content_type: string; name: string; data: Record<string, any> }
 export type Converted = { documentName: 'Item' | 'Actor' | 'JournalEntry' | 'ActiveEffect'; pack: string; data: Record<string, any> }
@@ -201,26 +202,12 @@ function useEffectConditions(data: Record<string, any>, img: string) {
 /*  Buffs / debuffs                                                    */
 /* ------------------------------------------------------------------ */
 
-/**
- * A CrawlSpace duration as Foundry effect duration data, so core expires the effect: `10 rounds` stays in
- * rounds, anything else (`1 minute`, `30 seconds`) becomes seconds of game time. Unparsed text gives none.
- */
-export function effectDuration(text: unknown): { value: number; units: string } | null {
-  const value = str(text).trim().toLowerCase().replace(/\.$/, '').replace(/^(?:for |lasts )/, '')
-  if (!value) return null
-  const rounds = /^(\d+)\s*rounds?$/.exec(value)
-  if (rounds) return { value: Number(rounds[1]), units: 'rounds' }
-  const units: Record<string, number> = { d: 86400, day: 86400, days: 86400, h: 3600, hr: 3600, hrs: 3600, hour: 3600, hours: 3600, m: 60, min: 60, mins: 60, minute: 60, minutes: 60, s: 1, sec: 1, secs: 1, second: 1, seconds: 1, round: 10, rounds: 10 }
-  let seconds = 0
-  let found = false
-  const rest = value
-    .replace(/(\d+(?:\.\d+)?)\s*(days?|d|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s|rounds?)\b/g, (_match: string, amount: string, unit: string) => {
-      seconds += Number(amount) * units[unit]
-      found = true
-      return ''
-    })
-    .replace(/\band\b|[\s,]/g, '')
-  return found && !rest && seconds > 0 ? { value: Math.round(seconds), units: 'seconds' } : null
+/** Native durations count game seconds in and out of combat; conditional events use core expiry. */
+export function effectDuration(text: unknown): { value: number | null; units: string; expiry?: string } | null {
+  const seconds = durationSeconds(text)
+  if (seconds !== null && seconds > 0) return { value: seconds, units: 'seconds' }
+  const expiry = durationEvent(text)
+  return expiry ? { value: null, units: 'seconds', expiry } : null
 }
 
 export function buffToEffect(data: Record<string, any>, img = ICONS.buff) {

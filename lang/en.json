@@ -431,7 +431,8 @@
       "Level": "Reached level {level}.",
       "PointsWaiting": "{points} stat points waiting to be assigned.",
       "NoPoints": "No stat points to assign.",
-      "FloorThree": "Stat points can be assigned from floor 3."
+      "FloorThree": "Stat points can be assigned from floor 3.",
+      "hourly": "Calm hourly recovery"
     },
     "Import": {
       "Character": "Import CrawlSpace character",
@@ -581,6 +582,57 @@
       "Enhanced": "Enhanced",
       "EnhancedHint": "Rank after effects",
       "AddFromDatabase": "Add from database (opens the compendium)"
+    },
+    "Time": {
+      "Title": "Time & Timers",
+      "Elapsed": "Elapsed (days:hours:minutes:seconds)",
+      "Running": "Clock running",
+      "Stopped": "Paused",
+      "ClockHint": "30-hour days. Exploration runs in real time when enabled. Foundry pause stops the clock; combat advances 10 seconds per round.",
+      "Start": "Start",
+      "Stop": "Pause",
+      "Floor": "Floor collapse",
+      "Remove": "Remove",
+      "NoTimers": "No countdowns yet.",
+      "Add": "Add countdown",
+      "Label": "Name",
+      "Duration": "Duration (for example: 2 days 3 hours)",
+      "Visible": "Show to players",
+      "Skip": "Skip time",
+      "SkipHint": "Advance time once for everyone. Select crawlers for recovery or safe-room advancement. Short, long, and full rests use fixed lengths; other activities use the hours below. Grinding here advances time only.",
+      "Activity": "Activity",
+      "Short": "Short rest · 2 hours",
+      "Long": "Long rest · 8 hours",
+      "Full": "Full rest · 30 hours",
+      "Grinding": "Grinding time",
+      "Hours": "Hours (other activities)",
+      "Apply": "Apply time skip",
+      "GMOnly": "The GM advances shared time. Ask the GM to include your crawler in Time & Timers.",
+      "InvalidDuration": "Enter a valid duration or whole number of hours.",
+      "Busy": "A time skip is already in progress.",
+      "InCombat": "End combat before resting or skipping hours. Advance combat rounds in the tracker.",
+      "SelectActors": "Select the crawlers participating in this activity.",
+      "Skipped": "Advanced game time by {time}.",
+      "Finished": "{name}: time has run out!",
+      "OnCooldown": "{name} is on cooldown: {remaining}.",
+      "CooldownName": "Cooldown: {name}",
+      "Cooldowns": "Active cooldowns",
+      "Reset": "Reset",
+      "Event": {
+        "safeRoom": "Enter a safe room",
+        "longRest": "Complete a long rest",
+        "leaveFloor": "Leave this floor",
+        "healed": "Heal at least one health slot"
+      },
+      "days": "Days",
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "seconds": "Seconds",
+      "Edit": "Adjust time",
+      "Save": "Set timer",
+      "SetFloor": "Set floor-collapse timer",
+      "FloorPrompt": "Set the remaining time before this floor collapses. A dungeon day lasts 30 hours.",
+      "OverflowHint": "Overflow is converted automatically: 90 minutes becomes 1 hour 30 minutes; 30 hours becomes 1 day."
     }
   }
 }

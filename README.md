@@ -37,3 +37,13 @@ npm run link          # junction into %LOCALAPPDATA%/FoundryVTT/Data
 ## Not done yet
 
 Shield Block / Blade Clap defenses, pets and mounts, the loot generator, character builders, reference tables as RollTables, inherent spells, light orbs and minions (stored as specials only).
+
+## Time and timers
+
+The GM is prompted to set the floor-collapse countdown when the world has none. The floor clock and visible secondary countdowns stay on screen; click them, or choose **Time & Timers** in the Actors directory or Upkeep, to open the controls. Timer entry accepts overflowing fields: 90 minutes becomes 1 hour 30 minutes, and 30 hours becomes 1 day. Individual countdowns can be paused, adjusted, or removed.
+
+**Start** enables real-time exploration while a GM is connected. Foundry's pause stops it, and active combat uses the tracker instead: one complete five-phase round advances ten seconds. The clock does not charge disconnected time. Time skips advance Foundry's world clock once for the whole party, so cooldowns, effects, regeneration and countdowns share the same elapsed time. Select participating crawlers for recovery: short rests take 2 hours, long rests 8 hours, and full rests 30 hours. Safe-room visits can include an explicit stay; grinding advances elapsed time only, without awarding grinding progress or ranks.
+
+Cooldowns begin only after a completed skill/spell use, including weapon-linked skills and inherent grants. Active cooldowns appear on the Actions tab and can be reset there. Conditional durations such as safe-room entry, long rest, leaving a floor, healing and combat end use Foundry effect expiry; unsupported conditional prose remains manual. Editing an effect's duration text starts its newly entered duration. Existing embedded item copies retain their data; consuming a potion resolves its duration text using the corrected time rules.
+
+`tests/foundry-time.mjs` exports integration checks intended only for the isolated Foundry copy on port 30001. They create disposable documents, verify time behavior, and remove their own documents and chat messages afterward. Never run them in a live campaign.

@@ -713,7 +713,7 @@
      CrawlSpace HUD theme: every system sheet uses the blue holographic
      frame, Quantico type and light input fields from CrawlSpace.
      ========================================================= */
-  .application.crawlspace {
+  .application.crawlspace, #crawlspace-timers.crawlspace {
     --dcc-navy: #17384f;
     --dcc-navy-dark: #102c3f;
     --dcc-blue-dark: #245a78;
@@ -2467,4 +2467,35 @@
   .crawl-footer button:disabled {
     opacity: 0.4;
   }
+}
+
+@layer system {
+  .application.crawlspace.time-panel .time-controls { display: grid; gap: 10px; padding: 12px; }
+  .application.crawlspace.time-panel .countdown { border: 1px solid var(--crawl-border); padding: 10px; display: grid; gap: 6px; }
+  .application.crawlspace.time-panel .floor-timer { border-color: var(--hud-cyan); }
+  .application.crawlspace.time-panel output { font-size: 24px; font-variant-numeric: tabular-nums; color: var(--hud-cyan); }
+  .application.crawlspace.time-panel .ended output { font-weight: bold; }
+  .application.crawlspace.time-panel fieldset { display: grid; gap: 8px; }
+  .application.crawlspace.time-panel .time-actors { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+}
+
+@layer system {
+  .crawlspace .time-fields { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .crawlspace .time-fields label { display: grid; gap: 4px; }
+  #crawlspace-timers.crawlspace { position: fixed; top: 70px; left: 115px; z-index: 30; display: grid; gap: 4px; max-width: min(520px, 45vw); pointer-events: auto; }
+  #crawlspace-timers.crawlspace button { display: grid; gap: 3px; padding: 7px 12px; height: auto; background: var(--btn-bg); border: 1px solid var(--crawl-border); color: var(--color-text-light-highlight); }
+  #crawlspace-timers.crawlspace .floor-timer { border-color: var(--hud-cyan); }
+  #crawlspace-timers.crawlspace span { font-variant-numeric: tabular-nums; font-size: 13px; }
+}
+
+@layer system {
+  .application.crawlspace.time-panel .time-controls { overflow-y: auto; }
+  .application.crawlspace.time-panel .time-check { display: flex; align-items: center; gap: 8px; }
+  .application.crawlspace.time-panel .time-check input { flex: 0 0 auto; }
+  .application.crawlspace.time-panel output { font-size: 18px; }
+}
+
+@layer system {
+  .application.crawlspace.time-panel .timer-actions { display: flex; gap: 6px; }
+  .application.crawlspace.time-panel .timer-actions > button { flex: 1 1 0; width: auto; min-width: 0; white-space: nowrap; }
 }

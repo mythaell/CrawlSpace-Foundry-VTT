@@ -1,3 +1,4 @@
+import { expireActorEvent, expireCombatConditions, settleTime } from '../time'
 import { COMBAT_PHASES } from '../config'
 import { attackOutcome, outcomeLabel, resolveFormulaTokens, SUCCESS_OUTCOMES } from '../rules/core'
 import { debuffById } from '../rules/debuffs'
@@ -47,6 +48,12 @@ export function combatantSide(combatant: any): 'crawler' | 'mob' {
  * and a phase ends when every combatant on its side has finished.
  */
 export class CrawlCombat extends Combat {
+  /** Ending an encounter also clears conditions with an earlier-of-combat-or-time duration. */
+  async _preDelete(options: any, user: any) {
+    if ((await super._preDelete(options, user)) === false) return false
+    if (this.started) await expireCombatConditions([...this.combatants].map((combatant: any) => combatant.actor).filter(Boolean))
+  }
+
   get crawl(): CrawlFlags {
     const flags = this.flags?.crawlspace ?? {}
     return { phase: Number(flags.phase) || 0, done: flags.done ?? [], declarations: flags.declarations ?? [] }
@@ -94,6 +101,7 @@ export class CrawlCombat extends Combat {
   async nextRound() {
     await this.update({ 'flags.crawlspace.phase': 0, 'flags.crawlspace.done': [] }, { render: false })
     const result = await super.nextRound()
+    await settleTime()
     await this.#announcePhase()
     return result
   }
@@ -318,6 +326,7 @@ export class CrawlCombat extends Combat {
         if (countdown <= 0) await actor.update({ 'system.health.value': 0 })
       }
     }
+    await expireActorEvent('cleanUp', [...this.combatants].map((combatant: any) => combatant.actor).filter(Boolean))
   }
 }
 
