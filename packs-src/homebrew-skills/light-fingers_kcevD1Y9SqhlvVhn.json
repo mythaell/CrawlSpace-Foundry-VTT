@@ -1,0 +1,60 @@
+{
+  "_id": "kcevD1Y9SqhlvVhn",
+  "name": "Light Fingers",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>Your hands finish their work while attention is still somewhere else.</p><p>Opposed by INT. Conceal or manipulate hand-sized objects, excluding other inventories or hotlists. Disadvantage against an observer with a higher Sharp Senses Rank.</p>",
+    "notes": "",
+    "stat": "DEX",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Opposed",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "May pick NPC and Mob pockets.",
+      "rank10": "May plant an item on a target with pockets or similar storage.",
+      "rank15": "May manipulate objects up to half your size, rounded down.",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 210,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-210",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!kcevD1Y9SqhlvVhn"
+}

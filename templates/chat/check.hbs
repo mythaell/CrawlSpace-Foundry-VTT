@@ -1,0 +1,7 @@
+<div class="crawl-card check">
+  <h4 class="card-title">{{label}}{{#if mode}} <span class="roll-mode">{{mode}}</span>{{/if}}</h4>
+  {{#if flavor}}<p class="card-flavor">{{flavor}}</p>{{/if}}
+  {{#if outcome}}
+  <p class="outcome {{#if success}}success{{else}}failure{{/if}}">{{outcome}}{{#if difficulty}} <small>(DC {{difficulty}})</small>{{/if}}</p>
+  {{/if}}
+</div>

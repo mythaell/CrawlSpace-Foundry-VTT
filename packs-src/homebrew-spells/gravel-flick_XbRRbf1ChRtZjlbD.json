@@ -1,0 +1,66 @@
+{
+  "_id": "XbRRbf1ChRtZjlbD",
+  "name": "Gravel Flick",
+  "type": "spell",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "description": "<p>Spell attack against Evade. AI Favor 2. Must be in your hotlist to cast in combat.</p>",
+    "notes": "",
+    "stat": "INT",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Attack",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "1d2+INT",
+      "types": [
+        "Bludgeoning"
+      ],
+      "armorPiercing": false,
+      "magic": true
+    },
+    "upgrades": {
+      "rank5": "Add 2d2 base damage.",
+      "rank10": "Add 1d2 base damage. The target gains Woozy.",
+      "rank15": "Add 1d2 base damage. Also add one Rank damage die.",
+      "rank5Damage": "3d2+INT",
+      "rank10Damage": "4d2+INT",
+      "rank15Damage": "5d2+RANK_DIE+INT"
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 178,
+      "book": "",
+      "pages": ""
+    },
+    "mana": "1",
+    "range": "100 feet",
+    "duration": "",
+    "usage": "learned"
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-178",
+      "contentType": "spell"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!XbRRbf1ChRtZjlbD"
+}

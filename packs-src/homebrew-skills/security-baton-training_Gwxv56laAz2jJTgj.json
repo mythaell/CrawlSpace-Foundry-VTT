@@ -1,0 +1,62 @@
+{
+  "_id": "Gwxv56laAz2jJTgj",
+  "name": "Security Baton Training",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>MY EDIT</p>",
+    "notes": "",
+    "stat": "STR",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Attack",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": true,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "1d6+STR",
+      "types": [
+        "Bludgeoning"
+      ],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Add 1d6 base damage.",
+      "rank10": "Add 1d6 base damage. The target gains Woozy.",
+      "rank15": "Add 1d6 base damage. If the target loses at least 3 HB slots, it also gains Take Down.",
+      "rank5Damage": "2d6+STR",
+      "rank10Damage": "3d6+STR",
+      "rank15Damage": "4d6+STR"
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 1071,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-1071",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!Gwxv56laAz2jJTgj"
+}

@@ -1,0 +1,103 @@
+{
+  "_id": "SURwHx3xsG6Etx0t",
+  "name": "Walking Staff Training",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>Attack against Evade. Requires two hands.</p>",
+    "notes": "",
+    "stat": "STR",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Attack",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "1d6+STR",
+      "types": [
+        "Bludgeoning"
+      ],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Add 1d6 base damage.",
+      "rank10": "Add 1d6 base damage. Gain another +1 Evade.",
+      "rank15": "Add 1d6 base damage. Gain another +1 Evade.",
+      "rank5Damage": "2d6+STR",
+      "rank10Damage": "3d6+STR",
+      "rank15Damage": "4d6+STR"
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 168,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [
+    {
+      "_id": "RXkuzxFAZDG0XjRm",
+      "name": "Walking Staff Training (Rank 10)",
+      "img": "icons/svg/book.svg",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "system": {
+        "changes": [
+          {
+            "key": "system.evade.bonus",
+            "type": "add",
+            "value": 1,
+            "phase": "initial"
+          }
+        ],
+        "requiredRank": 10
+      },
+      "_key": "!items.effects!SURwHx3xsG6Etx0t.RXkuzxFAZDG0XjRm"
+    },
+    {
+      "_id": "5Pxv59tPNxMZ5N8R",
+      "name": "Walking Staff Training (Rank 15)",
+      "img": "icons/svg/book.svg",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "system": {
+        "changes": [
+          {
+            "key": "system.evade.bonus",
+            "type": "add",
+            "value": 1,
+            "phase": "initial"
+          }
+        ],
+        "requiredRank": 15
+      },
+      "_key": "!items.effects!SURwHx3xsG6Etx0t.5Pxv59tPNxMZ5N8R"
+    }
+  ],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-168",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!SURwHx3xsG6Etx0t"
+}

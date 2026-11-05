@@ -1,0 +1,51 @@
+{
+  "_id": "9X2CJhAaNZZatR7N",
+  "name": "Survey Spear",
+  "type": "weapon",
+  "img": "icons/svg/sword.svg",
+  "system": {
+    "description": "<p>A practical weapon designed for ranged use. Requires one hand.</p>",
+    "notes": "",
+    "quantity": 1,
+    "equipped": false,
+    "tags": [],
+    "weaponType": "ranged",
+    "hands": "",
+    "twoHanded": false,
+    "skill": "Survey Spear Training",
+    "ammunition": "",
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "armorDr": 0,
+    "source": {
+      "database": "homebrew",
+      "id": 161,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-161",
+      "contentType": "weapon"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!9X2CJhAaNZZatR7N",
+  "folder": "oqIYXkDXiDsm9Hso"
+}

@@ -1,0 +1,43 @@
+<section class="tab effects {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  {{#if editable}}
+  <div class="add-debuff">
+    <select data-debuff-select>
+      {{#each debuffChoices}}<option value="{{id}}">{{name}}</option>{{/each}}
+    </select>
+    <button type="button" data-action="addDebuff"><i class="fa-solid fa-skull-crossbones"></i> {{localize "CRAWLSPACE.Effect.AddDebuff"}}</button>
+  </div>
+  {{/if}}
+
+  {{#*inline "effectRow"}}
+  <li class="effect-row draggable {{#if effect.disabled}}disabled{{/if}} {{#if effect.suppressed}}suppressed{{/if}}" data-effect-id="{{effect.id}}" {{#if effect.itemId}}data-item-id="{{effect.itemId}}"{{/if}}>
+    <img class="item-img" src="{{effect.img}}" alt="">
+    <a class="item-name" data-action="editEffect">{{effect.name}}{{#if effect.source}} <small>({{effect.source}})</small>{{/if}}</a>
+    {{#if effect.stackable}}
+      <span class="col stacks">
+        <a data-action="stackEffect" data-delta="-1"><i class="fa-solid fa-minus"></i></a> {{effect.stacks}} <a data-action="stackEffect" data-delta="1"><i class="fa-solid fa-plus"></i></a>
+      </span>
+    {{/if}}
+    <span class="col duration">{{effect.duration}}</span>
+    <span class="item-controls">
+      {{#unless effect.itemId}}<a data-action="toggleEffect" data-tooltip="{{localize (ifThen effect.disabled 'CRAWLSPACE.Effect.Enable' 'CRAWLSPACE.Effect.Disable')}}"><i class="fa-solid {{#if effect.disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}"></i></a>{{/unless}}
+      <a data-action="editEffect"><i class="fa-solid fa-pen-to-square"></i></a>
+      {{#unless effect.itemId}}<a data-action="deleteEffect"><i class="fa-solid fa-trash"></i></a>{{/unless}}
+    </span>
+  </li>
+  {{/inline}}
+
+  <div class="list-header">
+    <span class="item-name">{{localize "CRAWLSPACE.Effect.Debuffs"}}</span>
+    <span class="item-controls">{{#if editable}}<a data-action="createEffect" data-kind="debuff"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
+  </div>
+  <ol class="item-list">{{#each effects.conditions as |effect|}}{{> effectRow effect=effect}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Debuffs"}}</li>{{/each}}</ol>
+
+  <div class="list-header">
+    <span class="item-name">{{localize "CRAWLSPACE.Effect.Buffs"}}</span>
+    <span class="item-controls">{{#if editable}}<a data-action="createEffect" data-kind="buff"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
+  </div>
+  <ol class="item-list">{{#each effects.buffs as |effect|}}{{> effectRow effect=effect}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Buffs"}}</li>{{/each}}</ol>
+
+  <div class="list-header"><span class="item-name">{{localize "CRAWLSPACE.Effect.FromItems"}}</span></div>
+  <ol class="item-list">{{#each effects.fromItems as |effect|}}{{> effectRow effect=effect}}{{else}}<li class="empty">—</li>{{/each}}</ol>
+</section>

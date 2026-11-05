@@ -1,0 +1,62 @@
+{
+  "_id": "Rtk0lDey3b0bT590",
+  "name": "Shoulder Charger",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>Attack against Evade. Lose 1 HB slot on a successful attack. May use Bone Rattle. AI Favor 1 without a damage-effect skill.</p>",
+    "notes": "",
+    "stat": "STR",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Attack",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "1d4+CON",
+      "types": [
+        "Bludgeoning"
+      ],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Add 1d4 base damage. No longer lose an HB slot on a successful attack.",
+      "rank10": "Add 1d4 base damage. Also add one Rank damage die.",
+      "rank15": "Add 1d4 base damage. The target gains Woozy.",
+      "rank5Damage": "2d4+CON",
+      "rank10Damage": "3d4+RANK_DIE+CON",
+      "rank15Damage": "4d4+RANK_DIE+CON"
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 174,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-174",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!Rtk0lDey3b0bT590"
+}

@@ -1,0 +1,62 @@
+{
+  "_id": "ZPzbVnI7vXaQrRxZ",
+  "name": "Compact Crossbow Training",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>Attack against Evade. Requires two hands and ammunition; attack once per round.</p>",
+    "notes": "",
+    "stat": "DEX",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Attack",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "1d8",
+      "types": [
+        "Piercing"
+      ],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Add 1d8 base damage.",
+      "rank10": "Add 1d8 base damage. The target gains Blood Trail.",
+      "rank15": "Add 1d8 base damage. Range becomes 100 feet.",
+      "rank5Damage": "2d8",
+      "rank10Damage": "3d8",
+      "rank15Damage": "4d8"
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 154,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-154",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!ZPzbVnI7vXaQrRxZ"
+}

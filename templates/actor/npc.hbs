@@ -1,0 +1,39 @@
+<div class="npc-body">
+  <header class="crawl-header">
+    <img class="profile" src="{{document.img}}" alt="{{document.name}}" data-action="editImage" data-edit="img">
+    <div class="identity">
+      <input class="crawler-name" type="text" name="name" value="{{document.name}}">
+      <div class="identity-grid">
+        <label>{{localize "CRAWLSPACE.Npc.Job"}}<input type="text" name="system.job" value="{{systemSource.job}}"></label>
+        <label>{{localize "CRAWLSPACE.Crawler.Race"}}<input type="text" name="system.race" value="{{systemSource.race}}"></label>
+        <label>{{localize "CRAWLSPACE.Crawler.Floor"}}<input type="number" name="system.floor" value="{{systemSource.floor}}"></label>
+      </div>
+    </div>
+  </header>
+
+  <div class="npc-statblock">
+    {{#if statBlock}}
+      <a data-action="openStatBlock"><i class="fa-solid fa-skull"></i> {{localize "CRAWLSPACE.Npc.StatBlock"}}: {{statBlock.name}}</a>
+    {{else}}
+      <p class="hint">{{localize "CRAWLSPACE.Npc.DropMob"}}</p>
+    {{/if}}
+  </div>
+
+  <table class="stats">
+    <thead><tr><th></th><th>{{localize "CRAWLSPACE.Stat.Base"}}</th><th>{{localize "CRAWLSPACE.Stat.Mod"}}</th></tr></thead>
+    <tbody>
+      {{#each stats as |stat|}}
+      <tr>
+        <th><a class="rollable" data-action="rollStat" data-stat="{{stat.key}}">{{stat.label}}</a></th>
+        <td><input type="number" name="system.attributes.{{stat.key}}.value" value="{{crawlNumberOrBlank stat.source.value}}"></td>
+        <td class="derived-value mod">{{crawlSigned stat.mod}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <h3>{{localize "CRAWLSPACE.Item.Description"}}</h3>
+  {{#if editable}}<prose-mirror name="system.description" value="{{systemSource.description}}" toggled>{{{enriched.description}}}</prose-mirror>{{else}}{{{enriched.description}}}{{/if}}
+  <h3>{{localize "CRAWLSPACE.Crawler.Notes"}}</h3>
+  {{#if editable}}<prose-mirror name="system.notes" value="{{systemSource.notes}}" toggled>{{{enriched.notes}}}</prose-mirror>{{else}}{{{enriched.notes}}}{{/if}}
+</div>

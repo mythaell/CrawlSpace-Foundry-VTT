@@ -1,0 +1,35 @@
+<div class="crawl-card declaration">
+  <h4 class="card-title"><i class="fa-solid fa-skull"></i> {{declaration.mobName}}: {{declaration.attack.name}}</h4>
+  <p class="damage-tags">
+    <span class="tag">{{localize "CRAWLSPACE.Mob.ToHitShort"}} {{toHit}}</span>
+    {{#if declaration.attack.damage}}<span class="tag">{{declaration.attack.damage}}</span>{{/if}}
+    {{#if declaration.attack.damageTypes.length}}<span class="tag">{{crawlJoin declaration.attack.damageTypes}}</span>{{/if}}
+    {{#if declaration.attack.isArea}}<span class="tag">{{localize "CRAWLSPACE.Combat.Area"}}</span>{{/if}}
+    {{#if declaration.attack.armorPiercing}}<span class="tag">{{localize "CRAWLSPACE.Item.ArmorPiercing"}}</span>{{/if}}
+  </p>
+  {{#if declaration.attack.notes}}<p class="hint">{{declaration.attack.notes}}</p>{{/if}}
+  <ul class="declaration-targets">
+    {{#each targets as |target|}}
+    <li>
+      <span class="target-name">{{target.name}}</span>
+      {{#if target.response}}
+        <span class="outcome {{#if target.response.hit}}failure{{else}}success{{/if}}">
+          {{#if (eq target.response.kind "tank")}}{{localize "CRAWLSPACE.Combat.Tanked"}}{{else}}{{localize "CRAWLSPACE.Combat.Evaded" total=target.response.total}} · {{target.response.outcome}}{{/if}}
+          {{#if target.halfNote}} ({{localize "CRAWLSPACE.Combat.Half"}}){{/if}}
+        </span>
+        {{#if target.failedDebuff}}<button type="button" data-crawl-action="apply-debuff" data-debuff="{{target.failedDebuff}}" data-target="{{target.actorUuid}}">{{target.failedDebuff}}</button>{{/if}}
+      {{else}}
+        <span class="defend-buttons">
+          <button type="button" data-crawl-action="defend" data-actor="{{target.actorUuid}}" data-target="{{target.combatantId}}" data-kind="evade"><i class="fa-solid fa-person-running"></i> {{localize "CRAWLSPACE.Combat.Evade"}}</button>
+          <button type="button" data-crawl-action="defend" data-actor="{{target.actorUuid}}" data-target="{{target.combatantId}}" data-kind="tank"><i class="fa-solid fa-shield"></i> {{localize "CRAWLSPACE.Combat.Tank"}}</button>
+        </span>
+      {{/if}}
+    </li>
+    {{/each}}
+  </ul>
+  {{#unless declaration.damageRolled}}
+  <div class="card-buttons">
+    <button type="button" data-crawl-action="declaration-damage" data-tooltip="{{localize 'CRAWLSPACE.Combat.ResolveHint'}}"><i class="fa-solid fa-burst"></i> {{localize "CRAWLSPACE.Combat.ResolveDamage"}}</button>
+  </div>
+  {{/unless}}
+</div>

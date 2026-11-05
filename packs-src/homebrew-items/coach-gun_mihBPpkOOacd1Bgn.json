@@ -1,0 +1,51 @@
+{
+  "_id": "mihBPpkOOacd1Bgn",
+  "name": "Coach Gun",
+  "type": "weapon",
+  "img": "icons/svg/sword.svg",
+  "system": {
+    "description": "<p>A practical weapon designed for ranged use. Requires two hands.</p>",
+    "notes": "",
+    "quantity": 1,
+    "equipped": false,
+    "tags": [],
+    "weaponType": "ranged",
+    "hands": "",
+    "twoHanded": true,
+    "skill": "Coach Gun Training",
+    "ammunition": "",
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "armorDr": 0,
+    "source": {
+      "database": "homebrew",
+      "id": 159,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-159",
+      "contentType": "weapon"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!mihBPpkOOacd1Bgn",
+  "folder": "oqIYXkDXiDsm9Hso"
+}

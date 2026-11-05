@@ -1,0 +1,60 @@
+{
+  "_id": "jtozB3fO7Tq1L5Cs",
+  "name": "Field Dressing",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>You steady a wounded companion and make the most of a brief chance to help.</p><p>Restore 1 HB slot plus one per higher success tier. Once per rest per patient.</p>",
+    "notes": "",
+    "stat": "INT",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Unopposed",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Spend five minutes to remove a Minor Injury.",
+      "rank10": "Spending 10 minutes also removes a Long-Term Minor Injury.",
+      "rank15": "Heal one additional HB slot; spending 15 minutes also removes a Major Injury.",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 208,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-208",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!jtozB3fO7Tq1L5Cs"
+}

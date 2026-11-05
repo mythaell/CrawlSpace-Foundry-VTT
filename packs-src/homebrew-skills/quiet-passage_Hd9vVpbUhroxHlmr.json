@@ -1,0 +1,60 @@
+{
+  "_id": "Hd9vVpbUhroxHlmr",
+  "name": "Quiet Passage",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>You move through a watched space without becoming its most interesting feature.</p><p>Opposed by INT. Start out of sight. Success grants a non-attack Action before surprise; outside combat, may Move and Step.</p>",
+    "notes": "",
+    "stat": "DEX",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Opposed",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "May make a surprise attack with Advantage.",
+      "rank10": "Other party crawlers using this skill untrained no longer suffer Disadvantage.",
+      "rank15": "On a successful Surprise check, may also Move and Step; a Surprise attack doubles its base damage dice.",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 202,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-202",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!Hd9vVpbUhroxHlmr"
+}

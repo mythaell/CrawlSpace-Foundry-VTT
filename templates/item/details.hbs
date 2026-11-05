@@ -1,0 +1,128 @@
+<section class="tab details {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <div class="details-grid">
+  {{#if isRanked}}
+    <label>{{localize "CRAWLSPACE.Item.Stat"}}<select name="system.stat">{{selectOptions statChoices selected=systemSource.stat}}</select></label>
+    <label>{{localize "CRAWLSPACE.Item.Rank"}}<input type="number" name="system.rank.value" value="{{systemSource.rank.value}}" min="0"></label>
+    <label>{{localize "CRAWLSPACE.Item.RankOverride"}}<input type="number" name="system.rank.override" value="{{crawlNumberOrBlank systemSource.rank.override}}" placeholder="—"></label>
+    <label>{{localize "CRAWLSPACE.Item.ModOverride"}}<input type="number" name="system.rank.modOverride" value="{{crawlNumberOrBlank systemSource.rank.modOverride}}" placeholder="—"></label>
+    <label>{{localize "CRAWLSPACE.Item.CheckType"}}<select name="system.checkType">{{selectOptions checkTypes selected=systemSource.checkType}}</select></label>
+    <label>{{localize "CRAWLSPACE.Item.Cooldown"}}<input type="text" name="system.cooldown" value="{{systemSource.cooldown}}"></label>
+    {{#if (eq type "spell")}}
+    <label>{{localize "CRAWLSPACE.Stat.Mana"}}<input type="text" name="system.mana" value="{{systemSource.mana}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Range"}}<input type="text" name="system.range" value="{{systemSource.range}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Duration"}}<input type="text" name="system.duration" value="{{systemSource.duration}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Usage"}}<select name="system.usage">{{selectOptions usageChoices selected=systemSource.usage localize=true}}</select></label>
+    {{/if}}
+    <label class="check"><input type="checkbox" name="system.isAttack" {{checked systemSource.isAttack}}> {{localize "CRAWLSPACE.Item.IsAttack"}}</label>
+    <label class="check"><input type="checkbox" name="system.marked" {{checked systemSource.marked}}> {{localize "CRAWLSPACE.Item.Marked"}}</label>
+  {{/if}}
+
+  {{#if (eq type "weapon")}}
+    <label>{{localize "CRAWLSPACE.Item.WeaponType"}}<select name="system.weaponType">{{selectOptions weaponTypeChoices selected=systemSource.weaponType localize=true}}</select></label>
+    <label>{{localize "CRAWLSPACE.Item.Skill"}}<input type="text" name="system.skill" value="{{systemSource.skill}}" placeholder="{{localize 'CRAWLSPACE.Item.SkillHint'}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Hands"}}<input type="text" name="system.hands" value="{{systemSource.hands}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Ammunition"}}<input type="text" name="system.ammunition" value="{{systemSource.ammunition}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.ArmorDr"}}<input type="number" name="system.armorDr" value="{{systemSource.armorDr}}"></label>
+    <label class="check"><input type="checkbox" name="system.twoHanded" {{checked systemSource.twoHanded}}> {{localize "CRAWLSPACE.Item.TwoHanded"}}</label>
+  {{/if}}
+
+  {{#if (eq type "equipment")}}
+    <label>{{localize "CRAWLSPACE.Item.Slot"}}<select name="system.slot">{{selectOptions slotChoices selected=systemSource.slot}}</select></label>
+    <label>{{localize "CRAWLSPACE.Item.ArmorDr"}}<input type="number" name="system.armorDr" value="{{systemSource.armorDr}}"></label>
+    <label class="check"><input type="checkbox" name="system.isShield" {{checked systemSource.isShield}}> {{localize "CRAWLSPACE.Item.IsShield"}}</label>
+  {{/if}}
+
+  {{#if (eq type "tattoo")}}
+    <label>{{localize "CRAWLSPACE.Item.Location"}}<input type="text" name="system.location" value="{{systemSource.location}}"></label>
+  {{/if}}
+
+  {{#if (eq type "consumable")}}
+    <label>{{localize "CRAWLSPACE.Item.ConsumableType"}}<input type="text" name="system.consumableType" value="{{systemSource.consumableType}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Healing"}}<input type="text" name="system.healing.formula" value="{{systemSource.healing.formula}}"></label>
+    <label class="check"><input type="checkbox" name="system.healing.slots" {{checked systemSource.healing.slots}}> {{localize "CRAWLSPACE.Item.HealSlots"}}</label>
+    <label>{{localize "CRAWLSPACE.Item.ManaRestore"}}<input type="text" name="system.manaRestore" value="{{systemSource.manaRestore}}"></label>
+  {{/if}}
+
+  {{#if (eq type "lootBox")}}
+    <label>{{localize "CRAWLSPACE.Item.Tier"}}<input type="text" name="system.tier" value="{{systemSource.tier}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.BoxType"}}<input type="text" name="system.boxType" value="{{systemSource.boxType}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Quantity"}}<input type="number" name="system.quantity" value="{{systemSource.quantity}}"></label>
+    <label class="check"><input type="checkbox" name="system.sealed" {{checked systemSource.sealed}}> {{localize "CRAWLSPACE.Item.Sealed"}}</label>
+    <label class="wide">{{localize "CRAWLSPACE.Item.Contents"}}<textarea name="system.contents">{{systemSource.contents}}</textarea></label>
+  {{/if}}
+
+  {{#if (eq type "ability")}}
+    <label>{{localize "CRAWLSPACE.Item.Category"}}<select name="system.category">{{selectOptions abilityCategories selected=systemSource.category localize=true}}</select></label>
+    <label>{{localize "CRAWLSPACE.Item.Cooldown"}}<input type="text" name="system.cooldown" value="{{systemSource.cooldown}}"></label>
+  {{/if}}
+
+  {{#if (eq type "background")}}
+    <label>{{localize "CRAWLSPACE.Item.Stage"}}<select name="system.stage">{{selectOptions stageChoices selected=systemSource.stage localize=true}}</select></label>
+  {{/if}}
+
+  {{#if (eq type "achievement")}}
+    <label class="wide">{{localize "CRAWLSPACE.Item.Reward"}}<input type="text" name="system.reward" value="{{systemSource.reward}}"></label>
+    <label class="wide">{{localize "CRAWLSPACE.Item.Contents"}}<textarea name="system.contents">{{systemSource.contents}}</textarea></label>
+  {{/if}}
+
+  {{#if (eq type "trap")}}
+    <label>{{localize "CRAWLSPACE.Item.TrapType"}}<input type="text" name="system.trapType" value="{{systemSource.trapType}}"></label>
+  {{/if}}
+
+  {{#if hasBenefits}}
+    {{#if (eq type "race")}}
+    <label>{{localize "CRAWLSPACE.Item.Origin"}}<input type="text" name="system.origin" value="{{systemSource.origin}}"></label>
+    <label>{{localize "CRAWLSPACE.Crawler.Size"}}<input type="text" name="system.size" value="{{systemSource.size}}"></label>
+    {{/if}}
+    <label>{{localize "CRAWLSPACE.Item.DrBonus"}}<input type="number" name="system.drBonus" value="{{systemSource.drBonus}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Tags"}}<input type="text" name="system.tags" value="{{systemSource.tags}}"></label>
+  {{/if}}
+
+  {{#if isPhysical}}
+    <label class="check"><input type="checkbox" name="system.equipped" {{checked systemSource.equipped}}> {{localize "CRAWLSPACE.Item.Equipped"}}</label>
+  {{/if}}
+  </div>
+
+  {{#if hasDamage}}
+  <fieldset class="damage">
+    <legend>{{localize "CRAWLSPACE.Item.Damage"}}</legend>
+    <div class="details-grid">
+      <label>{{localize "CRAWLSPACE.Item.Formula"}}<input type="text" name="system.damage.formula" value="{{systemSource.damage.formula}}" placeholder="1d6+F"></label>
+      <label>{{localize "CRAWLSPACE.Item.DamageTypes"}}<input type="text" name="system.damage.typesText" value="{{damageTypesText}}" data-tooltip="{{damageTypeList}}"></label>
+      <label class="check"><input type="checkbox" name="system.damage.armorPiercing" {{checked systemSource.damage.armorPiercing}}> {{localize "CRAWLSPACE.Item.ArmorPiercing"}}</label>
+      <label class="check"><input type="checkbox" name="system.damage.magic" {{checked systemSource.damage.magic}}> {{localize "CRAWLSPACE.Item.Magic"}}</label>
+    </div>
+  </fieldset>
+  {{/if}}
+
+  {{#if isRanked}}
+  <fieldset class="upgrades">
+    <legend>{{localize "CRAWLSPACE.Item.Upgrades"}}</legend>
+    {{#each upgradeRows as |row|}}
+    <div class="upgrade-row">
+      <span class="rank-label">{{row.label}}</span>
+      <input type="text" name="system.upgrades.{{row.key}}" value="{{row.text}}" placeholder="{{localize 'CRAWLSPACE.Item.UpgradeText'}}">
+      <input type="text" name="system.upgrades.{{row.key}}Damage" value="{{row.damage}}" placeholder="{{localize 'CRAWLSPACE.Item.Damage'}}">
+    </div>
+    {{/each}}
+  </fieldset>
+  {{/if}}
+
+  {{#if hasBenefits}}
+  {{#each benefitLists as |list|}}
+  <fieldset class="benefits">
+    <legend>{{list.label}} {{#if @root.editable}}<a data-action="addBenefit" data-list="{{list.key}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</legend>
+    {{#each list.entries as |entry|}}
+    <div class="benefit-row">
+      <input type="text" name="system.{{list.key}}.{{@index}}.name" value="{{entry.name}}" placeholder="{{localize 'CRAWLSPACE.Item.Name'}}">
+      <input type="text" name="system.{{list.key}}.{{@index}}.tier" value="{{entry.tier}}" placeholder="{{localize 'CRAWLSPACE.Item.Tier'}}">
+      {{#if @root.editable}}<a data-action="deleteBenefit" data-list="{{list.key}}" data-index="{{@index}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
+      <textarea name="system.{{list.key}}.{{@index}}.description">{{entry.description}}</textarea>
+    </div>
+    {{/each}}
+  </fieldset>
+  {{/each}}
+  {{/if}}
+
+  <label class="wide">{{localize "CRAWLSPACE.Item.Notes"}}<input type="text" name="system.notes" value="{{systemSource.notes}}"></label>
+</section>

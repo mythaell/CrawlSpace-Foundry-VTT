@@ -1,0 +1,64 @@
+{
+  "_id": "0qhH3CP6gPuRZd2x",
+  "name": "test spell",
+  "type": "spell",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "description": "",
+    "notes": "test",
+    "stat": "INT",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "opposed",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": true
+    },
+    "upgrades": {
+      "rank5": "5",
+      "rank10": "10",
+      "rank15": "15",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 36,
+      "book": "",
+      "pages": ""
+    },
+    "mana": "2",
+    "range": "100",
+    "duration": "",
+    "usage": "learned"
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-36",
+      "contentType": "spell"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!0qhH3CP6gPuRZd2x"
+}

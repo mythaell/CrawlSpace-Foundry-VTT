@@ -1,0 +1,51 @@
+{
+  "_id": "BpHmZJ4tP9gW9Rtd",
+  "name": "Pocket Catapult",
+  "type": "weapon",
+  "img": "icons/svg/sword.svg",
+  "system": {
+    "description": "<p>A practical weapon designed for ranged use. Requires two hands.</p>",
+    "notes": "",
+    "quantity": 1,
+    "equipped": false,
+    "tags": [],
+    "weaponType": "ranged",
+    "hands": "",
+    "twoHanded": true,
+    "skill": "Pocket Catapult Training",
+    "ammunition": "",
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "armorDr": 0,
+    "source": {
+      "database": "homebrew",
+      "id": 165,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-165",
+      "contentType": "weapon"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!BpHmZJ4tP9gW9Rtd",
+  "folder": "oqIYXkDXiDsm9Hso"
+}

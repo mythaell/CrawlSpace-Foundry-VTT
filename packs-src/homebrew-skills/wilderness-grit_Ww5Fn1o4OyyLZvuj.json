@@ -1,0 +1,60 @@
+{
+  "_id": "Ww5Fn1o4OyyLZvuj",
+  "name": "Wilderness Grit",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>Bad weather and empty supplies become problems to solve rather than reasons to quit.</p><p>Endure remote hostile conditions; failure risks hunger and thirst.</p>",
+    "notes": "",
+    "stat": "CON",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Unopposed",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Avoid extra damage from a Critical Fail.",
+      "rank10": "Other party crawlers using this skill untrained no longer suffer Disadvantage.",
+      "rank15": "Avoid the additional damage from a Major Fail.",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 203,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-203",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!Ww5Fn1o4OyyLZvuj"
+}

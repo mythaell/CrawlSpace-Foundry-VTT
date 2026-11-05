@@ -1,0 +1,62 @@
+{
+  "_id": "WMN6Jz2OwsC479eV",
+  "name": "Demolition Maul Training",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>Attack against Evade. Requires two hands.</p>",
+    "notes": "",
+    "stat": "STR",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Attack",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "1d10+STR",
+      "types": [
+        "Bludgeoning"
+      ],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Add 1d10 base damage.",
+      "rank10": "Add 1d10 base damage.",
+      "rank15": "Add 1d10 base damage. Push a target of your size or smaller 15 feet.",
+      "rank5Damage": "2d10+STR",
+      "rank10Damage": "3d10+STR",
+      "rank15Damage": "4d10+STR"
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 144,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-144",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!WMN6Jz2OwsC479eV"
+}

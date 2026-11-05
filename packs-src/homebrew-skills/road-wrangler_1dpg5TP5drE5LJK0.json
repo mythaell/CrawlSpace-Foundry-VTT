@@ -1,0 +1,60 @@
+{
+  "_id": "1dpg5TP5drE5LJK0",
+  "name": "Road Wrangler",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>You feel a vehicle’s limits through the wheel and keep it moving inside them.</p><p>Drive a vehicle. Attacks while driving have Disadvantage.</p>",
+    "notes": "",
+    "stat": "DEX",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Unopposed",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Remove the attack Disadvantage from driving.",
+      "rank10": "Your vehicle gains +5 feet of Move; Evade attacks against it with Advantage.",
+      "rank15": "Your vehicle gains another +5 feet of Move; check with Advantage for extreme stunts.",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 213,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-213",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!1dpg5TP5drE5LJK0"
+}

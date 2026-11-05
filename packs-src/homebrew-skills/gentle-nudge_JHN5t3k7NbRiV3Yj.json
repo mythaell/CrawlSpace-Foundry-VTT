@@ -1,0 +1,60 @@
+{
+  "_id": "JHN5t3k7NbRiV3Yj",
+  "name": "Gentle Nudge",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>You frame an idea so another person can see themselves choosing it.</p><p>Opposed by INT. Requires ten minutes in safety; Disadvantage for risky, inconvenient or improper requests. The suggestion cannot be too costly, too dangerous or against the target’s nature.</p>",
+    "notes": "",
+    "stat": "CHA",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Opposed",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Suggestions need only avoid being too costly.",
+      "rank10": "Suggestions may be followed even when dangerous.",
+      "rank15": "Suggestions may be followed even when against the target’s nature.",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 206,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-206",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!JHN5t3k7NbRiV3Yj"
+}

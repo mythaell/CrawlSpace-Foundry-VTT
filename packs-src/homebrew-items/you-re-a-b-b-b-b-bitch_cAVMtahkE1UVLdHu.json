@@ -1,0 +1,37 @@
+{
+  "_id": "cAVMtahkE1UVLdHu",
+  "name": "You're a B-b-b-b-bitch!",
+  "type": "achievement",
+  "img": "icons/svg/coins.svg",
+  "system": {
+    "description": "<p>You little bitch.</p>",
+    "notes": "",
+    "source": {
+      "database": "homebrew",
+      "id": 38,
+      "book": "",
+      "pages": ""
+    },
+    "reward": "Lucky Bitch",
+    "contents": ""
+  },
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-38",
+      "contentType": "achievement"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!cAVMtahkE1UVLdHu",
+  "folder": "Rrwtz3DRTrXNjR9N"
+}

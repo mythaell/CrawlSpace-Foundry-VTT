@@ -1,0 +1,60 @@
+{
+  "_id": "Z9D4N9iNbHfojFNp",
+  "name": "Slip the Knot",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>A little slack and a well-timed twist can turn captivity into opportunity.</p><p>Escape bonds. Escaping Held instead uses STR opposed by the holding skill.</p>",
+    "notes": "",
+    "stat": "DEX",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Unopposed",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Escape unnoticed; may Step after escaping Held.",
+      "rank10": "Other party crawlers using this skill untrained no longer suffer Disadvantage.",
+      "rank15": "After escaping, may immediately take an Action with Advantage.",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 190,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-190",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!Z9D4N9iNbHfojFNp"
+}

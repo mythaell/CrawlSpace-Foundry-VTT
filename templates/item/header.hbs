@@ -1,0 +1,16 @@
+<header class="crawl-header item-header">
+  <img class="profile" src="{{item.img}}" alt="{{item.name}}" data-action="editImage" data-edit="img">
+  <div class="identity">
+    <input class="crawler-name" type="text" name="name" value="{{item.name}}">
+    <div class="item-subtitle">
+      <span class="type-tag">{{localize (concat "TYPES.Item." type)}}</span>
+      {{#if isRanked}}
+        <span>{{localize "CRAWLSPACE.Item.Rank"}} {{system.rank.total}}</span>
+        {{#if item.actor}}<span>{{localize "CRAWLSPACE.Item.Check"}} {{crawlSigned system.checkBonus}}</span>{{/if}}
+      {{/if}}
+      {{#if isPhysical}}
+        <label>×<input type="number" name="system.quantity" value="{{systemSource.quantity}}" min="0"></label>
+      {{/if}}
+    </div>
+  </div>
+</header>

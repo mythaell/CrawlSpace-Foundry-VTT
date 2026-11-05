@@ -1,0 +1,22 @@
+<section class="tab inventory {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <div class="inventory-top">
+    <label class="gold"><i class="fa-solid fa-coins"></i> {{localize "CRAWLSPACE.Crawler.Gold"}} <input type="number" name="system.details.gold" value="{{systemSource.details.gold}}" min="0"></label>
+    <div class="paper-doll">
+      {{#each paperDoll as |slot|}}
+      <div class="doll-slot {{#if slot.items.length}}filled{{/if}}" data-tooltip="{{#each slot.items}}{{name}}<br>{{/each}}">
+        <span class="slot-label">{{slot.label}}</span>
+        <span class="slot-item">{{#each slot.items}}{{name}}{{#unless @last}}, {{/unless}}{{else}}—{{/each}}</span>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{#each inventoryGroups as |group|}}
+  <div class="list-header">
+    <span class="item-name">{{group.label}}</span>
+    <span class="item-controls">{{#if @root.editable}}<a data-action="createItem" data-type="{{group.type}}" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
+  </div>
+  <ol class="item-list">
+    {{#each group.items as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item}}{{/each}}
+  </ol>
+  {{/each}}
+</section>

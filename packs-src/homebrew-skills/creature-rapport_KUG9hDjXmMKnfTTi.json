@@ -1,0 +1,60 @@
+{
+  "_id": "KUG9hDjXmMKnfTTi",
+  "name": "Creature Rapport",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>You read an animal’s signals and answer with a calm, steady presence.</p><p>Opposed by INT. Handle animals and discourage friendly animals from attacking.</p>",
+    "notes": "",
+    "stat": "CHA",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Opposed",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Choose an animal type; gain Advantage handling it.",
+      "rank10": "Each stage of bonding with a potential pet takes half the usual time.",
+      "rank15": "May have up to two pets.",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 197,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-197",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!KUG9hDjXmMKnfTTi"
+}

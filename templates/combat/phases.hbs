@@ -1,0 +1,29 @@
+<section class="crawl-phases">
+  {{#if crawl}}
+  <ol class="phase-strip">
+    {{#each crawl.phases as |phase|}}
+    <li class="phase side-{{phase.side}} {{#if phase.active}}active{{/if}} {{#if phase.past}}past{{/if}}"
+        {{#if @root.crawl.isGM}}data-action="crawlPhase" data-phase="{{phase.index}}"{{/if}} data-tooltip="{{phase.label}}">
+      <span class="phase-number">{{phase.number}}</span>
+    </li>
+    {{/each}}
+  </ol>
+  <div class="phase-current">
+    <strong>{{crawl.current.label}}</strong>
+    {{#if crawl.canDeclare}}
+      <button type="button" class="declare" data-action="crawlDeclare"><i class="fa-solid fa-bullhorn"></i> {{localize "CRAWLSPACE.Combat.Declare"}}</button>
+    {{/if}}
+  </div>
+  {{#if crawl.waiting.length}}
+  <ul class="phase-waiting">
+    {{#each crawl.waiting}}
+    <li class="{{#if done}}done{{/if}}">
+      <img src="{{img}}" alt="">
+      <span>{{name}}</span>
+      {{#if canToggle}}<a data-action="crawlDone" data-combatant-id="{{id}}" data-tooltip="{{localize 'CRAWLSPACE.Combat.MarkDone'}}"><i class="fa-solid {{#if done}}fa-square-check{{else}}fa-square{{/if}}"></i></a>{{/if}}
+    </li>
+    {{/each}}
+  </ul>
+  {{/if}}
+  {{/if}}
+</section>

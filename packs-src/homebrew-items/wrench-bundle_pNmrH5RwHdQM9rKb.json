@@ -1,0 +1,51 @@
+{
+  "_id": "pNmrH5RwHdQM9rKb",
+  "name": "Wrench Bundle",
+  "type": "weapon",
+  "img": "icons/svg/sword.svg",
+  "system": {
+    "description": "<p>A practical weapon built for close quarters. Requires one hand.</p>",
+    "notes": "",
+    "quantity": 1,
+    "equipped": false,
+    "tags": [],
+    "weaponType": "melee",
+    "hands": "",
+    "twoHanded": false,
+    "skill": "Wrench Bundle Training",
+    "ammunition": "",
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "armorDr": 0,
+    "source": {
+      "database": "homebrew",
+      "id": 143,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-143",
+      "contentType": "weapon"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!pNmrH5RwHdQM9rKb",
+  "folder": "oqIYXkDXiDsm9Hso"
+}

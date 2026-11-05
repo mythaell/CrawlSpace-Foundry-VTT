@@ -1,0 +1,60 @@
+{
+  "_id": "gyCWN3y64Spcnbgi",
+  "name": "Trail Reader",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>Bent grass and scuffed dust tell you where another traveler went.</p><p>Find and follow tracks, checking every fifteen minutes.</p>",
+    "notes": "",
+    "stat": "INT",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Unopposed",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Check every thirty minutes.",
+      "rank10": "Follow found tracks for 1 hour between checks and learn two details about the targets.",
+      "rank15": "Follow found tracks for 2 hours between checks and learn four details about the targets.",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 218,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-218",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!gyCWN3y64Spcnbgi"
+}

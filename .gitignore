@@ -1,0 +1,9 @@
+node_modules/
+dist/
+# Built LevelDB compendia are regenerated from packs-src by `npm run packs`.
+packs/
+# The game-database content module holds published book text: it is built locally and never committed.
+build/
+.env
+*.log
+.DS_Store

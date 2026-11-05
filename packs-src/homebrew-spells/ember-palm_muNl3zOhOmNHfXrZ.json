@@ -1,0 +1,66 @@
+{
+  "_id": "muNl3zOhOmNHfXrZ",
+  "name": "Ember Palm",
+  "type": "spell",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "description": "<p>Spell attack against Evade. AI Favor 1. Must be in your hotlist to cast in combat.</p>",
+    "notes": "",
+    "stat": "INT",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Attack",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "1d4+INT",
+      "types": [
+        "Fire"
+      ],
+      "armorPiercing": false,
+      "magic": true
+    },
+    "upgrades": {
+      "rank5": "Add 1d4 base damage.",
+      "rank10": "Add 1d4 base damage. The target gains Burned.",
+      "rank15": "Add 1d4 base damage. Your Palm Fighter, basic unarmed and claw-slice strikes also deal one Ember Palm Rank damage die as Fire damage.",
+      "rank5Damage": "2d4+INT",
+      "rank10Damage": "3d4+INT",
+      "rank15Damage": "4d4+INT"
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 179,
+      "book": "",
+      "pages": ""
+    },
+    "mana": "3",
+    "range": "Melee",
+    "duration": "",
+    "usage": "learned"
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-179",
+      "contentType": "spell"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!muNl3zOhOmNHfXrZ"
+}

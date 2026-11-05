@@ -1,0 +1,60 @@
+{
+  "_id": "bVRutLzpH9HOLJQ3",
+  "name": "Junkyard Design",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>You see workable mechanisms hiding inside piles of mismatched parts.</p><p>Build mundane devices with moving parts, fluids or chemicals from junk; excludes vehicles.</p>",
+    "notes": "",
+    "stat": "INT",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Unopposed",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Specialize in one mundane item type; gain Advantage crafting it.",
+      "rank10": "May craft your specialty with a +1 bonus-level enchantment.",
+      "rank15": "May craft your specialty with up to a +2 bonus-level enchantment, in half the time.",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 194,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-194",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!bVRutLzpH9HOLJQ3"
+}

@@ -1,0 +1,22 @@
+<div class="crawl-dialog declare">
+  <div class="form-group">
+    <label>{{localize "CRAWLSPACE.Combat.Mob"}}</label>
+    <div class="form-fields">
+      <select name="mob">{{#each mobs}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+    </div>
+  </div>
+  {{#each mobs as |mob|}}
+  <fieldset data-mob-attacks="{{mob.id}}">
+    <legend>{{localize "CRAWLSPACE.Section.Attacks"}}</legend>
+    {{#each mob.attacks as |attack|}}
+    <label class="radio"><input type="radio" name="attack-{{mob.id}}" value="{{attack.id}}" {{#if @first}}checked{{/if}}> {{attack.name}} <small>({{localize "CRAWLSPACE.Mob.ToHitShort"}} {{attack.toHit}}, {{attack.damage}})</small></label>
+    {{else}}<p class="hint">{{localize "CRAWLSPACE.Combat.NoAttacks"}}</p>{{/each}}
+  </fieldset>
+  {{/each}}
+  <fieldset>
+    <legend>{{localize "CRAWLSPACE.Combat.Targets"}}</legend>
+    {{#each crawlers}}
+    <label class="check"><input type="checkbox" name="target" value="{{id}}" {{checked checked}}> {{name}}</label>
+    {{else}}<p class="hint">{{localize "CRAWLSPACE.Combat.NoCrawlers"}}</p>{{/each}}
+  </fieldset>
+</div>

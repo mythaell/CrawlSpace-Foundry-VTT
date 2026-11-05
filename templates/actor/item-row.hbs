@@ -1,0 +1,38 @@
+<li class="item-row draggable {{item.type}}" data-item-id="{{item.id}}" data-uuid="{{item.uuid}}">
+  <img class="item-img" src="{{item.img}}" alt="" data-action="useItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Use'}}">
+  <a class="item-name" data-action="useItem">{{item.name}}</a>
+  {{#if (crawlEq item.type "skill")}}
+    <span class="col rank" data-tooltip="{{localize 'CRAWLSPACE.Item.RankHint'}}">
+      {{#if @root.editable}}<input type="number" min="0" value="{{item.system.rank.value}}" data-item-field="system.rank.value">{{else}}{{item.system.rank.value}}{{/if}}
+      {{#if (ne item.system.rank.total item.system.rank.value)}}<b>→{{item.system.rank.total}}</b>{{/if}}
+    </span>
+    <span class="col stat">{{item.system.stat}} {{crawlSigned item.system.rank.mod}}</span>
+    <span class="col bonus"><b>{{crawlSigned item.system.checkBonus}}</b></span>
+    <label class="col mark" data-tooltip="{{localize 'CRAWLSPACE.Item.MarkHint'}}"><input type="checkbox" {{checked item.system.marked}} data-item-field="system.marked" {{#unless @root.editable}}disabled{{/unless}}></label>
+  {{else if (crawlEq item.type "spell")}}
+    <span class="col rank">
+      {{#if @root.editable}}<input type="number" min="0" value="{{item.system.rank.value}}" data-item-field="system.rank.value">{{else}}{{item.system.rank.value}}{{/if}}
+      {{#if (ne item.system.rank.total item.system.rank.value)}}<b>→{{item.system.rank.total}}</b>{{/if}}
+    </span>
+    <span class="col mana" data-tooltip="{{localize 'CRAWLSPACE.Stat.Mana'}}"><i class="fa-solid fa-droplet"></i> {{item.system.mana}}</span>
+    <span class="col bonus"><b>{{crawlSigned item.system.checkBonus}}</b></span>
+    <label class="col mark" data-tooltip="{{localize 'CRAWLSPACE.Item.MarkHint'}}"><input type="checkbox" {{checked item.system.marked}} data-item-field="system.marked" {{#unless @root.editable}}disabled{{/unless}}></label>
+  {{else if (crawlEq item.type "lootBox")}}
+    <span class="col">{{item.system.tier}}</span>
+    <span class="col qty">×{{item.system.quantity}}</span>
+  {{else}}
+    {{#if item.system.damage.formula}}<span class="col damage" data-tooltip="{{crawlJoin item.system.damage.types}}"><i class="fa-solid fa-burst"></i> {{item.system.damage.formula}}</span>{{/if}}
+    {{#if (crawlEq item.type "equipment")}}<span class="col">{{item.system.slot}}{{#if item.system.armorDr}} · DR {{item.system.armorDr}}{{/if}}</span>{{/if}}
+    {{#if (ne item.system.quantity undefined)}}
+      <span class="col qty">{{#if @root.editable}}<input type="number" min="0" value="{{item.system.quantity}}" data-item-field="system.quantity">{{else}}×{{item.system.quantity}}{{/if}}</span>
+    {{/if}}
+  {{/if}}
+  <span class="item-controls">
+    {{#if (or (crawlEq item.type "weapon") (crawlEq item.type "equipment") (crawlEq item.type "tattoo"))}}
+      <a data-action="toggleEquip" class="{{#if item.system.equipped}}active{{/if}}" data-tooltip="{{localize (ifThen item.system.equipped 'CRAWLSPACE.Item.Unequip' 'CRAWLSPACE.Item.Equip')}}"><i class="fa-solid fa-shirt"></i></a>
+    {{/if}}
+    <a data-action="itemToChat" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
+    <a data-action="editItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
+    {{#if @root.editable}}<a data-action="deleteItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Delete'}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
+  </span>
+</li>

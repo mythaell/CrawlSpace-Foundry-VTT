@@ -1,0 +1,37 @@
+{
+  "_id": "NrZ29WcXBghartfF",
+  "name": "test",
+  "type": "achievement",
+  "img": "icons/svg/coins.svg",
+  "system": {
+    "description": "",
+    "notes": "",
+    "source": {
+      "database": "homebrew",
+      "id": 39,
+      "book": "",
+      "pages": ""
+    },
+    "reward": "Lucky Bitch",
+    "contents": ""
+  },
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-39",
+      "contentType": "achievement"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!NrZ29WcXBghartfF",
+  "folder": "Rrwtz3DRTrXNjR9N"
+}

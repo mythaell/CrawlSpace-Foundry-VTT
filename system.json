@@ -1,0 +1,76 @@
+{
+  "id": "crawlspace",
+  "title": "CrawlSpace",
+  "description": "Rules, character sheets and combat automation for dungeon-crawling LitRPG play: health slots, ranked skills and spells, typed damage, debuffs, and five-phase Mob/Crawler combat.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14.370",
+    "maximum": "14"
+  },
+  "authors": [{ "name": "Mythaell" }],
+  "url": "https://github.com/mythaell/CrawlSpace-Foundry-VTT",
+  "esmodules": ["dist/crawlspace.mjs"],
+  "styles": ["styles/crawlspace.css"],
+  "languages": [{ "lang": "en", "name": "English", "path": "lang/en.json" }],
+  "documentTypes": {
+    "Actor": {
+      "crawler": { "htmlFields": ["biography", "notes"] },
+      "mob": { "htmlFields": ["description", "notes"] },
+      "npc": { "htmlFields": ["description", "notes"] }
+    },
+    "Item": {
+      "skill": { "htmlFields": ["description"] },
+      "spell": { "htmlFields": ["description"] },
+      "weapon": { "htmlFields": ["description"] },
+      "equipment": { "htmlFields": ["description"] },
+      "consumable": { "htmlFields": ["description"] },
+      "tattoo": { "htmlFields": ["description"] },
+      "loot": { "htmlFields": ["description"] },
+      "lootBox": { "htmlFields": ["description"] },
+      "ability": { "htmlFields": ["description"] },
+      "race": { "htmlFields": ["description"] },
+      "class": { "htmlFields": ["description"] },
+      "background": { "htmlFields": ["description"] },
+      "achievement": { "htmlFields": ["description"] },
+      "trap": { "htmlFields": ["description"] }
+    }
+  },
+  "packs": [
+    {
+      "name": "homebrew-skills",
+      "label": "Homebrew Skills",
+      "path": "packs/homebrew-skills",
+      "type": "Item",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "homebrew-spells",
+      "label": "Homebrew Spells",
+      "path": "packs/homebrew-spells",
+      "type": "Item",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "homebrew-items",
+      "label": "Homebrew Items",
+      "path": "packs/homebrew-items",
+      "type": "Item",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "CrawlSpace Homebrew",
+      "color": "#7a2e1d",
+      "packs": ["homebrew-skills", "homebrew-spells", "homebrew-items"]
+    }
+  ],
+  "grid": { "distance": 5, "units": "ft" },
+  "primaryTokenAttribute": "healthBar",
+  "secondaryTokenAttribute": "mana",
+  "socket": true,
+  "initiative": "1d20",
+  "manifest": "",
+  "download": ""
+}

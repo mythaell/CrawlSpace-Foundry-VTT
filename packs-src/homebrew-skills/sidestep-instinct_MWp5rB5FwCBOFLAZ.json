@@ -1,0 +1,141 @@
+{
+  "_id": "MWp5rB5FwCBOFLAZ",
+  "name": "Sidestep Instinct",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>You shift out of danger before thought can slow the movement.</p><p>Gain +1 Evade. Advance by magical means, or training after Rank 5.</p>",
+    "notes": "",
+    "stat": "DEX",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Passive",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "",
+      "types": [],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Gain another +1 Evade and 5 feet of Step when Evading.",
+      "rank10": "Gain another +2 Evade; Evade spells and ranged attacks with Advantage.",
+      "rank15": "Gain another +2 Evade; may Evade in combat without spending an Action.",
+      "rank5Damage": "",
+      "rank10Damage": "",
+      "rank15Damage": ""
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 223,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [
+    {
+      "_id": "x9HaPiTk7wmqjl7r",
+      "name": "Sidestep Instinct (Rank 1)",
+      "img": "icons/svg/book.svg",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "system": {
+        "changes": [
+          {
+            "key": "system.evade.bonus",
+            "type": "add",
+            "value": 1,
+            "phase": "initial"
+          }
+        ],
+        "requiredRank": 1
+      },
+      "_key": "!items.effects!MWp5rB5FwCBOFLAZ.x9HaPiTk7wmqjl7r"
+    },
+    {
+      "_id": "WurLNQ0w8FYCrRdr",
+      "name": "Sidestep Instinct (Rank 5)",
+      "img": "icons/svg/book.svg",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "system": {
+        "changes": [
+          {
+            "key": "system.evade.bonus",
+            "type": "add",
+            "value": 1,
+            "phase": "initial"
+          }
+        ],
+        "requiredRank": 5
+      },
+      "_key": "!items.effects!MWp5rB5FwCBOFLAZ.WurLNQ0w8FYCrRdr"
+    },
+    {
+      "_id": "JrS7HTLHpb55XJKE",
+      "name": "Sidestep Instinct (Rank 10)",
+      "img": "icons/svg/book.svg",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "system": {
+        "changes": [
+          {
+            "key": "system.evade.bonus",
+            "type": "add",
+            "value": 2,
+            "phase": "initial"
+          }
+        ],
+        "requiredRank": 10
+      },
+      "_key": "!items.effects!MWp5rB5FwCBOFLAZ.JrS7HTLHpb55XJKE"
+    },
+    {
+      "_id": "rhvi3Ppy9pWtlTEd",
+      "name": "Sidestep Instinct (Rank 15)",
+      "img": "icons/svg/book.svg",
+      "type": "base",
+      "transfer": true,
+      "disabled": false,
+      "system": {
+        "changes": [
+          {
+            "key": "system.evade.bonus",
+            "type": "add",
+            "value": 2,
+            "phase": "initial"
+          }
+        ],
+        "requiredRank": 15
+      },
+      "_key": "!items.effects!MWp5rB5FwCBOFLAZ.rhvi3Ppy9pWtlTEd"
+    }
+  ],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-223",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!MWp5rB5FwCBOFLAZ"
+}

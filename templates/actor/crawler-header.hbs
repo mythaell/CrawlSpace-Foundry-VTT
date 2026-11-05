@@ -1,0 +1,33 @@
+<header class="crawl-header">
+  <img class="profile" src="{{document.img}}" alt="{{document.name}}" data-action="editImage" data-edit="img" data-tooltip="{{document.name}}">
+  <div class="identity">
+    <input class="crawler-name" type="text" name="name" value="{{document.name}}" placeholder="{{localize 'CRAWLSPACE.Crawler.Name'}}">
+    <div class="identity-grid">
+      <label>{{localize "CRAWLSPACE.Crawler.Level"}}<input type="number" name="system.details.level" value="{{systemSource.details.level}}" min="0"></label>
+      <label>{{localize "CRAWLSPACE.Crawler.Floor"}}<input type="number" name="system.details.floor" value="{{systemSource.details.floor}}" min="0"></label>
+      <label>{{localize "CRAWLSPACE.Crawler.Race"}}<input type="text" name="system.details.race" value="{{systemSource.details.race}}"></label>
+      <label>{{localize "CRAWLSPACE.Crawler.Class"}}<input type="text" name="system.details.className" value="{{systemSource.details.className}}"></label>
+      <label>{{localize "CRAWLSPACE.Crawler.Number"}}<input type="text" name="system.details.crawlerNumber" value="{{systemSource.details.crawlerNumber}}"></label>
+      <label>{{localize "CRAWLSPACE.Crawler.AiFavor"}}<input type="number" name="system.details.aiFavor" value="{{systemSource.details.aiFavor}}"></label>
+    </div>
+  </div>
+  <div class="vitals">
+    <div class="vital health {{#if system.isDying}}dying{{/if}}">
+      <span class="label">{{localize "CRAWLSPACE.Stat.Health"}}</span>
+      <span class="value">{{system.health.pct}}%</span>
+      <div class="meter"><div class="fill" style="width: {{system.health.pct}}%"></div></div>
+    </div>
+    <div class="vital mana">
+      <span class="label">{{localize "CRAWLSPACE.Stat.Mana"}}</span>
+      <span class="value"><input type="number" name="system.mana.value" value="{{systemSource.mana.value}}" min="0"> / {{system.mana.max}}</span>
+      <div class="meter"><div class="fill" style="width: {{system.mana.pct}}%"></div></div>
+    </div>
+    <div class="derived">
+      <a class="pill rollable" data-action="rollStat" data-stat="evade" data-tooltip="{{localize 'CRAWLSPACE.Roll.EvadeHint'}}"><b>{{system.evade.total}}</b> {{localize "CRAWLSPACE.Stat.Evade"}}</a>
+      <span class="pill"><b>{{system.dr.total}}</b> {{localize "CRAWLSPACE.Stat.DR"}}</span>
+      <span class="pill"><b>{{system.move.total}}</b> {{localize "CRAWLSPACE.Stat.Move"}}</span>
+      <span class="pill"><b>{{system.step.total}}</b> {{localize "CRAWLSPACE.Stat.Step"}}</span>
+      {{#if editable}}<button type="button" class="pill upkeep" data-action="upkeep"><i class="fa-solid fa-bed"></i> {{localize "CRAWLSPACE.Upkeep.Button"}}</button>{{/if}}
+    </div>
+  </div>
+</header>

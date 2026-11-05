@@ -1,0 +1,62 @@
+{
+  "_id": "xHrMlx3CTvwWZPAj",
+  "name": "Grapple Artist",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "description": "<p>Attack against Evade. Requires two hands. A hit inflicts Held. Escaping is a STR check opposed by this skill as an Interrupt. May use Ground Slam. AI Favor 1 without a damage-effect skill.</p>",
+    "notes": "",
+    "stat": "STR",
+    "rank": {
+      "value": 0,
+      "override": null,
+      "modOverride": null
+    },
+    "checkType": "Attack",
+    "cooldown": "",
+    "marked": false,
+    "isAttack": false,
+    "isUnarmed": false,
+    "damage": {
+      "formula": "1d4+STR",
+      "types": [
+        "Bludgeoning"
+      ],
+      "armorPiercing": false,
+      "magic": false
+    },
+    "upgrades": {
+      "rank5": "Maintain Held without spending an Action, but the check has Disadvantage.",
+      "rank10": "Add 1d4 base damage.",
+      "rank15": "Add 1d4 base damage.",
+      "rank5Damage": "",
+      "rank10Damage": "2d4+STR",
+      "rank15Damage": "3d4+STR"
+    },
+    "source": {
+      "database": "homebrew",
+      "id": 176,
+      "book": "",
+      "pages": ""
+    }
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-176",
+      "contentType": "skill"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!xHrMlx3CTvwWZPAj"
+}

@@ -1,0 +1,40 @@
+{
+  "_id": "YyUE5ScMoL9RPncF",
+  "name": "Local Class",
+  "type": "class",
+  "img": "icons/svg/combat.svg",
+  "system": {
+    "description": "",
+    "notes": "",
+    "source": {
+      "database": "homebrew",
+      "id": 1156,
+      "book": "",
+      "pages": ""
+    },
+    "drBonus": 0,
+    "benefits": [],
+    "detriments": [],
+    "tags": ""
+  },
+  "effects": [],
+  "flags": {
+    "crawlspace": {
+      "sourceId": "homebrew-1156",
+      "contentType": "class"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!YyUE5ScMoL9RPncF",
+  "folder": "BvkmVwlp7sVTvpmx"
+}

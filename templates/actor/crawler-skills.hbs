@@ -1,0 +1,13 @@
+<section class="tab skills {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <div class="list-header">
+    <span class="item-name">{{localize "TYPES.Item.skill"}}</span>
+    <span class="col rank">{{localize "CRAWLSPACE.Item.Rank"}}</span>
+    <span class="col stat">{{localize "CRAWLSPACE.Item.Stat"}}</span>
+    <span class="col bonus">{{localize "CRAWLSPACE.Item.Check"}}</span>
+    <span class="col mark" data-tooltip="{{localize 'CRAWLSPACE.Item.MarkHint'}}"><i class="fa-solid fa-check"></i></span>
+    <span class="item-controls">{{#if editable}}<a data-action="createItem" data-type="skill" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
+  </div>
+  <ol class="item-list">
+    {{#each skills as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Skills"}}</li>{{/each}}
+  </ol>
+</section>
