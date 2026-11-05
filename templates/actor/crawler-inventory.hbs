@@ -1,14 +1,6 @@
 <section class="tab inventory {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
   <div class="inventory-top">
     <label class="gold"><i class="fa-solid fa-coins"></i> {{localize "CRAWLSPACE.Crawler.Gold"}} <input type="number" name="system.details.gold" value="{{systemSource.details.gold}}" min="0"></label>
-    <div class="paper-doll">
-      {{#each paperDoll as |slot|}}
-      <div class="doll-slot {{#if slot.items.length}}filled{{/if}}">
-        <span class="slot-label">{{slot.label}}</span>
-        <span class="slot-item">{{#each slot.items}}{{name}}{{#unless @last}}, {{/unless}}{{else}}—{{/each}}</span>
-      </div>
-      {{/each}}
-    </div>
   </div>
   {{> "systems/crawlspace/templates/actor/filter-bar.hbs" table="inventory" categories=categories stats=false checks=false}}
   <div class="inventory-sections" data-filter-scope="inventory">

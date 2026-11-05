@@ -2,6 +2,8 @@
 <div class="crawl-filter-bar" data-filter-table="{{table}}">
   <input type="search" class="filter-search" data-filter-search placeholder="{{localize 'CRAWLSPACE.Filter.Search'}}" aria-label="{{localize 'CRAWLSPACE.Filter.Search'}}">
   {{#if categories}}
+  {{!-- The subtype row sits centered under the category buttons. --}}
+  <div class="filter-categories">
   <div class="filter-group">
     <button type="button" data-action="setFilter" data-filter-key="category" data-filter-value="">{{localize "CRAWLSPACE.Filter.all"}}</button>
     {{#each categories}}<button type="button" data-action="setFilter" data-filter-key="category" data-filter-value="{{id}}">{{label}}</button>{{/each}}
@@ -13,6 +15,7 @@
   </div>
   {{/if}}
   {{/each}}
+  </div>
   {{/if}}
   {{#if stats}}
   <div class="filter-group">

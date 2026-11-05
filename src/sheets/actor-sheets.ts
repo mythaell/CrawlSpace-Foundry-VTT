@@ -557,11 +557,6 @@ export class CrawlerSheet extends CrawlActorSheet {
         )
         context.inventoryCount = items.filter((i: any) => INVENTORY_TYPES.includes(i.type)).length
         context.filterCategory = filter.category ?? ''
-        context.paperDoll = Object.entries(GEAR_SLOTS).map(([slot, label]) => ({
-          slot,
-          label,
-          items: items.filter((i: any) => i.type === 'equipment' && i.system.equipped && i.system.slot === slot).map((i: any) => ({ name: i.name })),
-        }))
         context.gold = system.details.gold
         context.packs = ITEM_PACKS
         break

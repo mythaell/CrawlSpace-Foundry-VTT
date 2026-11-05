@@ -738,7 +738,9 @@
     border-radius: 16px;
     corner-shape: bevel;
     box-shadow: var(--hud-shadow);
-    scrollbar-color: #73d7ff #153c68;
+    --color-scrollbar: #bfeaff;
+    --color-scrollbar-track: #153c68;
+    scrollbar-color: var(--color-scrollbar) var(--color-scrollbar-track);
   }
   .application.crawlspace > .window-header {
     height: 30px;
@@ -1181,7 +1183,7 @@
     border-color: var(--hud-cyan);
     box-shadow: 0 0 6px rgb(140 255 246 / 60%);
   }
-  .crawlspace.crawler .crawl-top .progress-box input {
+  .application.crawlspace.crawler .window-content .progress-box input {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -1191,6 +1193,7 @@
     color: #fff;
     background: transparent;
     border: 0;
+    line-height: 1;
     font-size: 0.9rem;
     font-weight: 700;
     text-align: center;
@@ -1211,7 +1214,7 @@
   .crawlspace.crawler .progress-box.health-pressed {
     background: #000;
   }
-  .crawlspace.crawler .crawl-top .progress-box.health-pressed input {
+  .application.crawlspace.crawler .window-content .progress-box.health-pressed input {
     color: transparent;
   }
   .crawlspace.crawler .health-shield-wrapper {
@@ -1258,9 +1261,16 @@
     gap: 6px;
     margin: 0;
     padding: 4px 10px;
-    background: rgb(13 52 99 / 44%);
+    /* A thin band behind the title, narrower than the icon buttons that sit across it. */
+    background: linear-gradient(
+      transparent calc(50% - 10px),
+      rgb(13 52 99 / 44%) calc(50% - 10px),
+      rgb(13 52 99 / 44%) calc(50% + 9px),
+      var(--hud-cyan) calc(50% + 9px),
+      var(--hud-cyan) calc(50% + 10px),
+      transparent calc(50% + 10px)
+    );
     border: 0;
-    border-bottom: 1px solid var(--hud-cyan);
     border-radius: 0;
   }
   .crawlspace.crawler .crawl-tab-title {
@@ -1623,6 +1633,15 @@
     display: flex;
     flex-wrap: wrap;
     gap: 2px;
+  }
+  .crawlspace .crawl-filter-bar .filter-categories {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .crawlspace .crawl-filter-bar .filter-categories .filter-group {
+    justify-content: center;
   }
   .crawlspace .crawl-filter-bar .filter-group[hidden] {
     display: none;
