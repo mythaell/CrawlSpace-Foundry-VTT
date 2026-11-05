@@ -16,8 +16,11 @@ import { characterToActor } from './import/convert'
 import { openUpkeep } from './apps/upkeep'
 
 const TEMPLATES = [
+  'actor/crawler-sidebar',
   'actor/crawler-header',
-  'actor/crawler-main',
+  'actor/crawler-tabs',
+  'actor/crawler-character',
+  'actor/crawler-actions',
   'actor/crawler-skills',
   'actor/crawler-spells',
   'actor/crawler-inventory',

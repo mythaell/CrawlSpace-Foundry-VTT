@@ -1,5 +1,33 @@
 /* CrawlSpace for Foundry VTT. Scoped to .crawlspace sheets plus chat cards and the combat phase strip. */
 
+@font-face {
+  font-family: 'Quantico';
+  src: url('../assets/fonts/Quantico-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Quantico';
+  src: url('../assets/fonts/Quantico-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Quantico';
+  src: url('../assets/fonts/Quantico-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Quantico';
+  src: url('../assets/fonts/Quantico-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+
 @layer system {
   :root {
     --crawl-accent: #d4472c;
@@ -55,7 +83,6 @@
   .crawlspace label > input,
   .crawlspace label > select,
   .crawlspace label > textarea {
-    color: var(--color-text-primary, inherit);
     font-size: 0.875rem;
   }
   .crawlspace label.check,
@@ -199,12 +226,7 @@
     height: auto;
   }
 
-  /* ---------- Main tab ---------- */
-  .crawlspace .main-grid {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 1rem;
-  }
+  /* ---------- Stat tables (mob, NPC) ---------- */
   .crawlspace table.stats {
     width: 100%;
     border-collapse: collapse;
@@ -240,54 +262,11 @@
     gap: 0.4rem 0.6rem;
     align-items: end;
   }
-  .crawlspace .traits {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 0.85rem;
-  }
-
-  .crawlspace .health-slots {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 3px;
-  }
-  .crawlspace .health-slots .slot {
-    display: flex;
-    justify-content: space-between;
-    padding: 2px 8px;
-    border: 1px solid var(--crawl-border);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
-  }
-  .crawlspace .health-slots .slot.filled {
-    background: var(--crawl-good);
-    color: white;
-    border-color: transparent;
-  }
-  .crawlspace .health-slots .slot:hover {
-    outline: 1px solid var(--crawl-accent);
-  }
-  .crawlspace .health-slots .threshold {
-    opacity: 0.8;
-  }
-  .crawlspace .shield-slots,
   .crawlspace .mob-slots {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
     align-items: center;
-  }
-  .crawlspace .shield {
-    color: var(--crawl-border);
-    font-size: 1.2rem;
-  }
-  .crawlspace .shield.on {
-    color: var(--crawl-shield);
   }
   .crawlspace .mob-slot {
     width: 22px;
@@ -716,5 +695,823 @@
   }
   .combat-tracker .combatant.crawl-acting.side-mob {
     box-shadow: inset 3px 0 0 var(--crawl-bad);
+  }
+
+  /* =========================================================
+     CrawlSpace HUD theme: every system sheet uses the blue holographic
+     frame, Quantico type and light input fields from CrawlSpace.
+     ========================================================= */
+  .application.crawlspace {
+    --dcc-navy: #17384f;
+    --dcc-navy-dark: #102c3f;
+    --dcc-blue-dark: #245a78;
+    --dcc-blue: #3f7f9f;
+    --dcc-blue-light: #83dfff;
+    --dcc-input: #d9e6f2;
+    --dcc-input-text: #111820;
+    --dcc-placeholder: #7c7b7b;
+    --hud-cyan: #8cfff6;
+    --hud-edge: #66dfff;
+    --hud-surface: linear-gradient(155deg, rgb(39 125 205 / 86%), rgb(31 95 162 / 88%) 52%, rgb(25 65 113 / 94%));
+    --hud-shadow:
+      0 0 0 1px rgb(155 255 251 / 28%), 0 0 16px rgb(45 188 255 / 30%), 0 18px 48px rgb(2 13 33 / 55%),
+      inset 0 0 0 3px rgb(10 47 89 / 45%), inset 0 0 0 4px rgb(135 255 245 / 18%), inset 0 0 28px rgb(60 175 255 / 12%);
+    --btn-bg: #164976;
+    --btn-hover-bg: #246ca7;
+    --btn-shadow: inset 0 0 12px rgb(80 190 255 / 10%), 0 2px 5px rgb(2 15 35 / 25%);
+    --panel-bg: rgb(36 90 120 / 55%);
+    --panel-title-bg: linear-gradient(180deg, #214e68 0%, #17384f 100%);
+    --row-bg: rgb(27 67 88 / 45%);
+    --row-bg-hover: rgb(52 106 137 / 65%);
+    --text-shadow: 0 1px 2px #071b35;
+    --crawl-border: rgb(131 223 255 / 55%);
+    --crawl-muted: #c0dfef;
+    --crawl-accent: var(--hud-cyan);
+    --crawl-accent-soft: rgb(140 255 246 / 18%);
+    --color-text-primary: #f2fcff;
+    --color-border: var(--crawl-border);
+
+    font-family: 'Quantico', var(--font-sans, sans-serif);
+    color: #f2fcff;
+    background: var(--hud-surface);
+    border: 2px solid var(--hud-edge);
+    border-radius: 16px;
+    corner-shape: bevel;
+    box-shadow: var(--hud-shadow);
+    scrollbar-color: #73d7ff #153c68;
+  }
+  .application.crawlspace > .window-header {
+    height: 30px;
+    padding: 0 10px;
+    color: #fff;
+    background: linear-gradient(90deg, rgb(12 52 100 / 80%), rgb(45 130 204 / 70%));
+    border-bottom: 1px solid var(--hud-cyan);
+    border-radius: 14px 14px 0 0;
+    corner-shape: bevel;
+    font-family: inherit;
+    letter-spacing: 0.025em;
+    text-shadow:
+      0 1px 3px #051932,
+      0 0 10px rgb(96 221 255 / 35%);
+  }
+  .application.crawlspace > .window-header .window-title {
+    font-weight: 700;
+  }
+  .application.crawlspace .window-content {
+    background: transparent;
+    color: #f2fcff;
+  }
+  .application.crawlspace .window-content :is(label, span, strong, h1, h2, h3, h4, legend, summary, p, dt, dd, th, td) {
+    color: #fff;
+    text-shadow: var(--text-shadow);
+  }
+  .application.crawlspace .window-content a {
+    color: #fff;
+  }
+  .application.crawlspace .window-content a:hover {
+    color: var(--hud-cyan);
+    text-shadow: 0 0 6px rgb(140 255 246 / 50%);
+  }
+  .application.crawlspace .window-content :is(input[type='text'], input[type='number'], input:not([type]), textarea, select) {
+    color: var(--dcc-input-text);
+    background: var(--dcc-input);
+    border: 1px solid var(--dcc-blue-dark);
+    border-radius: 2px;
+    box-shadow: none;
+    text-shadow: none;
+    font-family: inherit;
+  }
+  .application.crawlspace .window-content :is(input, textarea)::placeholder {
+    color: var(--dcc-placeholder);
+  }
+  .application.crawlspace .window-content :is(input, textarea, select):focus {
+    outline: 2px solid var(--hud-cyan);
+    outline-offset: 0;
+    box-shadow: none;
+  }
+  .application.crawlspace .window-content input[type='number'] {
+    appearance: textfield;
+  }
+  .application.crawlspace .window-content input[type='number']::-webkit-inner-spin-button,
+  .application.crawlspace .window-content input[type='number']::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+  .application.crawlspace .window-content input[readonly] {
+    cursor: default;
+  }
+  .application.crawlspace .window-content button {
+    width: auto;
+    color: #fff;
+    background: var(--btn-bg);
+    border: 2px solid var(--dcc-blue-light);
+    border-radius: 2px;
+    box-shadow: var(--btn-shadow);
+    font-family: inherit;
+    text-shadow: none;
+  }
+  .application.crawlspace .window-content button:hover:not(:disabled) {
+    background: var(--btn-hover-bg);
+    border-color: var(--hud-cyan);
+  }
+  .application.crawlspace .window-content button:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  .application.crawlspace .window-content hr {
+    width: 100%;
+    margin: 6px 0;
+    border: 0;
+    border-top: 1px solid var(--dcc-blue-light);
+  }
+  .application.crawlspace h3 {
+    border-bottom-color: var(--crawl-border);
+  }
+  .application.crawlspace fieldset {
+    border-color: var(--crawl-border);
+    background: rgb(13 52 99 / 25%);
+  }
+
+  /* Foundry's standard tab strip (mob, NPC and item sheets). */
+  .application.crawlspace nav.tabs:not(.crawl-tabs) {
+    gap: 4px;
+    padding: 4px;
+    background: rgb(9 42 84 / 58%);
+    border: 1px solid var(--hud-edge);
+    border-radius: 8px 2px;
+    corner-shape: bevel;
+  }
+  .application.crawlspace nav.tabs:not(.crawl-tabs) > [data-tab] {
+    padding: 2px 10px;
+    color: #fff;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    text-shadow: var(--text-shadow);
+  }
+  .application.crawlspace nav.tabs:not(.crawl-tabs) > [data-tab].active {
+    background: linear-gradient(180deg, #318fda, #216baf);
+    border-color: var(--hud-cyan);
+    box-shadow:
+      inset 0 -2px var(--hud-cyan),
+      0 0 9px rgb(90 228 255 / 30%);
+  }
+
+  /* Tables and lists share CrawlSpace's title bars and translucent rows. */
+  .application.crawlspace .list-header {
+    min-height: 30px;
+    margin-top: 10px;
+    padding: 3px 8px;
+    color: #fff;
+    background: var(--panel-title-bg);
+    border: 1px solid var(--dcc-blue-light);
+    border-radius: 0;
+  }
+  .application.crawlspace .item-list {
+    border-inline: 1px solid rgb(131 223 255 / 35%);
+  }
+  .application.crawlspace :is(.item-row, .effect-row) {
+    min-height: 32px;
+    background: var(--row-bg);
+    border-bottom: 1px solid rgb(131 223 255 / 35%);
+  }
+  .application.crawlspace :is(.item-row, .effect-row):hover {
+    background: var(--row-bg-hover);
+  }
+  .application.crawlspace .item-row .col input {
+    height: 22px;
+    font-size: 12px;
+  }
+  .application.crawlspace .item-list .empty {
+    color: var(--crawl-muted);
+    background: var(--row-bg);
+  }
+  .application.crawlspace .hotlist {
+    border: 1px dashed var(--dcc-blue-light);
+  }
+  .application.crawlspace .list-panel {
+    min-width: 0;
+    margin-bottom: 14px;
+    background: var(--panel-bg);
+    border: 1px solid var(--dcc-blue-light);
+  }
+  .application.crawlspace .list-panel > .item-list {
+    border-inline: 0;
+  }
+  .application.crawlspace .table-section-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    margin: 0;
+    padding: 3px 8px;
+    background: var(--panel-title-bg);
+    border: 0;
+    border-bottom: 1px solid var(--dcc-blue-light);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+  }
+  .application.crawlspace .table-section-title small {
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+  .application.crawlspace .doll-slot {
+    color: var(--dcc-input-text);
+    background: var(--dcc-input);
+    border: 2px solid var(--dcc-blue-light);
+    border-radius: 0;
+  }
+  .application.crawlspace .doll-slot :is(.slot-label, .slot-item) {
+    color: var(--dcc-input-text);
+    text-shadow: none;
+  }
+  .application.crawlspace .doll-slot.filled {
+    border-color: var(--hud-cyan);
+  }
+
+  /* =========================================================
+     Crawler sheet: CrawlSpace's sidebar + header + icon tabs layout.
+     ========================================================= */
+  .crawlspace.crawler .window-content {
+    display: grid;
+    grid-template-columns: 215px minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 1.35;
+    container-type: inline-size;
+  }
+  .crawlspace.crawler .window-content > :not(.crawl-sidebar) {
+    grid-column: 2;
+    min-width: 0;
+  }
+  .crawlspace.crawler .window-content > .tab {
+    grid-row: 3;
+    min-height: 0;
+    padding: 12px;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .crawlspace.crawler label {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    flex-direction: unset;
+    align-items: center;
+    gap: 7px;
+    color: #fff;
+    font-size: 12px;
+  }
+  .crawlspace.crawler label.check {
+    display: flex;
+  }
+  .crawlspace.crawler .item-row label.col.mark {
+    display: flex;
+  }
+  .crawlspace.crawler :is(.crawl-sidebar, .crawl-top, .tab.character) :is(input, textarea) {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 28px;
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+  .crawlspace.crawler textarea {
+    field-sizing: content;
+    min-height: 28px;
+    resize: vertical;
+  }
+
+  /* ---- Sidebar ---- */
+  .crawlspace.crawler .crawl-sidebar {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+    padding: 12px 10px;
+    overflow: auto;
+    background: linear-gradient(180deg, rgb(10 43 82 / 78%), rgb(28 81 132 / 62%));
+    border-right: 1px solid var(--hud-edge);
+  }
+  .crawlspace.crawler .crawl-logo {
+    flex: none;
+    width: 100%;
+    height: 85px;
+    padding-bottom: 10px;
+    object-fit: contain;
+    border: 0;
+    border-bottom: 1px solid var(--dcc-blue-light);
+    border-radius: 0;
+  }
+  .crawlspace.crawler .crawl-sidebar label {
+    grid-template-columns: 64px minmax(0, 1fr);
+    font-size: 11px;
+  }
+  .crawlspace.crawler .crawl-sidebar input {
+    height: 24px;
+    min-height: 24px;
+    padding: 2px 4px;
+    text-align: center;
+  }
+  .crawlspace.crawler .mana-label {
+    margin-bottom: 3px;
+    font-weight: 700;
+    text-align: center;
+    text-shadow: var(--text-shadow);
+  }
+  .crawlspace.crawler .mana-fields {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 32px;
+  }
+  .crawlspace.crawler .crawl-sidebar .mana-fields input {
+    flex: 1;
+    height: 30px;
+    padding: 0;
+    color: #fff;
+    background: transparent;
+    border: 0;
+    font-size: 18px;
+    font-weight: 700;
+    text-shadow: var(--text-shadow);
+  }
+  .crawlspace.crawler .crawl-sidebar .mana-fields input:not([readonly]):hover {
+    background: rgb(255 255 255 / 8%);
+  }
+  .crawlspace.crawler .mana-slash {
+    font-size: 18px;
+  }
+  .crawlspace.crawler .buff-button-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .crawlspace.crawler .crawl-sidebar button {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 26px;
+    padding: 4px 2px;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  .crawlspace.crawler .buff-button-row .shield-button {
+    grid-column: 1 / -1;
+  }
+  .crawlspace.crawler .sidebar-evade {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .crawlspace.crawler .crawl-sidebar :is(.sidebar-evade label, .sidebar-dr) {
+    flex: none;
+    grid-template-columns: 38px 48px;
+  }
+  .crawlspace.crawler .crawl-sidebar .sidebar-dr {
+    padding-left: 42px;
+  }
+  .crawlspace.crawler .evade-die {
+    flex: none;
+    width: 34px;
+    height: 38px;
+    color: #fff;
+  }
+  .crawlspace.crawler .evade-die svg {
+    display: block;
+    width: 100%;
+  }
+  .crawlspace.crawler .evade-die text {
+    font-family: inherit;
+  }
+  .crawlspace.crawler .sidebar-responses > section {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--dcc-blue-light);
+  }
+  .crawlspace.crawler .sidebar-responses > section:first-child {
+    border-top: 1px solid var(--dcc-blue-light);
+    padding-top: 2px;
+  }
+  .crawlspace.crawler .response-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+  }
+  .crawlspace.crawler .response-section-header h3 {
+    margin: 5px 0 3px;
+    padding: 0;
+    border: 0;
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+  .crawlspace.crawler .crawl-sidebar .response-section-header button {
+    width: auto;
+    min-height: 16px;
+    padding: 0 4px;
+    border-width: 1px;
+    box-shadow: none;
+    font-size: 9px;
+  }
+  .crawlspace.crawler .response-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+  .crawlspace.crawler .response-tags > span {
+    padding: 1px 4px;
+    background: var(--dcc-blue-dark);
+    border: 1px solid var(--dcc-blue-light);
+    border-radius: 2px;
+    font-size: 10px;
+  }
+  .crawlspace.crawler .crawl-sidebar .upkeep-button {
+    margin-top: 4px;
+  }
+
+  /* ---- Header: identity, health bar, mana bar ---- */
+  .crawlspace.crawler .crawl-top {
+    grid-row: 1;
+    padding: 10px;
+    background: rgb(36 90 120 / 70%);
+    border-bottom: 2px solid var(--dcc-blue-light);
+  }
+  .crawlspace.crawler .crawl-identity {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 100px 185px;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .crawlspace.crawler .level-up-field {
+    display: flex;
+    gap: 4px;
+  }
+  .crawlspace.crawler .crawl-top .level-up-field input {
+    flex: 1;
+  }
+  .crawlspace.crawler .level-up-field button {
+    flex: none;
+    min-height: 28px;
+    padding: 2px 6px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .crawlspace.crawler .progress-track {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    height: 43px;
+    padding: 3px;
+    background: linear-gradient(90deg, #df3028 0%, #ed8a21 25%, #d6a827 50%, #69a54c 75%, #318b45 100%);
+  }
+  .crawlspace.crawler .progress-box {
+    position: relative;
+    height: 24px;
+    margin: 0 2px;
+    background: var(--dcc-navy);
+    border: 2px solid var(--dcc-blue-light);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  .crawlspace.crawler .progress-box:hover {
+    border-color: var(--hud-cyan);
+    box-shadow: 0 0 6px rgb(140 255 246 / 60%);
+  }
+  .crawlspace.crawler .crawl-top .progress-box input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+    color: #fff;
+    background: transparent;
+    border: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+    pointer-events: none;
+  }
+  .crawlspace.crawler .progress-box span {
+    position: absolute;
+    z-index: 2;
+    bottom: -17px;
+    left: 0;
+    width: 100%;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .crawlspace.crawler .progress-box.health-pressed {
+    background: #000;
+  }
+  .crawlspace.crawler .crawl-top .progress-box.health-pressed input {
+    color: transparent;
+  }
+  .crawlspace.crawler .health-shield-wrapper {
+    padding: 6px;
+    border: 3px solid #cda8f5;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #70409f 0%, #a76bd2 25%, #7b49ad 50%, #b77de3 75%, #673693 100%);
+    box-shadow:
+      inset 0 2px 5px rgb(255 255 255 / 35%),
+      inset 0 -4px 8px rgb(35 10 65 / 45%),
+      0 0 8px rgb(174 111 255 / 30%);
+  }
+  .crawlspace.crawler .progress-track.shield-track {
+    height: auto;
+    grid-auto-rows: 30px;
+    row-gap: 4px;
+    padding: 8px 4px 2px;
+    background: transparent;
+  }
+  .crawlspace.crawler .dying-tag {
+    margin: 4px 0 0;
+    color: #ff8f8f;
+    font-weight: 700;
+  }
+  .crawlspace.crawler .mana-bar-track {
+    height: 8px;
+    margin-top: 8px;
+    overflow: hidden;
+    background: var(--dcc-navy-dark);
+    border: 1px solid var(--dcc-blue-light);
+    border-radius: 12px;
+  }
+  .crawlspace.crawler .mana-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8acb75, #b7e99a);
+    transition: width 0.2s ease;
+  }
+
+  /* ---- Icon tab strip ---- */
+  .crawlspace.crawler .crawl-tabs {
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 4px 10px;
+    background: rgb(13 52 99 / 44%);
+    border: 0;
+    border-bottom: 1px solid var(--hud-cyan);
+    border-radius: 0;
+  }
+  .crawlspace.crawler .crawl-tab-title {
+    margin-right: auto;
+    padding-left: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-shadow:
+      0 2px 3px #082545,
+      0 0 14px rgb(85 223 255 / 40%);
+  }
+  .crawlspace.crawler .crawl-tab-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .crawlspace.crawler .crawl-tab-icons > a {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 35px;
+    height: 35px;
+    margin: 0;
+    padding: 0;
+    color: #fff;
+    background: var(--btn-bg);
+    border: 2px solid var(--dcc-blue-light);
+    border-radius: 50%;
+    text-shadow: none;
+  }
+  .crawlspace.crawler .crawl-tab-icons > a:hover {
+    background: var(--btn-hover-bg);
+    border-color: var(--hud-cyan);
+  }
+  .crawlspace.crawler .crawl-tab-icons > a.active {
+    background: linear-gradient(180deg, #318fda, #216baf);
+    border-color: var(--hud-cyan);
+    box-shadow:
+      inset 0 -2px var(--hud-cyan),
+      0 0 9px rgb(90 228 255 / 30%);
+  }
+  .crawlspace.crawler .crawl-tab-icons svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* ---- Character tab ---- */
+  .crawlspace.crawler .char-intro {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+  }
+  .crawlspace.crawler .portrait-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .crawlspace.crawler .portrait-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 115px;
+    overflow: hidden;
+    background: var(--dcc-navy-dark);
+    border: 1px solid var(--dcc-blue-light);
+  }
+  .crawlspace.crawler .portrait-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border: 0;
+    cursor: pointer;
+  }
+  .crawlspace.crawler .portrait-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+  .crawlspace.crawler .portrait-actions button {
+    min-height: 0;
+    padding: 2px 4px;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+  .crawlspace.crawler .char-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px 16px;
+  }
+  .crawlspace.crawler .char-fields label {
+    grid-template-columns: 90px minmax(0, 1fr);
+  }
+  .crawlspace.crawler .char-attributes {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 7px;
+    margin: 10px 0;
+  }
+  .crawlspace.crawler .attribute-card {
+    min-width: 0;
+    padding: 6px;
+    background: var(--panel-bg);
+    border: 1px solid var(--dcc-blue-light);
+  }
+  .crawlspace.crawler .attribute-card h3 {
+    display: block;
+    margin: 0 0 5px;
+    padding: 0;
+    border: 0;
+    font-size: 11px;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+  .crawlspace.crawler .stat-values {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 7px minmax(0, 1fr);
+    gap: 3px;
+    align-items: start;
+  }
+  .crawlspace.crawler .stat-values label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 8px;
+  }
+  .crawlspace.crawler .tab.character .attribute-card input {
+    min-height: 24px;
+    padding: 3px;
+    font-size: 11px;
+    text-align: center;
+  }
+  .crawlspace.crawler .attribute-slash {
+    padding-top: 4px;
+    font-size: 17px;
+  }
+  .crawlspace.crawler .stat-mod {
+    margin-top: 8px;
+    font-size: 8px;
+  }
+  .crawlspace.crawler .char-background {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .crawlspace.crawler .char-background label {
+    grid-template-columns: 80px minmax(0, 1fr);
+  }
+  .crawlspace.crawler .char-social {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+  }
+  .crawlspace.crawler .club-rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .crawlspace.crawler .club-rows li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 6px;
+    background: var(--row-bg);
+    border-bottom: 1px solid rgb(131 223 255 / 35%);
+  }
+  .crawlspace.crawler .list-panel > button {
+    margin: 0;
+    padding: 2px 8px;
+    font-size: 12px;
+  }
+  .crawlspace.crawler .char-sponsors {
+    display: grid;
+    gap: 7px;
+    padding-top: 5px;
+  }
+  .crawlspace.crawler .char-sponsors label {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+  .crawlspace.crawler .char-calculations {
+    margin-top: 14px;
+    border: 1px solid rgb(131 223 255 / 45%);
+    background: rgb(8 32 49 / 24%);
+  }
+  .crawlspace.crawler .char-calculations > summary {
+    padding: 7px 9px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .crawlspace.crawler .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 6px 14px;
+    padding: 4px 9px 10px;
+  }
+  .crawlspace.crawler .calc-grid label {
+    grid-template-columns: minmax(0, 1fr) 70px;
+    font-size: 11px;
+  }
+
+  /* ---- Other crawler tabs ---- */
+  .crawlspace.crawler .tab > .list-header:first-child,
+  .crawlspace.crawler .tab > .inventory-top + .list-header {
+    margin-top: 0;
+  }
+  .crawlspace.crawler .bio-grid label {
+    grid-template-columns: 110px minmax(0, 1fr);
+  }
+  .crawlspace.crawler .gold {
+    display: flex;
+  }
+
+  @container (max-width: 720px) {
+    .crawlspace.crawler .char-intro,
+    .crawlspace.crawler .char-social,
+    .crawlspace.crawler .char-background {
+      grid-template-columns: 1fr;
+    }
+    .crawlspace.crawler .char-attributes {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .crawlspace.crawler .crawl-identity {
+      grid-template-columns: minmax(0, 1fr) 70px 150px;
+      gap: 5px;
+    }
+    .crawlspace.crawler .crawl-identity label {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+
+  /* Dialogs opened from the crawler sheet. */
+  .crawl-trait-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px 12px;
+  }
+  .crawl-trait-grid label.check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .crawl-dialog-field {
+    display: grid;
+    gap: 4px;
   }
 }

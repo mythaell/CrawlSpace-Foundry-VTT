@@ -1,14 +1,6 @@
 <section class="tab biography {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
   <div class="bio-grid">
-    <label>{{localize "CRAWLSPACE.Crawler.Gender"}}<input type="text" name="system.details.gender" value="{{systemSource.details.gender}}"></label>
-    <label>{{localize "CRAWLSPACE.Crawler.Size"}}<input type="text" name="system.details.size" value="{{systemSource.details.size}}"></label>
-    <label>{{localize "CRAWLSPACE.Crawler.Popularity"}}<input type="number" name="system.details.popularity" value="{{systemSource.details.popularity}}"></label>
-    <label>{{localize "CRAWLSPACE.Crawler.Deity"}}<input type="text" name="system.details.deity" value="{{systemSource.details.deity}}"></label>
-    <label>{{localize "CRAWLSPACE.Crawler.Childhood"}}<input type="text" name="system.background.childhood" value="{{systemSource.background.childhood}}"></label>
-    <label>{{localize "CRAWLSPACE.Crawler.Adolescence"}}<input type="text" name="system.background.adolescence" value="{{systemSource.background.adolescence}}"></label>
-    <label>{{localize "CRAWLSPACE.Crawler.Career"}}<input type="text" name="system.background.career" value="{{systemSource.background.career}}"></label>
-    <label>{{localize "CRAWLSPACE.Crawler.Hobby"}}<input type="text" name="system.background.hobby" value="{{systemSource.background.hobby}}"></label>
-    <label>{{localize "CRAWLSPACE.Crawler.PersonalSpace"}}<input type="text" name="system.personalSpace.tier" value="{{systemSource.personalSpace.tier}}"></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.PersonalSpace"}}</span><input type="text" name="system.personalSpace.tier" value="{{systemSource.personalSpace.tier}}"></label>
   </div>
   <h3>{{localize "CRAWLSPACE.Crawler.Biography"}}</h3>
   {{#if editable}}<prose-mirror name="system.biography" value="{{systemSource.biography}}" toggled>{{{enriched.biography}}}</prose-mirror>{{else}}{{{enriched.biography}}}{{/if}}

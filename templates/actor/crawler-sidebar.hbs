@@ -1,0 +1,50 @@
+<aside class="crawl-sidebar">
+  <img class="crawl-logo" src="systems/crawlspace/assets/crawlspace-logo.png" alt="CrawlSpace">
+
+  <div class="mana-box" data-tooltip="{{localize 'CRAWLSPACE.Sheet.ManaHint'}}">
+    <div class="mana-label">{{localize "CRAWLSPACE.Stat.Mana"}}</div>
+    <div class="mana-fields">
+      <input type="number" name="system.mana.value" value="{{systemSource.mana.value}}" min="0" aria-label="{{localize 'CRAWLSPACE.Sheet.CurrentMana'}}">
+      <span class="mana-slash">/</span>
+      <input type="text" value="{{system.mana.max}}" readonly tabindex="-1" aria-label="{{localize 'CRAWLSPACE.Sheet.MaxMana'}}">
+    </div>
+  </div>
+
+  <div class="buff-button-row">
+    <button type="button" class="shield-button" data-action="shieldPrompt">{{localize "CRAWLSPACE.Section.Shield"}}</button>
+    <button type="button" data-action="openEffects">{{localize "CRAWLSPACE.Effect.Debuffs"}}</button>
+    <button type="button" data-action="openEffects">{{localize "CRAWLSPACE.Effect.Buffs"}}</button>
+  </div>
+
+  <div class="sidebar-evade">
+    <a class="evade-die" data-action="rollStat" data-stat="evade" data-tooltip="{{localize 'CRAWLSPACE.Roll.EvadeHint'}}" aria-label="{{localize 'CRAWLSPACE.Roll.EvadeHint'}}">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M20 2L37 12V29L20 38L3 29V12Z M20 2L9 28H31ZM3 12L9 28L20 38L31 28L37 12" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <text x="20" y="25" text-anchor="middle" font-size="12" fill="currentColor">20</text>
+      </svg>
+    </a>
+    <label data-tooltip="{{evadeTooltip}}"><span>{{localize "CRAWLSPACE.Stat.Evade"}}</span><input type="text" value="{{system.evade.total}}" readonly tabindex="-1"></label>
+  </div>
+  <label class="sidebar-dr" data-tooltip="{{drTooltip}}"><span>{{localize "CRAWLSPACE.Stat.DR"}}</span><input type="text" value="{{system.dr.total}}" readonly tabindex="-1"></label>
+
+  <div class="sidebar-responses">
+    {{#each traitSections as |section|}}
+    <section>
+      <div class="response-section-header">
+        <h3>{{section.label}}</h3>
+        {{#if @root.editable}}<button type="button" data-action="editTraits" data-trait="{{section.key}}"><i class="fa-solid fa-pen"></i> {{localize "CRAWLSPACE.Sheet.Edit"}}</button>{{/if}}
+      </div>
+      {{#if section.values.length}}
+      <div class="response-tags">{{#each section.values}}<span>{{this}}</span>{{/each}}</div>
+      {{/if}}
+    </section>
+    {{/each}}
+  </div>
+
+  <label><span>{{localize "CRAWLSPACE.Crawler.AiFavor"}}</span><input type="number" name="system.details.aiFavor" value="{{systemSource.details.aiFavor}}"></label>
+  <label><span>{{localize "CRAWLSPACE.Crawler.Popularity"}}</span><input type="number" name="system.details.popularity" value="{{systemSource.details.popularity}}"></label>
+  <hr>
+  <label><span>{{localize "CRAWLSPACE.Stat.Move"}}</span><input type="text" value="{{system.move.total}}" readonly tabindex="-1"></label>
+  <label><span>{{localize "CRAWLSPACE.Stat.Step"}}</span><input type="text" value="{{system.step.total}}" readonly tabindex="-1"></label>
+  {{#if editable}}<button type="button" class="upkeep-button" data-action="upkeep">{{localize "CRAWLSPACE.Upkeep.Button"}}</button>{{/if}}
+</aside>

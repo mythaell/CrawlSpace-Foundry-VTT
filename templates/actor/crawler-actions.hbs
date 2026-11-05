@@ -1,0 +1,16 @@
+<section class="tab actions {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <section class="list-panel">
+    <h2 class="table-section-title">{{localize "CRAWLSPACE.Section.Attacks"}}</h2>
+    <ol class="item-list attacks">
+      {{#each attacks as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="attack"}}{{/each}}
+      <li class="item-row unarmed"><a class="item-name rollable" data-action="attackUnarmed"><i class="fa-solid fa-hand-fist"></i> {{localize "CRAWLSPACE.Attack.Unarmed"}}</a></li>
+    </ol>
+  </section>
+
+  <section class="list-panel">
+    <h2 class="table-section-title">{{localize "CRAWLSPACE.Section.Hotlist"}} <small>({{hotlist.length}}/{{system.hotlist.capacity}})</small></h2>
+    <ol class="item-list hotlist" data-hotlist>
+      {{#each hotlist as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="hotlist"}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Hotlist.Empty"}}</li>{{/each}}
+    </ol>
+  </section>
+</section>

@@ -1,7 +1,8 @@
 import { DAMAGE_TYPES, GEAR_SLOTS, STATS, STAT_KEYS } from '../config'
 import { DEBUFFS } from '../rules/debuffs'
 import { penaltyModifiers, rollAttack, rollCheck } from '../dice/rolls'
-import { openUpkeep } from '../apps/upkeep'
+import { levelUp, openUpkeep } from '../apps/upkeep'
+import { pendingStatPoints } from '../rules/upkeep'
 
 const { HandlebarsApplicationMixin } = foundry.applications.api
 const { ActorSheetV2 } = foundry.applications.sheets
@@ -201,25 +202,48 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   }
 }
 
+/** Tab icons from CrawlSpace's sheet (AlternateCharacterSheet.tsx), drawn inside a 24×24 stroke SVG. */
+const TAB_ICONS: Record<string, string> = {
+  character: '<circle cx="12" cy="7" r="3"/><path d="M5 21v-3a7 7 0 0 1 14 0v3"/>',
+  actions: '<path d="m4 20 13-13 3-4-4 3L3 19m9-9 3 3M5 15l4 4"/>',
+  inventory: '<path d="M5 8h14v13H5zM8 8V5h8v3M5 13h14M10 12v3h4v-3"/>',
+  skills: '<path d="m4 20 13-13M15 4l1-3m4 8 3-1M5 5l1-3m3 8 3-1M16 16l1-3"/><path d="m5 15 4 4"/>',
+  spells: '<path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5Z"/>',
+  abilities: '<path d="m12 2 7 4v6c0 5-7 10-7 10S5 17 5 12V6zM8 12l3 3 5-6"/>',
+  effects: '<path d="M9 2h6M10 2v7L4 19q-1 3 3 3h10q4 0 3-3L14 9V2M7 15h10"/>',
+  biography: '<path d="M12 6C8 3 3 4 3 4v16s5-1 9 2c4-3 9-2 9-2V4s-5-1-9 2Zm0 0v16"/>',
+}
+
+const TRAIT_SECTIONS = ['immunities', 'vulnerabilities', 'resistances'] as const
+
 export class CrawlerSheet extends CrawlActorSheet {
   static DEFAULT_OPTIONS: any = {
     classes: ['crawler'],
-    position: { width: 820, height: 760 },
+    position: { width: 1120, height: 720 },
     actions: {
       slot: CrawlerSheet.#onHealthSlot,
       shield: CrawlerSheet.#onShieldSlot,
+      shieldPrompt: CrawlerSheet.#onShieldPrompt,
       upkeep: CrawlerSheet.#onUpkeep,
+      levelUp: CrawlerSheet.#onLevelUp,
       attackUnarmed: CrawlerSheet.#onUnarmed,
+      openEffects: CrawlerSheet.#onOpenEffects,
+      editTraits: CrawlerSheet.#onEditTraits,
+      removeImage: CrawlerSheet.#onRemoveImage,
+      addClub: CrawlerSheet.#onAddClub,
+      removeClub: CrawlerSheet.#onRemoveClub,
     },
   }
 
   static PARTS = {
+    sidebar: { template: 'systems/crawlspace/templates/actor/crawler-sidebar.hbs', scrollable: [''] },
     header: { template: 'systems/crawlspace/templates/actor/crawler-header.hbs' },
-    tabs: { template: 'templates/generic/tab-navigation.hbs' },
-    main: { template: 'systems/crawlspace/templates/actor/crawler-main.hbs', scrollable: [''] },
+    tabs: { template: 'systems/crawlspace/templates/actor/crawler-tabs.hbs' },
+    character: { template: 'systems/crawlspace/templates/actor/crawler-character.hbs', scrollable: [''] },
+    actions: { template: 'systems/crawlspace/templates/actor/crawler-actions.hbs', scrollable: [''] },
+    inventory: { template: 'systems/crawlspace/templates/actor/crawler-inventory.hbs', scrollable: [''] },
     skills: { template: 'systems/crawlspace/templates/actor/crawler-skills.hbs', scrollable: [''] },
     spells: { template: 'systems/crawlspace/templates/actor/crawler-spells.hbs', scrollable: [''] },
-    inventory: { template: 'systems/crawlspace/templates/actor/crawler-inventory.hbs', scrollable: [''] },
     abilities: { template: 'systems/crawlspace/templates/actor/crawler-abilities.hbs', scrollable: [''] },
     effects: { template: 'systems/crawlspace/templates/actor/effects.hbs', scrollable: [''] },
     biography: { template: 'systems/crawlspace/templates/actor/crawler-biography.hbs', scrollable: [''] },
@@ -227,26 +251,64 @@ export class CrawlerSheet extends CrawlActorSheet {
 
   static TABS = {
     primary: {
-      tabs: [
-        { id: 'main', icon: 'fa-solid fa-user' },
-        { id: 'skills', icon: 'fa-solid fa-dumbbell' },
-        { id: 'spells', icon: 'fa-solid fa-wand-sparkles' },
-        { id: 'inventory', icon: 'fa-solid fa-sack' },
-        { id: 'abilities', icon: 'fa-solid fa-dna' },
-        { id: 'effects', icon: 'fa-solid fa-bolt' },
-        { id: 'biography', icon: 'fa-solid fa-book' },
-      ],
-      initial: 'main',
+      tabs: ['character', 'actions', 'inventory', 'skills', 'spells', 'abilities', 'effects', 'biography'].map((id) => ({ id })),
+      initial: 'character',
       labelPrefix: 'CRAWLSPACE.Tab',
     },
   }
+
+  /** The Calculations drawer stays open across re-renders. */
+  #calculationsOpen = false
 
   async _preparePartContext(partId: string, context: any, options: any) {
     context = await super._preparePartContext(partId, context, options)
     if (context.tabs?.[partId]) context.tab = context.tabs[partId]
     const actor = this.actor
+    const system = actor.system
     const items = [...actor.items].sort((a: any, b: any) => (a.sort || 0) - (b.sort || 0))
     switch (partId) {
+      case 'sidebar': {
+        const evadeBuffs = system.evade.buff + (system.evade.bonus ?? 0)
+        const drBuffs = system.dr.buff + (system.dr.bonus ?? 0)
+        context.evadeTooltip = `DEX MOD (${system.attributes.dex.mod}) + ${game.i18n.localize('CRAWLSPACE.Stat.EvadeBuffs')} (${evadeBuffs}) = ${system.evade.total}`
+        context.drTooltip = `${game.i18n.localize('CRAWLSPACE.Stat.ArmorBase')} (${system.dr.armorTotal}) + ${game.i18n.localize('CRAWLSPACE.Stat.DrBuffs')} (${drBuffs}) = ${system.dr.total}`
+        context.traitSections = TRAIT_SECTIONS.map((key) => ({
+          key,
+          label: game.i18n.localize(`CRAWLSPACE.Sheet.${key}`),
+          values: [...(system.traits[key] ?? [])].sort(),
+        }))
+        break
+      }
+      case 'header':
+        // Left to right: 10% … 100%, like CrawlSpace's health bar.
+        context.healthBoxes = [...system.health.slots].reverse()
+        context.shieldBoxes = system.shield.slots.map((on: boolean, index: number) => ({ on, index })).filter((slot: any) => slot.on)
+        context.pendingStatPoints = pendingStatPoints(system.details.level, system.upkeep.allocatedThroughLevel)
+        break
+      case 'tabs': {
+        for (const tab of Object.values(context.tabs ?? {}) as any[]) tab.svg = TAB_ICONS[tab.id] ?? ''
+        const active = Object.values(context.tabs ?? {}).find((tab: any) => tab.active) as any
+        context.activeTabLabel = active ? game.i18n.localize(active.label) : ''
+        break
+      }
+      case 'character':
+        context.clubs = system.clubs.map((value: string, index: number) => ({ value, index }))
+        context.sponsors = Array.from({ length: Math.max(3, system.details.sponsors.length) }, (_, index) => ({
+          index,
+          number: index + 1,
+          value: system.details.sponsors[index] ?? '',
+        }))
+        context.calculationsOpen = this.#calculationsOpen
+        break
+      case 'actions':
+        context.attacks = items
+          .filter((i: any) => (i.type === 'weapon' && i.system.equipped) || ((i.type === 'skill' || i.type === 'spell') && i.system.isAttack))
+          .map((i: any) => this.itemRow(i))
+        context.hotlist = system.hotlist.items
+          .map((id: string) => actor.items.get(id))
+          .filter(Boolean)
+          .map((i: any) => this.itemRow(i))
+        break
       case 'skills':
         context.skills = items.filter((i: any) => i.type === 'skill').map((i: any) => this.itemRow(i))
         break
@@ -265,7 +327,7 @@ export class CrawlerSheet extends CrawlActorSheet {
           label,
           items: rows.filter((row: any) => row.type === 'equipment' && row.system.equipped && row.system.slot === slot),
         }))
-        context.gold = actor.system.details.gold
+        context.gold = system.details.gold
         break
       }
       case 'abilities': {
@@ -281,26 +343,103 @@ export class CrawlerSheet extends CrawlActorSheet {
       }
       case 'biography':
         context.enriched = {
-          biography: await this.enrich(actor.system.biography),
-          notes: await this.enrich(actor.system.notes),
-          pastTrauma: await this.enrich(actor.system.journal.pastTrauma),
-          looseEnds: await this.enrich(actor.system.journal.looseEnds),
-          regrets: await this.enrich(actor.system.journal.regrets),
+          biography: await this.enrich(system.biography),
+          notes: await this.enrich(system.notes),
+          pastTrauma: await this.enrich(system.journal.pastTrauma),
+          looseEnds: await this.enrich(system.journal.looseEnds),
+          regrets: await this.enrich(system.journal.regrets),
         }
-        break
-      case 'main':
-        context.healthSlots = actor.system.health.slots
-        context.shieldSlots = actor.system.shield.slots.map((on: boolean, index: number) => ({ on, index }))
-        context.attacks = items
-          .filter((i: any) => (i.type === 'weapon' && i.system.equipped) || ((i.type === 'skill' || i.type === 'spell') && i.system.isAttack))
-          .map((i: any) => this.itemRow(i))
-        context.hotlist = actor.system.hotlist.items
-          .map((id: string) => actor.items.get(id))
-          .filter(Boolean)
-          .map((i: any) => this.itemRow(i))
         break
     }
     return context
+  }
+
+  async _onRender(context: any, options: any) {
+    await super._onRender(context, options)
+    this.element.querySelector('details.char-calculations')?.addEventListener('toggle', (event: Event) => {
+      this.#calculationsOpen = (event.currentTarget as HTMLDetailsElement).open
+    })
+  }
+
+  /** Keep the nav title in step with the selected tab without a re-render. */
+  changeTab(tab: string, group: string, options?: any) {
+    super.changeTab(tab, group, options)
+    const title = this.element?.querySelector('.crawl-tab-title')
+    const button = this.element?.querySelector(`.crawl-tab-icons [data-tab="${tab}"]`) as HTMLElement | null
+    if (title && button?.dataset.label) title.textContent = button.dataset.label
+  }
+
+  /** Clubs and sponsors post as `system.clubs.0`…; turn them back into arrays. */
+  _processFormData(event: any, form: any, formData: any) {
+    const data = super._processFormData(event, form, formData)
+    for (const path of ['system.clubs', 'system.details.sponsors']) {
+      const value = foundry.utils.getProperty(data, path)
+      if (!value || typeof value !== 'object' || Array.isArray(value)) continue
+      const current = [...(foundry.utils.getProperty(this.actor._source, path) ?? [])]
+      for (const [index, entry] of Object.entries(value)) current[Number(index)] = entry
+      foundry.utils.setProperty(data, path, current)
+    }
+    return data
+  }
+
+  static async #onLevelUp(this: CrawlerSheet) {
+    return levelUp(this.actor)
+  }
+
+  static async #onOpenEffects(this: CrawlerSheet) {
+    this.changeTab('effects', 'primary')
+  }
+
+  static async #onRemoveImage(this: CrawlerSheet) {
+    await this.actor.update({ img: (this.actor.constructor as any).DEFAULT_ICON ?? 'icons/svg/mystery-man.svg' })
+  }
+
+  static async #onAddClub(this: CrawlerSheet) {
+    await this.actor.update({ 'system.clubs': [...this.actor._source.system.clubs, ''] })
+  }
+
+  static async #onRemoveClub(this: CrawlerSheet, _event: PointerEvent, target: HTMLElement) {
+    const clubs = [...this.actor._source.system.clubs]
+    clubs.splice(Number(target.dataset.index), 1)
+    await this.actor.update({ 'system.clubs': clubs })
+  }
+
+  /** CrawlSpace's Shield popup: set how many shield slots the crawler has (each worth CON mod). */
+  static async #onShieldPrompt(this: CrawlerSheet) {
+    const current = this.actor.system.shield.slots.filter(Boolean).length
+    const label = game.i18n.format('CRAWLSPACE.Sheet.ShieldSlots', { value: this.actor.system.shield.value })
+    const count = await foundry.applications.api.DialogV2.prompt({
+      window: { title: game.i18n.localize('CRAWLSPACE.Section.Shield') },
+      content: `<label class="crawl-dialog-field"><span>${label}</span><input type="number" name="slots" min="0" max="20" value="${current}" autofocus></label>`,
+      ok: {
+        label: game.i18n.localize('CRAWLSPACE.Sheet.Apply'),
+        callback: (_event: Event, button: any) => Number(button.form.elements.slots.value) || 0,
+      },
+      rejectClose: false,
+    })
+    if (count === null || count === undefined) return
+    await this.actor.update({ 'system.shield.slots': Array.from({ length: Math.clamp(count, 0, 20) }, () => true) })
+  }
+
+  /** Edit Immunities / Vulnerabilities / Resistances as damage-type checkboxes. */
+  static async #onEditTraits(this: CrawlerSheet, _event: PointerEvent, target: HTMLElement) {
+    const key = target.dataset.trait as (typeof TRAIT_SECTIONS)[number]
+    const selected = new Set<string>(this.actor._source.system.traits[key] ?? [])
+    const boxes = ['All', ...DAMAGE_TYPES]
+      .map((type) => `<label class="check"><input type="checkbox" name="types" value="${type}" ${selected.has(type) ? 'checked' : ''}> ${type}</label>`)
+      .join('')
+    const result = await foundry.applications.api.DialogV2.prompt({
+      window: { title: game.i18n.localize(`CRAWLSPACE.Sheet.${key}`) },
+      content: `<div class="crawl-trait-grid">${boxes}</div>`,
+      ok: {
+        label: game.i18n.localize('CRAWLSPACE.Sheet.Apply'),
+        callback: (_event: Event, button: any) =>
+          [...button.form.querySelectorAll('input[name="types"]:checked')].map((input: any) => input.value),
+      },
+      rejectClose: false,
+    })
+    if (!result) return
+    await this.actor.update({ [`system.traits.${key}`]: result })
   }
 
   /** Clicking a health slot sets health to that slot (CrawlSpace's slot click); clicking the top filled slot empties it. */

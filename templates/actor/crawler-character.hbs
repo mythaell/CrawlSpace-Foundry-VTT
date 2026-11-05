@@ -1,0 +1,88 @@
+<section class="tab character {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <div class="char-intro">
+    <div class="portrait-editor">
+      <div class="portrait-box"><img src="{{document.img}}" alt="{{document.name}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}}></div>
+      {{#if editable}}
+      <div class="portrait-actions">
+        <button type="button" data-action="editImage" data-edit="img">{{localize "CRAWLSPACE.Sheet.BrowseImages"}}</button>
+        <button type="button" data-action="removeImage">{{localize "CRAWLSPACE.Sheet.Remove"}}</button>
+      </div>
+      {{/if}}
+    </div>
+    <div class="char-fields">
+      <label><span>{{localize "CRAWLSPACE.Crawler.Race"}}</span><input type="text" name="system.details.race" value="{{systemSource.details.race}}"></label>
+      <label><span>{{localize "CRAWLSPACE.Crawler.Number"}}</span><input type="text" name="system.details.crawlerNumber" value="{{systemSource.details.crawlerNumber}}"></label>
+      <label><span>{{localize "CRAWLSPACE.Crawler.Class"}}</span><input type="text" name="system.details.className" value="{{systemSource.details.className}}"></label>
+      <label><span>{{localize "CRAWLSPACE.Crawler.Deity"}}</span><textarea name="system.details.deity" rows="1">{{systemSource.details.deity}}</textarea></label>
+      <label><span>{{localize "CRAWLSPACE.Crawler.Size"}}</span><input type="text" name="system.details.size" value="{{systemSource.details.size}}"></label>
+      <label><span>{{localize "CRAWLSPACE.Sheet.Pronouns"}}</span><input type="text" name="system.details.gender" value="{{systemSource.details.gender}}"></label>
+    </div>
+  </div>
+  <hr>
+
+  <div class="char-attributes">
+    {{#each stats as |stat|}}
+    <section class="attribute-card">
+      <h3><a class="rollable" data-action="rollStat" data-stat="{{stat.key}}" data-tooltip="{{localize 'CRAWLSPACE.Roll.StatHint'}}">{{stat.label}}</a></h3>
+      <div class="stat-values">
+        <label>
+          <input type="text" value="{{crawlNumberOrBlank stat.total}}" readonly tabindex="-1" aria-label="{{stat.label}} {{localize 'CRAWLSPACE.Sheet.Enhanced'}}"
+                 {{#if stat.bonus}}data-tooltip="{{localize 'CRAWLSPACE.Stat.FromEffects'}}: {{crawlSigned stat.bonus}}"{{/if}}>
+          <span>{{localize "CRAWLSPACE.Sheet.Enhanced"}}</span>
+        </label>
+        <span class="attribute-slash">/</span>
+        <label>
+          <input type="number" name="system.attributes.{{stat.key}}.value" value="{{crawlNumberOrBlank stat.source.value}}" aria-label="{{stat.label}} {{localize 'CRAWLSPACE.Sheet.Unenhanced'}}">
+          <span>{{localize "CRAWLSPACE.Sheet.Unenhanced"}}</span>
+        </label>
+      </div>
+      <label class="stat-mod"><span>{{stat.code}} MOD</span><input type="text" value="{{stat.mod}}" readonly tabindex="-1"></label>
+    </section>
+    {{/each}}
+  </div>
+  <hr>
+
+  <div class="char-background">
+    <label><span>{{localize "CRAWLSPACE.Crawler.Childhood"}}</span><textarea name="system.background.childhood" rows="1">{{systemSource.background.childhood}}</textarea></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.Career"}}</span><textarea name="system.background.career" rows="1">{{systemSource.background.career}}</textarea></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.Adolescence"}}</span><textarea name="system.background.adolescence" rows="1">{{systemSource.background.adolescence}}</textarea></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.Hobby"}}</span><textarea name="system.background.hobby" rows="1">{{systemSource.background.hobby}}</textarea></label>
+  </div>
+  <hr>
+
+  <div class="char-social">
+    <section class="list-panel">
+      <h2 class="table-section-title">{{localize "CRAWLSPACE.Sheet.Clubs"}}</h2>
+      <ol class="club-rows">
+        {{#each clubs as |club|}}
+        <li>
+          <input type="text" name="system.clubs.{{club.index}}" value="{{club.value}}" aria-label="{{localize 'CRAWLSPACE.Sheet.Clubs'}}">
+          {{#if @root.editable}}<a data-action="removeClub" data-index="{{club.index}}" data-tooltip="{{localize 'CRAWLSPACE.Sheet.Remove'}}"><i class="fa-solid fa-xmark"></i></a>{{/if}}
+        </li>
+        {{/each}}
+      </ol>
+      {{#if editable}}<button type="button" data-action="addClub">+ {{localize "CRAWLSPACE.Sheet.AddClub"}}</button>{{/if}}
+    </section>
+    <div class="char-sponsors">
+      {{#each sponsors as |sponsor|}}
+      <label><span>{{localize "CRAWLSPACE.Sheet.Sponsor" number=sponsor.number}}</span><textarea name="system.details.sponsors.{{sponsor.index}}" rows="1">{{sponsor.value}}</textarea></label>
+      {{/each}}
+    </div>
+  </div>
+
+  <details class="char-calculations" {{#if calculationsOpen}}open{{/if}}>
+    <summary>{{localize "CRAWLSPACE.Sheet.Calculations"}}</summary>
+    <div class="calc-grid">
+      <label><span>{{localize "CRAWLSPACE.Stat.ArmorBase"}}</span><input type="number" name="system.dr.armor" value="{{systemSource.dr.armor}}"></label>
+      <label><span>{{localize "CRAWLSPACE.Stat.DrBuffs"}}</span><input type="number" name="system.dr.buff" value="{{systemSource.dr.buff}}"></label>
+      <label><span>{{localize "CRAWLSPACE.Stat.DrOverride"}}</span><input type="number" name="system.dr.override" value="{{crawlNumberOrBlank systemSource.dr.override}}" placeholder="—"></label>
+      <label><span>{{localize "CRAWLSPACE.Stat.EvadeBuffs"}}</span><input type="number" name="system.evade.buff" value="{{systemSource.evade.buff}}"></label>
+      <label><span>{{localize "CRAWLSPACE.Stat.EvadeOverride"}}</span><input type="number" name="system.evade.override" value="{{crawlNumberOrBlank systemSource.evade.override}}" placeholder="—"></label>
+      <label><span>{{localize "CRAWLSPACE.Stat.ManaOverride"}}</span><input type="number" name="system.mana.override" value="{{crawlNumberOrBlank systemSource.mana.override}}" placeholder="—"></label>
+      {{#each stats as |stat|}}
+      <label><span>{{stat.code}} {{localize "CRAWLSPACE.Stat.OverrideTotal"}}</span><input type="number" name="system.attributes.{{stat.key}}.override" value="{{crawlNumberOrBlank stat.source.override}}" placeholder="—"></label>
+      <label><span>{{stat.code}} {{localize "CRAWLSPACE.Stat.OverrideMod"}}</span><input type="number" name="system.attributes.{{stat.key}}.modOverride" value="{{crawlNumberOrBlank stat.source.modOverride}}" placeholder="—"></label>
+      {{/each}}
+    </div>
+  </details>
+</section>

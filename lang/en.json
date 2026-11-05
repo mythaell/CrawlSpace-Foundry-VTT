@@ -24,7 +24,6 @@
   },
   "CRAWLSPACE": {
     "Tab": {
-      "main": "Crawler",
       "skills": "Skills",
       "spells": "Spells",
       "inventory": "Inventory",
@@ -33,13 +32,36 @@
       "biography": "Biography",
       "stats": "Stat Block",
       "description": "Description",
-      "details": "Details"
+      "details": "Details",
+      "character": "Character",
+      "actions": "Actions"
     },
     "Sheet": {
       "Crawler": "CrawlSpace Crawler",
       "Mob": "CrawlSpace Mob",
       "Npc": "CrawlSpace NPC",
-      "Item": "CrawlSpace Item"
+      "Item": "CrawlSpace Item",
+      "Name": "Name",
+      "Navigation": "Character sheet tabs",
+      "ManaHint": "Current mana / max mana. Max mana is enhanced Intelligence plus buffs.",
+      "CurrentMana": "Current mana",
+      "MaxMana": "Max mana",
+      "Edit": "Edit",
+      "Apply": "Apply",
+      "immunities": "Immunities",
+      "vulnerabilities": "Vulnerabilities",
+      "resistances": "Resistances",
+      "ShieldSlotHint": "Click to spend this shield slot",
+      "ShieldSlots": "Shield slots (each blocks {value} damage)",
+      "BrowseImages": "Browse images",
+      "Remove": "Remove",
+      "Pronouns": "Pronouns",
+      "Enhanced": "Enhanced",
+      "Unenhanced": "Unenhanced",
+      "Clubs": "Clubs / Societies / Guilds",
+      "AddClub": "Add Club / Society",
+      "Sponsor": "Sponsor {number}",
+      "Calculations": "Calculations and overrides"
     },
     "Section": {
       "Stats": "Stats",
