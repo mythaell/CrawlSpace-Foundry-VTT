@@ -1,3 +1,4 @@
+import { CrawlRoll } from './dice/crawl-roll'
 import { openGrinding } from './apps/grinding'
 import { openAwards } from './apps/awards'
 import { registerImmunity } from './effects/immunity'
@@ -152,6 +153,7 @@ Hooks.once('init', () => {
   registerHandlebarsHelpers()
   foundry.applications.handlebars.loadTemplates(TEMPLATES)
   registerChatHandlers()
+  CONFIG.Dice.rolls.unshift(CrawlRoll)
   registerClock()
   registerUpkeep()
 

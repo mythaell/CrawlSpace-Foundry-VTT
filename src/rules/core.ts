@@ -76,9 +76,9 @@ export function applyDamageResponses(damage: number, types: readonly string[], r
       return target === 'all' || (type && target === type)
     })
     const has = (kind: string) => matches.some((entry) => String(entry.response).trim().toLowerCase() === kind)
-    let amount = damage / (selected.length || 1)
-    const resistanceBlocked = has('resistance') ? amount / 2 : 0
-    if (has('resistance')) amount /= 2
+    let amount = Math.floor(damage / (selected.length || 1))
+    const resistanceBlocked = has('resistance') ? amount - Math.floor(amount / 2) : 0
+    if (has('resistance')) amount = Math.floor(amount / 2)
     if (has('vulnerability')) amount *= 2
     if (has('immunity')) amount = 0
     return { damageType: type || 'unspecified', damage: amount, immune: has('immunity'), resistanceBlocked }
@@ -92,7 +92,7 @@ export function applyDamageResponses(damage: number, types: readonly string[], r
 
 /** rollDamage.ts: a successful Physical Shield Block halves damage; Rank 15 also subtracts Strength. */
 export function blockedDamage(amount: number, rank: number, strength: number) {
-  return Math.max(0, amount / 2 - (rank >= 15 ? Math.max(0, strength) : 0))
+  return Math.max(0, Math.floor(amount / 2 - (rank >= 15 ? Math.max(0, strength) : 0)))
 }
 
 /** `nonMagic` shields let magic damage through. */
@@ -231,7 +231,7 @@ export function safeArithmetic(text: string): number | null {
   if (!expression || !/^[\d+\-*/().]+$/.test(expression)) return null
   try {
     const value = Function(`"use strict"; return (${expression})`)()
-    return Number.isFinite(value) ? Math.trunc(value) : null
+    return Number.isFinite(value) ? Math.floor(value) : null
   } catch {
     return null
   }

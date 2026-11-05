@@ -74,9 +74,10 @@ abstract class CrawlActorData extends foundry.abstract.TypeDataModel {
       const hasBase = attribute.value !== null && attribute.value !== undefined
       attribute.total =
         attribute.override ?? (hasBase ? attribute.value + attribute.bonus + attribute.percentBonus : null)
+      if (attribute.total !== null) attribute.total = Math.floor(attribute.total)
       const baseMod =
         attribute.modOverride ?? (attribute.total === null ? 0 : abilityScoreModifier(attribute.total))
-      attribute.mod = attribute.modLost ? 0 : baseMod + attribute.modBonus
+      attribute.mod = attribute.modLost ? 0 : Math.floor(baseMod + attribute.modBonus)
     }
   }
 
@@ -222,7 +223,7 @@ export class CrawlerData extends CrawlActorData {
 
     // Max mana = enhanced INT + mana bonuses (vttTokenResources.ts).
     const int = this.attributes.int.total
-    this.mana.max = this.mana.override ?? (int === null ? 0 : int + this.mana.bonus)
+    this.mana.max = Math.floor(this.mana.override ?? (int === null ? 0 : int + this.mana.bonus))
     this.mana.pct = this.mana.max > 0 ? Math.clamp((this.mana.value / this.mana.max) * 100, 0, 100) : 0
 
     // DR = armor (base + equipped armor DR) + current Shield DR + DR buffs (App.tsx automaticDrTotal).
@@ -236,25 +237,25 @@ export class CrawlerData extends CrawlActorData {
     }
     this.shieldDr.max = shieldMax
     this.shieldDr.value = Math.clamp(shieldMax - this.shieldDr.lost, 0, shieldMax)
-    this.dr.armorTotal = this.dr.armor + equippedArmor
-    this.dr.total = this.dr.override ?? this.dr.armorTotal + this.shieldDr.value + this.dr.buff + this.dr.bonus
+    this.dr.armorTotal = Math.floor(this.dr.armor + equippedArmor)
+    this.dr.total = Math.floor(this.dr.override ?? this.dr.armorTotal + this.shieldDr.value + this.dr.buff + this.dr.bonus)
 
     // Evade = DEX mod + Evade buffs.
     const hasDex = this.attributes.dex.total !== null || this.attributes.dex.modOverride !== null
-    this.evade.total = this.evade.override ?? (hasDex ? this.attributes.dex.mod : 0) + this.evade.buff + this.evade.bonus
+    this.evade.total = Math.floor(this.evade.override ?? (hasDex ? this.attributes.dex.mod : 0) + this.evade.buff + this.evade.bonus)
 
     // Move = (20 + bonuses) × halving effects; Step = 10 + bonuses.
     const statuses: Set<string> = actor?.statuses ?? new Set()
     const halved = [...statuses].some((id) => debuffById(id)?.halveMove)
-    this.move.total = this.move.override ?? (20 + this.move.bonus) * (halved ? 0.5 : 1)
-    this.step.total = this.step.override ?? 10 + this.step.bonus
+    this.move.total = Math.floor(this.move.override ?? (20 + this.move.bonus) * (halved ? 0.5 : 1))
+    this.step.total = Math.floor(this.step.override ?? 10 + this.step.bonus)
 
     // Health slots: slot N (N = 10 down to 1, worth N×10%) is CON mod + slot health bonuses.
     const conMod = this.attributes.con.mod
     this.health.slots = Array.from({ length: HEALTH_SLOTS }, (_, index) => {
       const slot = HEALTH_SLOTS - index
       const override = this.health.overrides?.[String(slot)]
-      const threshold = override ?? conMod + (Number(this.bonuses.healthSlots[String(slot)]) || 0)
+      const threshold = Math.floor(override ?? conMod + (Number(this.bonuses.healthSlots[String(slot)]) || 0))
       const percentage = slot * 10
       return { slot, percentage, threshold, filled: this.health.value > percentage }
     })
@@ -266,7 +267,7 @@ export class CrawlerData extends CrawlActorData {
     this.shield.remaining = this.shield.slots.filter(Boolean).length
 
     this.checkPenalty = this.checkPenaltyFromStatuses(statuses, (id) => actor?.debuffStacks?.(id) ?? 1)
-    this.hotlist.capacity = Math.max(0, 10 + Math.trunc(this.hotlist.bonus))
+    this.hotlist.capacity = Math.max(0, 10 + Math.floor(this.hotlist.bonus))
     // Two actions a round, plus Extra Actions effects (encounterActions.ts), at most 20 extra.
     this.actions.total = 2 + Math.max(0, Math.min(20, Math.floor(Number(this.actions.extra) || 0)))
     this.isDying = statuses.has('dying')
@@ -357,9 +358,9 @@ export class MobData extends CrawlActorData {
       perSlot: this.healthPerSlotOverride ?? derived.healthPerSlot,
     }
     this.healthBar = { value: this.health.value, max: this.health.max }
-    this.evade.total = derived.evade + this.evade.bonus
-    this.dr.total = this.dr.armor + this.dr.bonus
-    this.move.total = this.move.value + this.move.bonus
+    this.evade.total = Math.floor(derived.evade + this.evade.bonus)
+    this.dr.total = Math.floor(this.dr.armor + this.dr.bonus)
+    this.move.total = Math.floor(this.move.value + this.move.bonus)
     this.surpriseTotal = derived.surprise
     this.statPoints = derived.statPoints
     const statuses: Set<string> = this.parent?.statuses ?? new Set()

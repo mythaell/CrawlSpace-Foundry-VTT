@@ -163,8 +163,8 @@ export class CrawlItem extends Item {
     if (system.manaRestore) {
       const max = Number(actor.system.mana?.max) || 0
       const text = String(system.manaRestore).trim()
-      // manaRestore.ts manaRestorePoints: a share of max mana rounds up, points round down.
-      const restore = text.endsWith('%') ? Math.ceil((max * Number(text.slice(0, -1))) / 100) : Math.floor(Number(text) || 0)
+      // manaRestore.ts manaRestorePoints: percentage and point recovery both round down.
+      const restore = text.endsWith('%') ? Math.floor((max * Number(text.slice(0, -1))) / 100) : Math.floor(Number(text) || 0)
       await actor.update({ 'system.mana.value': Math.min(max, (Number(actor.system.mana.value) || 0) + restore) })
     }
     // Healing rolls give health slots; the card's Heal button applies them.

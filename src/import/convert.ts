@@ -52,14 +52,14 @@ export function toHtml(text: unknown): string {
 
 const str = (value: unknown) => (value === null || value === undefined ? '' : String(value))
 const int = (value: unknown, fallback = 0) => {
-  const parsed = Number.parseInt(String(value ?? '').replace(/[^\d-]/g, ''), 10)
-  return Number.isFinite(parsed) ? parsed : fallback
+  const parsed = Number.parseFloat(String(value ?? '').replace(/[^\d.-]/g, ''))
+  return Number.isFinite(parsed) ? Math.floor(parsed) : fallback
 }
 const nullableInt = (value: unknown) => {
   const text = str(value).trim()
   if (!text) return null
-  const parsed = Number.parseInt(text.replace(/[^\d-]/g, ''), 10)
-  return Number.isFinite(parsed) ? parsed : null
+  const parsed = Number.parseFloat(text.replace(/[^\d.-]/g, ''))
+  return Number.isFinite(parsed) ? Math.floor(parsed) : null
 }
 const list = (value: unknown): any[] => (Array.isArray(value) ? value : [])
 const types = (value: unknown) => list(value).map(String).filter(Boolean)
@@ -765,7 +765,7 @@ export function characterToActor(input: Record<string, any>) {
     img: typeof data.portrait === 'string' && /^https?:|^data:/.test(data.portrait) ? data.portrait : 'icons/svg/mystery-man.svg',
     system: {
       attributes,
-      health: { value: Number.isFinite(health) ? Math.max(0, Math.min(110, Math.round(health / 10) * 10)) : 110, overrides: {} },
+      health: { value: Number.isFinite(health) ? Math.max(0, Math.min(110, Math.floor(health / 10) * 10)) : 110, overrides: {} },
       shield: { slots: list(data.shieldSlotStates).map(Boolean) },
       mana: { value: int(character.currentMana), override: nullableInt(data.maxManaOverride) },
       dr: { armor: int(character.armor), buff: int(character.drBuffs), override: nullableInt(data.drOverride) },

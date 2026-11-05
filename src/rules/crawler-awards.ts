@@ -4,7 +4,7 @@ export function awardNumber(input: string, current: number) {
   if (!/^[+-]?\d+(?:\.\d+)?$/.test(input.trim())) throw new Error('CRAWLSPACE.Awards.InvalidNumber')
   const next = /^[+-]/.test(input.trim()) ? current + Number(input) : Number(input)
   if (!Number.isFinite(next)) throw new Error('CRAWLSPACE.Awards.InvalidNumber')
-  return next
+  return Math.floor(next)
 }
 
 /** Normalize the tier/type in a sealed box name, as CrawlSpace does. */

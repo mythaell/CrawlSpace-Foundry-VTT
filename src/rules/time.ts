@@ -14,7 +14,7 @@ export function timePartsSeconds(parts: TimeParts): number {
 
 /** Break game seconds into normalized day/hour/minute/second fields. */
 export function timeParts(value: number): TimeParts {
-  const seconds = Math.max(0, Math.ceil(value))
+  const seconds = Math.max(0, Math.floor(value))
   return { days: Math.floor(seconds / DAY_SECONDS), hours: Math.floor(seconds / 3600) % 30, minutes: Math.floor(seconds / 60) % 60, seconds: seconds % 60 }
 }
 
@@ -35,7 +35,7 @@ export function durationSeconds(value: unknown): number | null {
     found = true
     return ''
   }).replace(/\band\b|[\s,]/g, '')
-  return found && !remainder && Number.isFinite(seconds) && seconds >= 0 && seconds <= 108000000 ? Math.round(seconds) : null
+  return found && !remainder && Number.isFinite(seconds) && seconds >= 0 && seconds <= 108000000 ? Math.floor(seconds) : null
 }
 
 /** Event durations use native ActiveEffect expiry events, scoped to the affected actors. */
@@ -62,7 +62,7 @@ export function restSeconds(kind: string, hours = 1): number {
 
 /** Compact thirty-hour-day display, shared by cooldowns and the GM clock. */
 export function formatTime(value: number): string {
-  const seconds = Math.max(0, Math.ceil(value))
+  const seconds = Math.max(0, Math.floor(value))
   return [Math.floor(seconds / DAY_SECONDS), Math.floor(seconds / 3600) % 30, Math.floor(seconds / 60) % 60, seconds % 60]
     .map((part) => String(part).padStart(2, '0')).join(':')
 }

@@ -102,7 +102,7 @@ export async function rollD20(actor: any, options: CheckOptions) {
     options.difficulty = answer.difficulty
   }
   const terms = modifiers.map((modifier) => `${modifier.value >= 0 ? '+' : '-'} ${Math.abs(modifier.value)}[${modifier.label.replace(/[[\]]/g, '')}]`)
-  const roll = new Roll(`${MODE_FORMULA[mode]} ${terms.join(' ')}`.trim())
+  const roll = Roll.create(`${MODE_FORMULA[mode]} ${terms.join(' ')}`.trim())
   await roll.evaluate()
   return { roll, mode, modifiers }
 }
@@ -251,14 +251,14 @@ export async function rollDamage(
   if (options.tier === 'critical') formula = doubleDice(formula)
   if (options.tier === 'amazing' && floor) formula = `${formula}+${floor}`
   const rollData = actor?.getRollData?.() ?? {}
-  const roll = new Roll(formula, rollData)
+  const roll = Roll.create(formula, rollData)
   await roll.evaluate()
   // Wisp Armor: the spell's Rank 1 base damage, rolled once, caps what this card does to a protected target.
   let magicBase: number | null = null
   const base = damage.magic && !options.healing ? resolveFormulaTokens(damage.baseFormula ?? '', { floor, rank: 1 }) : ''
   if (base) {
     try {
-      magicBase = (await new Roll(base, rollData).evaluate()).total
+      magicBase = (await Roll.create(base, rollData).evaluate()).total
     } catch {
       magicBase = null
     }

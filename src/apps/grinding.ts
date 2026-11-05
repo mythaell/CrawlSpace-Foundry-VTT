@@ -75,7 +75,7 @@ export async function openGrinding(actors: any[], hours = 1, policy: { advance?:
     entry.level = actor.system.details.level
     if (state.levelHours >= entry.level) {
       const others = levels.filter((other: any) => other.uuid !== actor.uuid).map((other: any) => other.level)
-      const gained = isUniqueLowestCrawler(entry.level, others) ? (await new Roll('1d2').evaluate()).total : 1
+      const gained = isUniqueLowestCrawler(entry.level, others) ? (await Roll.create('1d2').evaluate()).total : 1
       entry.level += gained
       state.levelHours = 0
       entry.lines.push(t('LevelResult', { gained, level: entry.level }))

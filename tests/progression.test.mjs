@@ -49,7 +49,7 @@ test('floor checks and signed awards follow source arithmetic', () => {
   assert.equal(awardNumber('', 8), 8)
   assert.equal(awardNumber('+5', 8), 13)
   assert.equal(awardNumber('-2', 8), 6)
-  assert.equal(awardNumber('2.5', 8), 2.5)
+  assert.equal(awardNumber('2.5', 8), 2)
   assert.throws(() => awardNumber('Infinity', 8))
 })
 test('killing-blow stacks are spell-specific, rank-capped and expire', () => {
@@ -68,4 +68,11 @@ test('imports retain spell stacks and remap grinding progress to Foundry item id
   assert.equal(spell.system.killingBlowStacks, 3)
   assert.equal(actor.flags.crawlspace.grinding.skillHours[spell._id], 4)
   assert.equal(actor.flags.crawlspace.grinding.attempted[skill._id], 4)
+})
+
+test('character import floors decimals instead of removing their decimal points', () => {
+  const actor = characterToActor({ character: { name: 'Fractional import' }, attributeValues: [{ unenhanced: '12.9' }], attributeModOverrides: { 0: '-1.5' }, skills: [{ name: 'Test', unenhancedRank: '2.9' }] })
+  assert.equal(actor.system.attributes.str.value, 12)
+  assert.equal(actor.system.attributes.str.modOverride, -2)
+  assert.equal(actor.items.find((item) => item.type === 'skill').system.rank.value, 2)
 })

@@ -79,7 +79,7 @@ export async function advanceMarked(actor: any, kind: AdvancementKind) {
       }
       continue
     }
-    const roll = await new Roll('1d20').evaluate()
+    const roll = await Roll.create('1d20').evaluate()
     const advanced = advances(roll.total, rank)
     lines.push(game.i18n.format(advanced ? 'CRAWLSPACE.Upkeep.Advanced' : 'CRAWLSPACE.Upkeep.NotAdvanced', { name: item.name, roll: roll.total, rank, next: rank + 1 }))
     updates.push({ _id: item.id, 'system.marked': false, ...(advanced ? { 'system.rank.value': item.system.rank.value + 1 } : {}) })
@@ -116,7 +116,7 @@ export async function assignStats(actor: any) {
     window: { title: game.i18n.localize('CRAWLSPACE.Upkeep.Assign') },
     content,
     rejectClose: false,
-    ok: { callback: (_event: Event, button: any) => Object.fromEntries(STAT_KEYS.map((key) => [key, Math.max(0, Math.trunc(Number(button.form.elements[key].value) || 0))])) },
+    ok: { callback: (_event: Event, button: any) => Object.fromEntries(STAT_KEYS.map((key) => [key, Math.max(0, Math.floor(Number(button.form.elements[key].value) || 0))])) },
   })
   if (!additions) return
   const total = Object.values(additions as Record<string, number>).reduce((sum, value) => sum + value, 0)

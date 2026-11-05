@@ -83,9 +83,9 @@ function prepareRanked(model: any, kind: 'skill' | 'spell') {
   const baseBonus = Number(bonuses?.[kind === 'skill' ? 'baseSkillRanks' : 'baseSpellRanks']?.[name]) || 0
   const bonus = Number(bonuses?.[kind === 'skill' ? 'skillRanks' : 'spellRanks']?.[name]) || 0
   model.rank.cap = rankCap(actor, model.parent?.name ?? '')
-  model.rank.base = Math.min(model.rank.cap, model.rank.value + baseBonus)
-  model.rank.total = Math.max(0, Math.min(model.rank.cap, model.rank.override ?? model.rank.base + bonus))
-  model.rank.mod = model.rank.modOverride ?? (actor?.system?.statMod?.(model.stat) ?? 0)
+  model.rank.base = Math.floor(Math.min(model.rank.cap, model.rank.value + baseBonus))
+  model.rank.total = Math.max(0, Math.floor(Math.min(model.rank.cap, model.rank.override ?? model.rank.base + bonus)))
+  model.rank.mod = Math.floor(model.rank.modOverride ?? (actor?.system?.statMod?.(model.stat) ?? 0))
   const rank = model.rank.total
   const upgraded =
     rank >= 15 && model.upgrades.rank15Damage
@@ -141,7 +141,7 @@ export class SpellData extends foundry.abstract.TypeDataModel {
   prepareDerivedData() {
     prepareRanked(this, 'spell')
     const cost = Number(String(this.mana).replace(/[^\d.-]/g, ''))
-    this.manaCost = Number.isFinite(cost) ? cost : 0
+    this.manaCost = Number.isFinite(cost) ? Math.floor(cost) : 0
   }
 }
 

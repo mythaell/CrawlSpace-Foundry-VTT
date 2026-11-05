@@ -1,3 +1,4 @@
+import { blockedDamage, applyDamageResponses, safeArithmetic } from '../src/rules/core.ts'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { abilityScoreModifier, attackOutcome, doubleDice, resolveFormulaTokens } from '../src/rules/core.ts'
@@ -68,4 +69,13 @@ test('critical hits double dice only', () => {
 test('debuff definitions', () => {
   assert.equal(debuffById('fatigued')?.checkPenalty, -1)
   assert.ok(debuffById('poisoned')?.stackable)
+})
+
+test('fractional rule results round down, including negative values', () => {
+  assert.equal(blockedDamage(5, 1, 0), 2)
+  assert.equal(applyDamageResponses(5, ['Fire'], [{ damageType: 'Fire', response: 'Resistance' }]).damage, 2)
+  assert.equal(applyDamageResponses(5, ['Fire', 'Cold'], []).damage, 4)
+  assert.equal(safeArithmetic('-3/2'), -2)
+  assert.equal(durationSeconds('1.9 seconds'), 1)
+  assert.equal(timeParts(90.9).seconds, 30)
 })

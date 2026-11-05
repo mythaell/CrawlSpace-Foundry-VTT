@@ -68,7 +68,7 @@ export async function testFoundryTime() {
       assert(other.getFlag('crawlspace', 'grinding').attempted[grindSkill.id] === 1, 'Grinding records the once-per-day skill attempt')
       foundry.applications.api.DialogV2.prompt = async () => ({ aiFavor: '+5', popularity: '2.5', name: 'Test award', description: 'An achievement', reward: '', box: 'Legendary Adventurer Box', quantity: '2', notes: '', link: true })
       await game.crawlspace.openAwards([other])
-      assert(other.system.details.aiFavor === 5 && other.system.details.popularity === 2.5, 'Awards apply signed favor and exact popularity')
+      assert(other.system.details.aiFavor === 5 && other.system.details.popularity === 2, 'Awards apply signed favor and rounded-down popularity')
       const award = other.items.find((item) => item.type === 'achievement')
       const box = other.items.find((item) => item.type === 'lootBox')
       assert(box.system.sealed && box.system.quantity === 2 && box.system.tier === 'Legendary', 'Awards create sealed boxes with the correct tier and quantity')

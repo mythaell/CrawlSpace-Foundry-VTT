@@ -764,7 +764,7 @@ export class CrawlerSheet extends CrawlActorSheet {
       return rollCheck(this.actor, { label: `${action.name} (${skill.name})`, kind: 'check', modifiers: skill.checkModifiers(), sources: [skill.name], fast: event.shiftKey })
     }
     if (action.formula) {
-      const roll = await new Roll(action.formula, this.actor.getRollData()).evaluate()
+      const roll = await Roll.create(action.formula, this.actor.getRollData()).evaluate()
       return roll.toMessage({ speaker: ChatMessage.implementation.getSpeaker({ actor: this.actor }), flavor: action.name })
     }
     return CrawlerSheet.#postAction(this.actor, action)

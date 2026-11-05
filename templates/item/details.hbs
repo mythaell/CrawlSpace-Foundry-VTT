@@ -136,11 +136,10 @@
   {{/if}}
 
   <label class="wide">{{localize "CRAWLSPACE.Item.Notes"}}<input type="text" name="system.notes" value="{{systemSource.notes}}"></label>
-</section>
-
 {{#if (eq type "spell")}}
 <fieldset><legend>{{localize "CRAWLSPACE.Item.KillingBlowStacks"}}</legend>
 <label><input type="checkbox" name="system.killingBlowStacking" {{checked systemSource.killingBlowStacking}}> {{localize "CRAWLSPACE.Item.KillingBlowStacking"}}</label>
 <label>{{localize "CRAWLSPACE.Item.KillingBlowStacks"}}<input type="number" name="system.killingBlowStacks" min="0" value="{{systemSource.killingBlowStacks}}"></label>
 </fieldset>
 {{/if}}
+</section>
