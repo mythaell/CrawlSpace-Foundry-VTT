@@ -1,0 +1,45 @@
+<aside class="pf-side">
+  <img class="pf-side-portrait" src="{{document.img}}" alt="{{document.name}}" data-action="editImage" data-edit="img" data-tooltip="{{localize 'CRAWLSPACE.Sheet.PortraitHint'}}">
+
+  <div class="pf-side-defense">
+    <a class="pf-side-stat" data-action="rollStat" data-stat="evade" data-tooltip="{{localize 'CRAWLSPACE.Roll.EvadeHint'}}">
+      <span>{{localize "CRAWLSPACE.Stat.Evade"}}</span><b>{{system.evade.total}}</b>
+    </a>
+    <div class="pf-side-stat"><span>{{localize "CRAWLSPACE.Stat.DR"}}</span><b>{{system.dr.total}}</b></div>
+  </div>
+
+  <div class="pf-side-block">
+    <h4>{{localize "CRAWLSPACE.Stat.Health"}} <small>{{system.health.value}}/{{system.health.max}} · {{localize "CRAWLSPACE.Mob.PerSlot" value=system.health.perSlot}}</small></h4>
+    <div class="mob-slots">
+      {{#each slots as |slot|}}<a class="mob-slot {{#if slot.filled}}filled{{/if}}" data-action="slotLost" data-index="{{slot.index}}"></a>{{/each}}
+    </div>
+  </div>
+
+  <div class="pf-side-fields">
+    <label><span>{{localize "CRAWLSPACE.Stat.ArmorBase"}}</span><input type="number" name="system.dr.armor" value="{{systemSource.dr.armor}}"></label>
+    <label><span>{{localize "CRAWLSPACE.Mob.PublishedEvade"}}</span><input type="text" name="system.evade.published" value="{{systemSource.evade.published}}" placeholder="10+DEX+F"></label>
+    <label><span>{{localize "CRAWLSPACE.Stat.Move"}}</span><input type="number" name="system.move.value" value="{{systemSource.move.value}}"></label>
+    <label><span>{{localize "CRAWLSPACE.Mob.Surprise"}}{{#if system.surpriseTotal}} ({{system.surpriseTotal}}){{/if}}</span><input type="text" name="system.surprise" value="{{systemSource.surprise}}"></label>
+    <label><span>{{localize "CRAWLSPACE.Mob.HealthSlots"}}</span><input type="number" name="system.healthSlotsOverride" value="{{crawlNumberOrBlank systemSource.healthSlotsOverride}}" placeholder="{{system.health.max}}"></label>
+    <label><span>{{localize "CRAWLSPACE.Mob.HealthPerSlot"}}</span><input type="number" name="system.healthPerSlotOverride" value="{{crawlNumberOrBlank systemSource.healthPerSlotOverride}}" placeholder="{{system.health.perSlot}}"></label>
+  </div>
+
+  {{#each traitSections as |section|}}
+  {{#if section.values.length}}
+  <div class="pf-side-block"><h4>{{section.label}}</h4><div class="pf-tags">{{#each section.values}}<span class="pf-tag">{{this}}</span>{{/each}}</div></div>
+  {{/if}}
+  {{/each}}
+
+  <div class="pf-side-block">
+    <h4>{{localize "CRAWLSPACE.Section.Stats"}} <small>{{localize "CRAWLSPACE.Mob.StatPoints" value=system.statPoints}}</small></h4>
+    <div class="pf-side-stats">
+      {{#each stats as |stat|}}
+      <div class="pf-side-attr">
+        <a class="rollable" data-action="rollStat" data-stat="{{stat.key}}">{{stat.code}}</a>
+        <input type="number" name="system.attributes.{{stat.key}}.value" value="{{crawlNumberOrBlank stat.source.value}}" aria-label="{{stat.label}}">
+        <a class="rollable mod" data-action="rollStat" data-stat="{{stat.key}}">{{crawlSigned stat.mod}}</a>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</aside>

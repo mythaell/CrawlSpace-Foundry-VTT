@@ -1,7 +1,6 @@
-<section class="tab description {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-  <label class="wide">{{localize "CRAWLSPACE.Mob.Tags"}}<input type="text" name="system.tags" value="{{systemSource.tags}}"></label>
-  <h3>{{localize "CRAWLSPACE.Item.Description"}}</h3>
+<section class="tab notes {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <h3 class="pf-section">{{localize "CRAWLSPACE.Item.Description"}}</h3>
   {{#if editable}}<prose-mirror name="system.description" value="{{systemSource.description}}" toggled>{{{enriched.description}}}</prose-mirror>{{else}}{{{enriched.description}}}{{/if}}
-  <h3>{{localize "CRAWLSPACE.Crawler.Notes"}}</h3>
+  <h3 class="pf-section">{{localize "CRAWLSPACE.Crawler.Notes"}}</h3>
   {{#if editable}}<prose-mirror name="system.notes" value="{{systemSource.notes}}" toggled>{{{enriched.notes}}}</prose-mirror>{{else}}{{{enriched.notes}}}{{/if}}
 </section>

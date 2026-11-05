@@ -19,7 +19,7 @@
     {{/if}}
     <span class="col duration">{{effect.duration}}</span>
     <span class="item-controls">
-      {{#unless effect.itemId}}<a data-action="toggleEffect" data-tooltip="{{localize (ifThen effect.disabled 'CRAWLSPACE.Effect.Enable' 'CRAWLSPACE.Effect.Disable')}}"><i class="fa-solid {{#if effect.disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}"></i></a>{{/unless}}
+      <a data-action="toggleEffect" data-tooltip="{{localize (ifThen effect.disabled 'CRAWLSPACE.Effect.Enable' 'CRAWLSPACE.Effect.Disable')}}"><i class="fa-solid {{#if effect.disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}"></i></a>
       <a data-action="editEffect"><i class="fa-solid fa-pen-to-square"></i></a>
       {{#unless effect.itemId}}<a data-action="deleteEffect"><i class="fa-solid fa-trash"></i></a>{{/unless}}
     </span>

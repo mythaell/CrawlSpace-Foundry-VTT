@@ -1,0 +1,11 @@
+<header class="pf-actor-header">
+  <div class="pf-actor-title">
+    <input class="pf-name" type="text" name="name" value="{{document.name}}">
+    <div class="pf-level-badge">{{localize "TYPES.Actor.npc"}}</div>
+  </div>
+  <div class="pf-actor-fields">
+    <label><span>{{localize "CRAWLSPACE.Npc.Job"}}</span><input type="text" name="system.job" value="{{systemSource.job}}"></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.Race"}}</span><input type="text" name="system.race" value="{{systemSource.race}}"></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.Floor"}}</span><input type="number" name="system.floor" value="{{systemSource.floor}}"></label>
+  </div>
+</header>

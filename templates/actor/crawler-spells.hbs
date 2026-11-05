@@ -1,13 +1,68 @@
 <section class="tab spells {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-  <div class="list-header">
-    <span class="item-name">{{localize "TYPES.Item.spell"}}</span>
-    <span class="col rank">{{localize "CRAWLSPACE.Item.Rank"}}</span>
-    <span class="col mana">{{localize "CRAWLSPACE.Stat.Mana"}}</span>
-    <span class="col bonus">{{localize "CRAWLSPACE.Item.Check"}}</span>
-    <span class="col mark"><i class="fa-solid fa-check"></i></span>
-    <span class="item-controls">{{#if editable}}<a data-action="createItem" data-type="spell" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
+  {{> "systems/crawlspace/templates/actor/filter-bar.hbs" table="spells" stats=filterStats checks=filterChecks categories=false}}
+  <div class="crawl-table spell-table" data-filter-scope="spells">
+    <div class="table-head">
+      <span></span>
+      <span>{{localize "CRAWLSPACE.Table.Name"}}</span>
+      <span>{{localize "CRAWLSPACE.Table.Base"}}</span>
+      <span>{{localize "CRAWLSPACE.Table.Enhanced"}}</span>
+      <span>{{localize "CRAWLSPACE.Item.Stat"}}</span>
+      <span>{{localize "CRAWLSPACE.Stat.Mana"}}</span>
+      <span>{{localize "CRAWLSPACE.Item.Range"}}</span>
+      <span>{{localize "CRAWLSPACE.Item.CheckType"}}</span>
+      <span>{{localize "CRAWLSPACE.Item.Cooldown"}}</span>
+      <span data-tooltip="{{localize 'CRAWLSPACE.Item.MarkHint'}}"><i class="fa-solid fa-check"></i></span>
+      <span class="head-controls">
+        {{#if editable}}
+        <a data-action="createItem" data-type="spell" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>
+        <a data-action="openPack" data-packs="{{packs}}" data-tooltip="{{localize 'CRAWLSPACE.Table.AddFromDatabase'}}"><i class="fa-solid fa-database"></i></a>
+        {{/if}}
+      </span>
+    </div>
+    <ol class="table-rows">
+      {{#each spells as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="spell"}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Spells"}}</li>{{/each}}
+    </ol>
   </div>
-  <ol class="item-list">
-    {{#each spells as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Spells"}}</li>{{/each}}
-  </ol>
+
+  <h2 class="table-section-title">{{localize "CRAWLSPACE.Spell.Inherent"}}</h2>
+  <div class="crawl-table inherent-table" data-filter-scope="spells">
+    <div class="table-head">
+      <span></span>
+      <span>{{localize "CRAWLSPACE.Table.Name"}}</span>
+      <span>{{localize "CRAWLSPACE.Item.Rank"}}</span>
+      <span>{{localize "CRAWLSPACE.Item.Stat"}}</span>
+      <span>{{localize "CRAWLSPACE.Item.Range"}}</span>
+      <span>{{localize "CRAWLSPACE.Item.CheckType"}}</span>
+      <span>{{localize "CRAWLSPACE.Item.Cooldown"}}</span>
+      <span></span>
+    </div>
+    <ol class="table-rows">
+      {{#each inherent as |spell|}}
+      <li class="crawl-row {{#if spell.expanded}}expanded{{/if}} {{#if spell.missing}}missing{{/if}}" data-expand-key="{{spell.expandKey}}" {{#if spell.itemId}}data-item-id="{{spell.itemId}}"{{else}}data-inherent-name="{{spell.name}}" data-inherent-rank="{{spell.rank}}"{{/if}}
+          data-filter-row data-f-name="{{crawlLower spell.name}}" data-f-stat="{{spell.stat}}" data-f-check="{{spell.checkType}}">
+        <div class="row-main">
+          <img class="row-img" src="{{spell.img}}" alt="" data-action="{{#if spell.itemId}}useItem{{else}}castInherent{{/if}}" data-tooltip="{{localize 'CRAWLSPACE.Spell.CastInherent'}}">
+          <a class="row-name" data-action="toggleExpand">{{spell.name}}{{#if spell.missing}} <i class="fa-solid fa-triangle-exclamation" data-tooltip="{{localize 'CRAWLSPACE.Spell.NotFound'}}"></i>{{/if}}</a>
+          <span class="col">{{spell.rank}}</span>
+          <span class="col">{{spell.stat}}</span>
+          <span class="col">{{spell.range}}</span>
+          <span class="col">{{spell.checkType}}</span>
+          <span class="col">{{spell.cooldown}}</span>
+          <span class="row-controls">
+            {{#if spell.itemId}}
+            <a data-action="itemToChat" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
+            <a data-action="editItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
+            {{else}}
+            <a data-action="castInherent" data-chat="true" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
+            {{/if}}
+          </span>
+        </div>
+        <div class="row-details">
+          {{#if spell.sourceLabel}}<div class="pf-tags"><span class="pf-tag">{{spell.sourceLabel}}</span></div>{{/if}}
+          <div class="row-description">{{{spell.details}}}</div>
+        </div>
+      </li>
+      {{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Inherent"}}</li>{{/each}}
+    </ol>
+  </div>
 </section>

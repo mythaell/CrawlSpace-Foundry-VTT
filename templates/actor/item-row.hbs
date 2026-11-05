@@ -1,38 +1,44 @@
-<li class="item-row draggable {{item.type}}" data-item-id="{{item.id}}" data-uuid="{{item.uuid}}">
-  <img class="item-img" src="{{item.img}}" alt="" data-action="useItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Use'}}">
-  <a class="item-name" data-action="useItem">{{item.name}}</a>
-  {{#if (crawlEq item.type "skill")}}
-    <span class="col rank" data-tooltip="{{localize 'CRAWLSPACE.Item.RankHint'}}">
-      {{#if @root.editable}}<input type="number" min="0" value="{{item.system.rank.value}}" data-item-field="system.rank.value">{{else}}{{item.system.rank.value}}{{/if}}
-      {{#if (ne item.system.rank.total item.system.rank.value)}}<b>→{{item.system.rank.total}}</b>{{/if}}
-    </span>
-    <span class="col stat">{{item.system.stat}} {{crawlSigned item.system.rank.mod}}</span>
-    <span class="col bonus"><b>{{crawlSigned item.system.checkBonus}}</b></span>
-    <label class="col mark" data-tooltip="{{localize 'CRAWLSPACE.Item.MarkHint'}}"><input type="checkbox" {{checked item.system.marked}} data-item-field="system.marked" {{#unless @root.editable}}disabled{{/unless}}></label>
-  {{else if (crawlEq item.type "spell")}}
-    <span class="col rank">
-      {{#if @root.editable}}<input type="number" min="0" value="{{item.system.rank.value}}" data-item-field="system.rank.value">{{else}}{{item.system.rank.value}}{{/if}}
-      {{#if (ne item.system.rank.total item.system.rank.value)}}<b>→{{item.system.rank.total}}</b>{{/if}}
-    </span>
-    <span class="col mana" data-tooltip="{{localize 'CRAWLSPACE.Stat.Mana'}}"><i class="fa-solid fa-droplet"></i> {{item.system.mana}}</span>
-    <span class="col bonus"><b>{{crawlSigned item.system.checkBonus}}</b></span>
-    <label class="col mark" data-tooltip="{{localize 'CRAWLSPACE.Item.MarkHint'}}"><input type="checkbox" {{checked item.system.marked}} data-item-field="system.marked" {{#unless @root.editable}}disabled{{/unless}}></label>
-  {{else if (crawlEq item.type "lootBox")}}
-    <span class="col">{{item.system.tier}}</span>
-    <span class="col qty">×{{item.system.quantity}}</span>
-  {{else}}
-    {{#if item.system.damage.formula}}<span class="col damage" data-tooltip="{{crawlJoin item.system.damage.types}}"><i class="fa-solid fa-burst"></i> {{item.system.damage.formula}}</span>{{/if}}
-    {{#if (crawlEq item.type "equipment")}}<span class="col">{{item.system.slot}}{{#if item.system.armorDr}} · DR {{item.system.armorDr}}{{/if}}</span>{{/if}}
-    {{#if (ne item.system.quantity undefined)}}
-      <span class="col qty">{{#if @root.editable}}<input type="number" min="0" value="{{item.system.quantity}}" data-item-field="system.quantity">{{else}}×{{item.system.quantity}}{{/if}}</span>
+{{!-- One owned item as a table row. Icon = use, name = expand (read-only details). mode: skill | spell | inventory | hotlist | (plain) --}}
+<li class="crawl-row draggable {{item.type}} {{#if item.expanded}}expanded{{/if}}" data-item-id="{{item.id}}" data-uuid="{{item.uuid}}" data-expand-key="{{item.id}}"
+    data-filter-row data-f-name="{{crawlLower item.name}}" data-f-stat="{{item.system.stat}}" data-f-check="{{item.system.checkType}}" data-f-category="{{item.category}}" data-f-subtype="{{item.subtype}}">
+  <div class="row-main">
+    <img class="row-img" src="{{item.img}}" alt="" data-action="useItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Use'}}">
+    <a class="row-name" data-action="toggleExpand">{{item.name}}{{#if (eq mode "hotlist")}} <small>{{item.typeLabel}}</small>{{/if}}</a>
+
+    {{#if (or (eq mode "skill") (eq mode "spell"))}}
+      <span class="col">{{#if @root.editable}}<input type="number" min="0" value="{{item.system.rank.value}}" data-item-field="system.rank.value" aria-label="{{localize 'CRAWLSPACE.Table.Base'}}">{{else}}{{item.system.rank.value}}{{/if}}</span>
+      <span class="col enhanced {{#if (ne item.system.rank.total item.system.rank.value)}}boosted{{/if}}" data-tooltip="{{localize 'CRAWLSPACE.Table.EnhancedHint'}}">{{item.system.rank.total}}</span>
+      <span class="col">{{#if @root.editable}}<select data-item-field="system.stat" aria-label="{{localize 'CRAWLSPACE.Item.Stat'}}">{{selectOptions @root.statChoices selected=item.system.stat}}</select>{{else}}{{item.system.stat}}{{/if}}</span>
+      {{#if (eq mode "spell")}}
+      <span class="col">{{#if @root.editable}}<input type="text" value="{{item.system.mana}}" data-item-field="system.mana" aria-label="{{localize 'CRAWLSPACE.Stat.Mana'}}">{{else}}{{item.system.mana}}{{/if}}</span>
+      <span class="col">{{#if @root.editable}}<input type="text" value="{{item.system.range}}" data-item-field="system.range" aria-label="{{localize 'CRAWLSPACE.Item.Range'}}">{{else}}{{item.system.range}}{{/if}}</span>
+      {{/if}}
+      <span class="col">{{#if @root.editable}}<select data-item-field="system.checkType" aria-label="{{localize 'CRAWLSPACE.Item.CheckType'}}">{{selectOptions @root.checkChoices selected=item.system.checkType}}</select>{{else}}{{item.system.checkType}}{{/if}}</span>
+      <span class="col">{{#if @root.editable}}<input type="text" value="{{item.system.cooldown}}" data-item-field="system.cooldown" aria-label="{{localize 'CRAWLSPACE.Item.Cooldown'}}">{{else}}{{item.system.cooldown}}{{/if}}</span>
+      <label class="col mark" data-tooltip="{{localize 'CRAWLSPACE.Item.MarkHint'}}"><input type="checkbox" {{checked item.system.marked}} data-item-field="system.marked" {{#unless @root.editable}}disabled{{/unless}}></label>
+    {{else if (eq mode "inventory")}}
+      <span class="col qty">
+        {{#if item.hasQuantity}}
+          {{#if @root.editable}}<a data-action="adjustQuantity" data-delta="-1"><i class="fa-solid fa-minus"></i></a>{{/if}}
+          <span>{{item.system.quantity}}</span>
+          {{#if @root.editable}}<a data-action="adjustQuantity" data-delta="1"><i class="fa-solid fa-plus"></i></a>{{/if}}
+        {{/if}}
+      </span>
+    {{else}}
+      <span class="col type">{{item.typeLabel}}</span>
     {{/if}}
-  {{/if}}
-  <span class="item-controls">
-    {{#if (or (crawlEq item.type "weapon") (crawlEq item.type "equipment") (crawlEq item.type "tattoo"))}}
-      <a data-action="toggleEquip" class="{{#if item.system.equipped}}active{{/if}}" data-tooltip="{{localize (ifThen item.system.equipped 'CRAWLSPACE.Item.Unequip' 'CRAWLSPACE.Item.Equip')}}"><i class="fa-solid fa-shirt"></i></a>
-    {{/if}}
-    <a data-action="itemToChat" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
-    <a data-action="editItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
-    {{#if @root.editable}}<a data-action="deleteItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Delete'}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
-  </span>
+
+    <span class="row-controls">
+      {{#if item.equippable}}<a data-action="toggleEquip" class="{{#if item.system.equipped}}active{{/if}}" data-tooltip="{{localize (ifThen item.system.equipped 'CRAWLSPACE.Item.Unequip' 'CRAWLSPACE.Item.Equip')}}"><i class="fa-solid fa-shirt"></i></a>{{/if}}
+      {{#if item.canPin}}<a data-action="togglePin" class="{{#if item.pinned}}active{{/if}}" data-tooltip="{{localize (ifThen item.pinned 'CRAWLSPACE.Hotlist.Unpin' 'CRAWLSPACE.Hotlist.Pin')}}"><i class="fa-solid fa-thumbtack"></i></a>{{/if}}
+      <a data-action="itemToChat" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
+      <a data-action="editItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
+      {{#if @root.editable}}<a data-action="deleteItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Delete'}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
+    </span>
+  </div>
+  <div class="row-details">
+    {{#if item.tags.length}}<div class="pf-tags">{{#each item.tags}}<span class="pf-tag">{{this}}</span>{{/each}}</div>{{/if}}
+    {{#if item.upgrades.length}}<ul class="row-upgrades">{{#each item.upgrades}}<li><b>{{label}}:</b> {{text}}</li>{{/each}}</ul>{{/if}}
+    <div class="row-description">{{{item.details}}}</div>
+  </div>
 </li>

@@ -624,21 +624,28 @@ export function characterToActor(input: Record<string, any>) {
     }),
   )
   const items: any[] = []
-  const add = (item: any) => items.push({ _id: stableId(`${name}-${items.length}-${item.name}`), ...item })
+  // CrawlSpace row id → Foundry item id, so attacks and actions keep pointing at the right item.
+  const idMap = new Map<string, string>()
+  const add = (item: any, appId?: unknown) => {
+    const _id = stableId(`${name}-${items.length}-${item.name}`)
+    if (appId !== undefined && appId !== null && appId !== '') idMap.set(String(appId), _id)
+    items.push({ _id, ...item })
+  }
+  const mapped = (appId: unknown) => (appId ? (idMap.get(String(appId)) ?? '') : '')
 
   for (const skill of list(data.skills)) {
     const system = rankedSystem(skill, 'skill')
     const override = data.skillEnhancedOverrides?.[skill.id]
     if (str(override)) system.rank.override = nullableInt(override)
-    add({ name: str(skill.name) || 'Skill', type: 'skill', img: ICONS.skill, system, effects: effectsFor(skill.name, ICONS.skill, list(skill.effects)) })
+    add({ name: str(skill.name) || 'Skill', type: 'skill', img: ICONS.skill, system, effects: effectsFor(skill.name, ICONS.skill, list(skill.effects)) }, skill.id)
   }
   for (const spell of list(data.spells)) {
     const system: Record<string, any> = { ...rankedSystem(spell, 'spell'), mana: str(spell.mana), range: str(spell.range), duration: str(spell.duration), usage: spell.inherentGrantId ? 'inherent' : 'learned' }
     const override = data.spellEnhancedOverrides?.[spell.id]
     if (str(override)) system.rank.override = nullableInt(override)
-    add({ name: str(spell.name) || 'Spell', type: 'spell', img: ICONS.spell, system, effects: [...effectsFor(spell.name, ICONS.spell, list(spell.effects)), ...useEffectConditions(spell, ICONS.spell)] })
+    add({ name: str(spell.name) || 'Spell', type: 'spell', img: ICONS.spell, system, effects: [...effectsFor(spell.name, ICONS.spell, list(spell.effects)), ...useEffectConditions(spell, ICONS.spell)] }, spell.id)
   }
-  for (const entry of list(data.inventory)) add(inventoryToItem(entry))
+  for (const entry of list(data.inventory)) add(inventoryToItem(entry), entry.id)
   for (const box of list(data.lootBoxes))
     add({ name: str(box.name) || 'Loot Box', type: 'lootBox', img: ICONS.lootBox, system: { description: toHtml(box.description), tier: str(box.tier) || 'Bronze', quantity: 1, sealed: true, contents: '' } })
   const abilityGroups: [string, string][] = [
@@ -682,6 +689,32 @@ export function characterToActor(input: Record<string, any>) {
     })
   }
 
+  // Attacks table rows and Actions (CrawlSpace has no interrupt actions; they import as actions).
+  const attacks = list(data.attacks)
+    .filter((attack) => str(attack.name) || attack.sourceId)
+    .map((attack, index) => ({
+      id: stableId(`${name}-attack-${index}-${attack.id}`),
+      name: str(attack.name) || 'Attack',
+      sourceId: mapped(attack.sourceId),
+      skillId: mapped(attack.linkedSkillId),
+      ammunitionId: mapped(attack.ammunitionId),
+      hitBonus: int(attack.hitMod),
+      damage: str(attack.damageDice),
+      damageBonus: str(attack.damageMod),
+      notes: toHtml(attack.effects),
+    }))
+  const sheetActions = list(data.actions)
+    .filter((action) => str(action.name))
+    .map((action, index) => ({
+      id: stableId(`${name}-action-${index}-${action.id}`),
+      kind: 'action',
+      name: str(action.name),
+      sourceId: mapped(action.linkedItemId || action.sourceId),
+      skillId: mapped(action.linkedSkillId),
+      formula: str(action.formula),
+      notes: toHtml([action.notes, action.effects].map(str).filter(Boolean).join('\n\n')),
+    }))
+
   const health = Number(data.currentHealth)
   return {
     name,
@@ -717,6 +750,8 @@ export function characterToActor(input: Record<string, any>) {
       importantKills: list(data.importantKills).map((kill) => str(kill.value)).filter(Boolean),
       amenities: list(data.amenities).map((entry) => str(entry.value)).filter(Boolean),
       clubs: list(data.clubs).map((entry) => str(entry.value)).filter(Boolean),
+      attacks,
+      sheetActions,
       personalSpace: { tier: str(data.personalSpace?.tier), size: str(data.personalSpace?.size) },
       upkeep: { allocatedThroughLevel: int(data.upkeep?.allocatedThroughLevel, 1), lastSafeRoomLevel: int(data.upkeep?.lastSafeRoomLevel, 0), pendingStatPoints: 0 },
     },

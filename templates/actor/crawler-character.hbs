@@ -1,13 +1,7 @@
 <section class="tab character {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
   <div class="char-intro">
     <div class="portrait-editor">
-      <div class="portrait-box"><img src="{{document.img}}" alt="{{document.name}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}}></div>
-      {{#if editable}}
-      <div class="portrait-actions">
-        <button type="button" data-action="editImage" data-edit="img">{{localize "CRAWLSPACE.Sheet.BrowseImages"}}</button>
-        <button type="button" data-action="removeImage">{{localize "CRAWLSPACE.Sheet.Remove"}}</button>
-      </div>
-      {{/if}}
+      <div class="portrait-box" {{#if editable}}data-tooltip="{{localize 'CRAWLSPACE.Sheet.PortraitHint'}}"{{/if}}><img src="{{document.img}}" alt="{{document.name}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}}></div>
     </div>
     <div class="char-fields">
       <label><span>{{localize "CRAWLSPACE.Crawler.Race"}}</span><input type="text" name="system.details.race" value="{{systemSource.details.race}}"></label>

@@ -126,6 +126,7 @@ export function effectPropertyToChanges(effect: CrawlEffectProperty): ChangeData
             damageTypes: effect.damageTypes ?? [],
             damageScope: effect.damageScope ?? '',
             armorPiercing: !!effect.armorPiercing,
+            ...(effect.cooldown ? { cooldown: String(effect.cooldown) } : {}),
           }),
         ),
       ]

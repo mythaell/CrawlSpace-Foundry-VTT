@@ -1,0 +1,74 @@
+<section class="tab main {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <section class="crawl-table">
+    <div class="table-head plain-head pf-bar">
+      <span class="head-name">{{localize "CRAWLSPACE.Section.Attacks"}}</span>
+      <span class="head-controls">{{#if editable}}<a data-action="addAttack"><i class="fa-solid fa-plus"></i> {{localize "CRAWLSPACE.Attack.Add"}}</a>{{/if}}</span>
+    </div>
+    <ol class="table-rows">
+      {{#each attacks as |attack|}}
+      <li class="pf-strike {{#if attack.expanded}}expanded{{/if}}" data-attack-index="{{attack.index}}" data-expand-key="{{attack.expandKey}}">
+        <div class="strike-main">
+          <i class="strike-icon fa-solid {{#if attack.ranged}}fa-bow-arrow{{else}}fa-sword{{/if}}"></i>
+          <div class="strike-body">
+            <div class="strike-title">
+              <a class="row-name" data-action="toggleExpand">{{attack.name}}</a>
+              {{#if attack.tags.length}}<span class="pf-tags">{{#each attack.tags}}<span class="pf-tag">{{this}}</span>{{/each}}</span>{{/if}}
+            </div>
+            <div class="strike-buttons">
+              <button type="button" class="strike-attack" data-action="mobAttack" data-tooltip="{{localize 'CRAWLSPACE.Mob.ToHit'}} {{attack.toHit}}">{{localize "CRAWLSPACE.Attack.Attack"}} {{attack.toHitSigned}}</button>
+              <button type="button" data-action="mobDamage" data-tier="normal" data-tooltip="{{attack.types}}"><i class="fa-solid fa-burst"></i> {{#if attack.damageText}}{{attack.damageText}}{{else}}{{localize "CRAWLSPACE.Attack.Damage"}}{{/if}}</button>
+              <button type="button" data-action="mobDamage" data-tier="critical"><i class="fa-solid fa-star"></i> {{localize "CRAWLSPACE.Attack.Critical"}}</button>
+            </div>
+          </div>
+          {{#if @root.editable}}
+          <span class="row-controls">
+            <a data-action="editAttack" data-tooltip="{{localize 'CRAWLSPACE.Attack.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
+            <a data-action="deleteAttack" data-tooltip="{{localize 'CRAWLSPACE.Attack.Delete'}}"><i class="fa-solid fa-trash"></i></a>
+          </span>
+          {{/if}}
+        </div>
+        <div class="row-details">
+          {{#if attack.failedDebuff}}<p><b>{{localize "CRAWLSPACE.Mob.FailedDebuff"}}:</b> {{attack.failedDebuff}}</p>{{/if}}
+          {{#if attack.publishedToHit}}<p><b>{{localize "CRAWLSPACE.Mob.PublishedToHit"}}:</b> {{attack.publishedToHit}}</p>{{/if}}
+          <div class="row-description">{{{attack.notesHtml}}}</div>
+        </div>
+      </li>
+      {{else}}<li class="empty">—</li>{{/each}}
+    </ol>
+  </section>
+
+  <section class="crawl-table">
+    <div class="table-head plain-head pf-bar">
+      <span class="head-name">{{localize "CRAWLSPACE.Mob.Abilities"}}</span>
+      <span class="head-controls">{{#if editable}}<a data-action="addAbility"><i class="fa-solid fa-plus"></i> {{localize "CRAWLSPACE.Mob.AddAbility"}}</a>{{/if}}</span>
+    </div>
+    <ol class="table-rows">
+      {{#each abilities as |ability|}}
+      <li class="crawl-row {{#if ability.expanded}}expanded{{/if}}" data-ability-index="{{ability.index}}" data-expand-key="{{ability.expandKey}}">
+        <div class="row-main">
+          <i class="row-icon fa-solid fa-star"></i>
+          <a class="row-name" data-action="toggleExpand">{{ability.name}}</a>
+          <span class="row-controls">
+            <a data-action="abilityToChat" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
+            {{#if @root.editable}}
+            <a data-action="editAbility" data-tooltip="{{localize 'CRAWLSPACE.Item.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
+            <a data-action="deleteAbility" data-tooltip="{{localize 'CRAWLSPACE.Item.Delete'}}"><i class="fa-solid fa-trash"></i></a>
+            {{/if}}
+          </span>
+        </div>
+        <div class="row-details"><div class="row-description">{{{ability.descriptionHtml}}}</div></div>
+      </li>
+      {{else}}<li class="empty">—</li>{{/each}}
+    </ol>
+  </section>
+
+  <section class="crawl-table">
+    <div class="table-head plain-head pf-bar">
+      <span class="head-name">{{localize "CRAWLSPACE.Mob.Items"}}</span>
+      <span class="head-controls">{{#if editable}}<a data-action="createItem" data-type="loot"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
+    </div>
+    <ol class="table-rows">
+      {{#each items as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="plain"}}{{else}}<li class="empty">—</li>{{/each}}
+    </ol>
+  </section>
+</section>

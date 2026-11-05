@@ -34,7 +34,10 @@
       "description": "Description",
       "details": "Details",
       "character": "Character",
-      "actions": "Actions"
+      "actions": "Actions",
+      "main": "Main",
+      "notes": "Notes",
+      "rules": "Rules"
     },
     "Sheet": {
       "Crawler": "CrawlSpace Crawler",
@@ -61,7 +64,11 @@
       "Clubs": "Clubs / Societies / Guilds",
       "AddClub": "Add Club / Society",
       "Sponsor": "Sponsor {number}",
-      "Calculations": "Calculations and overrides"
+      "Calculations": "Calculations and overrides",
+      "Effect": "CrawlSpace Effect",
+      "PortraitHint": "Click to change the image",
+      "FillDamage": "Fill skill damage from compendium",
+      "FillDamageDone": "Filled damage for {count} skills and spells."
     },
     "Section": {
       "Stats": "Stats",
@@ -91,7 +98,12 @@
       "DrOverride": "DR override",
       "EvadeBuffs": "Evade buffs",
       "EvadeOverride": "Evade override",
-      "ManaOverride": "Max mana override"
+      "ManaOverride": "Max mana override",
+      "ShieldDr": "Shield DR",
+      "ShieldDrShort": "Shield",
+      "ShieldDrHint": "Shield DR from your equipped shield. Use − when it absorbs damage and + to restore it.",
+      "ShieldDrLose": "Lose 1 shield DR",
+      "ShieldDrRestore": "Restore 1 shield DR"
     },
     "Trait": {
       "Resist": "Resist",
@@ -131,7 +143,10 @@
       "ClearShield": "Remove all shield slots"
     },
     "Hotlist": {
-      "Empty": "Drag items here to pin them to the hotlist."
+      "Empty": "Drag items here to pin them to the hotlist.",
+      "Hint": "Pin items with the pin icon, or drop them here or on the Actions tab icon.",
+      "Pin": "Pin to hotlist",
+      "Unpin": "Unpin from hotlist"
     },
     "Empty": {
       "Skills": "No skills yet. Drag one in from a compendium.",
@@ -139,7 +154,8 @@
       "Identity": "No race, class or background.",
       "Debuffs": "No debuffs.",
       "Buffs": "No buffs.",
-      "ItemEffects": "No effects."
+      "ItemEffects": "No effects.",
+      "Inherent": "No inherent spells. Add an \"Inherent Spell\" rule to an effect, or set a spell's usage to Inherent."
     },
     "Ability": {
       "racial": "Racial abilities",
@@ -207,7 +223,11 @@
       "Notes": "Notes",
       "Description": "Description",
       "benefits": "Benefits",
-      "detriments": "Detriments"
+      "detriments": "Detriments",
+      "DamageBonus": "Damage Bonus",
+      "Upgrade5": "Rank 5",
+      "Upgrade10": "Rank 10",
+      "Upgrade15": "Rank 15"
     },
     "Usage": {
       "learned": "Learned",
@@ -236,13 +256,47 @@
       "AtRank": "Rank {rank}+",
       "OnTarget": "On target",
       "ApplyHint": "Not applied to the owner. Drag it onto a target's sheet or token to apply it.",
-      "ItemHint": "Effects that apply to the owner are active while the item is held (weapons, equipment and tattoos must be equipped). Effects with a rank requirement switch on when the skill or spell reaches that rank."
+      "ItemHint": "Effects that apply to the owner are active while the item is held (weapons, equipment and tattoos must be equipped). Effects with a rank requirement switch on when the skill or spell reaches that rank.",
+      "Buff": "Buff",
+      "Debuff": "Debuff",
+      "Plain": "Effect",
+      "CastRank": "Cast at Rank",
+      "CleanUp": "Clean Up damage",
+      "Conditions": "Conditions",
+      "Delete": "Delete effect",
+      "Edit": "Edit effect",
+      "Duration": "Duration",
+      "Effect": "Effect",
+      "Kind": "Kind",
+      "MagicOnly": "Blocks magic damage only",
+      "MaxStacks": "Max stacks",
+      "OnSelf": "On self",
+      "PerSlot": "Per slot",
+      "Remaining": "Remaining",
+      "RequiredRank": "Required Rank",
+      "ShieldSlots": "Shield slots",
+      "Stacks": "Stacks",
+      "Transfer": "Applies to the owner"
     },
     "Attack": {
-      "Unarmed": "Unarmed strike"
+      "Unarmed": "Unarmed strike",
+      "Add": "Add Attack",
+      "Attack": "Attack",
+      "Critical": "Critical",
+      "Damage": "Damage",
+      "Delete": "Delete attack",
+      "Edit": "Edit attack",
+      "HitBonus": "Hit bonus",
+      "New": "New Attack",
+      "Roll": "Roll attack",
+      "ToHit": "To hit"
     },
     "Spell": {
-      "Cast": "Cast ({mana} mana)"
+      "Cast": "Cast ({mana} mana)",
+      "Inherent": "Inherent Spells",
+      "GrantedBy": "Granted by {source}",
+      "NotFound": "No spell with this name was found in the world or compendia.",
+      "CastInherent": "Cast (no mana)"
     },
     "Mob": {
       "Kind": "Kind",
@@ -264,12 +318,16 @@
       "Abilities": "Abilities",
       "Items": "Items",
       "Tags": "Tags",
-      "NewAttack": "New Attack"
+      "NewAttack": "New Attack",
+      "AddAbility": "Add Ability",
+      "NewAbility": "New Ability",
+      "AreaFeet": "Area (ft)"
     },
     "Npc": {
       "Job": "Job",
       "StatBlock": "Stat block",
-      "DropMob": "Drop a Mob actor here to use it as this NPC's stat block."
+      "DropMob": "Drop a Mob actor here to use it as this NPC's stat block.",
+      "ClearStatBlock": "Unlink stat block"
     },
     "Roll": {
       "Roll": "Roll",
@@ -378,7 +436,129 @@
       "NoneLeft": "No {name} left.",
       "SlotFull": "The {slot} slot is full ({limit}).",
       "Tainted": "{name} has The Taint and can't be healed.",
-      "NoActor": "No actor selected."
+      "NoActor": "No actor selected.",
+      "HotlistFull": "The hotlist is full ({capacity}).",
+      "NoDamage": "{name} has no damage formula.",
+      "NoPack": "No matching compendium is installed.",
+      "SpellNotFound": "Could not find a spell named {name}."
+    },
+    "Actions": {
+      "action": "Action",
+      "interrupt": "Interrupt Action",
+      "actionPlural": "Actions",
+      "interruptPlural": "Interrupt Actions",
+      "Add": "Add",
+      "newAction": "New Action",
+      "newInterrupt": "New Interrupt Action"
+    },
+    "Filter": {
+      "Search": "Search…",
+      "all": "All",
+      "anyCheck": "Any check",
+      "weapon": "Weapons",
+      "equipment": "Equipment",
+      "consumable": "Consumables",
+      "tattoo": "Tattoos & Patches",
+      "other": "Other",
+      "melee": "Melee",
+      "ranged": "Ranged",
+      "potion": "Potions",
+      "scroll": "Scrolls",
+      "ammunition": "Ammunition",
+      "explosives": "Explosives"
+    },
+    "Ids": {
+      "Title": "Identifiers",
+      "Copy": "Copy",
+      "Copied": "Copied {value}",
+      "Uuid": "Foundry UUID",
+      "UuidHint": "Unique to this document in this world. Use it in @UUID links and macros.",
+      "SourceId": "Compendium source",
+      "SourceIdHint": "The compendium entry this was created from, if any.",
+      "CrawlSpace": "CrawlSpace ID",
+      "CrawlSpaceHint": "The CrawlSpace database row this was imported from (database:id)."
+    },
+    "RowConfig": {
+      "attack": "Attack",
+      "action": "Action",
+      "mobAttack": "Mob Attack",
+      "mobAbility": "Ability",
+      "ActionKind": "Kind",
+      "CheckSkill": "Check with skill",
+      "Damage": "Damage formula",
+      "DamageHint": "Leave blank to use the weapon or skill damage.",
+      "Formula": "Roll formula",
+      "Skill": "Attack skill",
+      "SkillAuto": "(automatic)",
+      "Source": "Item"
+    },
+    "Rules": {
+      "Title": "Rules",
+      "New": "New Rule Element",
+      "None": "No rules yet.",
+      "Delete": "Delete rule",
+      "EditJson": "Edit rule: {name}",
+      "EditJsonHint": "Edit as JSON",
+      "BadJson": "That is not valid JSON: {error}",
+      "Field": {
+        "stat": "Stat",
+        "value": "Value",
+        "name": "Name",
+        "percent": "Percent",
+        "damageType": "Damage type",
+        "debuff": "Debuff",
+        "skill": "Skill",
+        "spell": "Spell",
+        "slots": "Slots",
+        "rollKind": "Roll",
+        "appliesTo": "Applies to",
+        "mode": "Mode",
+        "rank": "Rank",
+        "cooldown": "Cooldown",
+        "special": "Special",
+        "key": "Key",
+        "changeType": "Change type"
+      },
+      "RollKind": {
+        "attackMode": "Attack rolls",
+        "checkMode": "Checks",
+        "evadeMode": "Evade rolls",
+        "incomingAttackMode": "Attacks against you"
+      },
+      "Type": {
+        "statBonus": "Stat Bonus",
+        "baseStatBonus": "Base Stat Bonus",
+        "statModifier": "Stat Modifier",
+        "statPercent": "Stat Percent",
+        "modLoss": "Modifier Loss",
+        "mana": "Mana",
+        "dr": "Damage Reduction",
+        "evade": "Evade",
+        "move": "Move",
+        "step": "Step",
+        "extraActions": "Extra Actions",
+        "hotlist": "Hotlist Slots",
+        "resistance": "Resistance",
+        "vulnerability": "Vulnerability",
+        "immunity": "Immunity",
+        "conditionImmunity": "Condition Immunity",
+        "skillRank": "Skill Rank",
+        "spellRank": "Spell Rank",
+        "baseSkillRank": "Base Skill Rank",
+        "baseSpellRank": "Base Spell Rank",
+        "healthBonus": "Health Bonus",
+        "rollMode": "Advantage / Disadvantage",
+        "inherentSpell": "Inherent Spell",
+        "special": "Special",
+        "custom": "Custom"
+      }
+    },
+    "Table": {
+      "Name": "Name",
+      "Base": "Base",
+      "Enhanced": "Enhanced",
+      "EnhancedHint": "Rank after effects",
+      "AddFromDatabase": "Add from database (opens the compendium)"
     }
   }
 }

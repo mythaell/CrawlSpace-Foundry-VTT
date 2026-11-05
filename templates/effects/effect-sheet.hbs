@@ -1,0 +1,46 @@
+<div class="crawl-sheet-body effect-body">
+  <header class="pf-header">
+    <img class="pf-portrait" src="{{effect.img}}" alt="" data-action="editImage" data-edit="img">
+    <input class="pf-name" type="text" name="name" value="{{source.name}}">
+    <div class="pf-type">
+      <span>{{localize "CRAWLSPACE.Effect.Effect"}}</span>
+      <a class="effect-toggle {{#unless effect.disabled}}on{{/unless}}" data-action="toggleDisabled" data-tooltip="{{localize (ifThen effect.disabled 'CRAWLSPACE.Effect.Enable' 'CRAWLSPACE.Effect.Disable')}}">
+        <i class="fa-solid {{#if effect.disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}"></i>
+      </a>
+    </div>
+  </header>
+
+  <div class="pf-columns">
+    <aside class="pf-summary">
+      <label><span>{{localize "CRAWLSPACE.Effect.Kind"}}</span><select name="system.conditionType">{{selectOptions conditionChoices selected=systemSource.conditionType localize=true}}</select></label>
+      <label><span>{{localize "CRAWLSPACE.Effect.Stacks"}}</span><input type="number" name="system.stacks" value="{{systemSource.stacks}}" min="1"></label>
+      <label><span>{{localize "CRAWLSPACE.Effect.MaxStacks"}}</span><input type="number" name="system.maxStacks" value="{{crawlNumberOrBlank systemSource.maxStacks}}" placeholder="—"></label>
+      <label><span>{{localize "CRAWLSPACE.Effect.Duration"}}</span><input type="text" name="system.durationText" value="{{systemSource.durationText}}"></label>
+      <label><span>{{localize "CRAWLSPACE.Effect.RequiredRank"}}</span><input type="number" name="system.requiredRank" value="{{crawlNumberOrBlank systemSource.requiredRank}}" placeholder="—"></label>
+      <label><span>{{localize "CRAWLSPACE.Effect.CastRank"}}</span><input type="number" name="system.rank" value="{{crawlNumberOrBlank systemSource.rank}}" placeholder="—"></label>
+      {{#if onItem}}
+      <label class="check"><input type="checkbox" name="transfer" {{checked source.transfer}}> {{localize "CRAWLSPACE.Effect.Transfer"}}</label>
+      {{/if}}
+    </aside>
+
+    <div class="pf-main">
+      <fieldset>
+        <legend>{{localize "CRAWLSPACE.Effect.CleanUp"}}</legend>
+        <label><span>{{localize "CRAWLSPACE.Item.Formula"}}</span><input type="text" name="system.cleanup.formula" value="{{systemSource.cleanup.formula}}" placeholder="1d8+F"></label>
+        <label><span>{{localize "CRAWLSPACE.Item.DamageTypes"}}</span><input type="text" name="system.cleanup.typesText" value="{{cleanupTypes}}"></label>
+      </fieldset>
+      <fieldset>
+        <legend>{{localize "CRAWLSPACE.Effect.ShieldSlots"}}</legend>
+        <label><span>{{localize "CRAWLSPACE.Effect.Remaining"}}</span><input type="number" name="system.shield.remaining" value="{{systemSource.shield.remaining}}" min="0"></label>
+        <label><span>{{localize "CRAWLSPACE.Effect.PerSlot"}}</span><input type="number" name="system.shield.perSlot" value="{{systemSource.shield.perSlot}}" min="0"></label>
+        <label class="check"><input type="checkbox" name="system.shield.magicOnly" {{checked systemSource.shield.magicOnly}}> {{localize "CRAWLSPACE.Effect.MagicOnly"}}</label>
+      </fieldset>
+      <h3 class="pf-section">{{localize "CRAWLSPACE.Item.Description"}}</h3>
+      {{#if editable}}<prose-mirror name="description" value="{{source.description}}" toggled>{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
+    </div>
+  </div>
+
+  {{> "systems/crawlspace/templates/sheets/ids.hbs" ids=ids}}
+  <h3 class="pf-section">{{localize "CRAWLSPACE.Rules.Title"}}</h3>
+  {{> "systems/crawlspace/templates/effects/rules.hbs" effectId=effect.id rules=rules ruleTypes=ruleTypes editable=editable}}
+</div>

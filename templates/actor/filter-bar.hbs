@@ -1,0 +1,29 @@
+{{!-- Search + filter buttons for one table. Context: table, stats?, checks?, categories? --}}
+<div class="crawl-filter-bar" data-filter-table="{{table}}">
+  <input type="search" class="filter-search" data-filter-search placeholder="{{localize 'CRAWLSPACE.Filter.Search'}}" aria-label="{{localize 'CRAWLSPACE.Filter.Search'}}">
+  {{#if categories}}
+  <div class="filter-group">
+    <button type="button" data-action="setFilter" data-filter-key="category" data-filter-value="">{{localize "CRAWLSPACE.Filter.all"}}</button>
+    {{#each categories}}<button type="button" data-action="setFilter" data-filter-key="category" data-filter-value="{{id}}">{{label}}</button>{{/each}}
+  </div>
+  {{#each categories as |category|}}
+  {{#if category.subtypes.length}}
+  <div class="filter-group subtypes" data-subtype-group="{{category.id}}" hidden>
+    {{#each category.subtypes}}<button type="button" data-action="setFilter" data-filter-key="subtype" data-filter-value="{{id}}">{{label}}</button>{{/each}}
+  </div>
+  {{/if}}
+  {{/each}}
+  {{/if}}
+  {{#if stats}}
+  <div class="filter-group">
+    <button type="button" data-action="setFilter" data-filter-key="stat" data-filter-value="">{{localize "CRAWLSPACE.Filter.all"}}</button>
+    {{#each stats}}<button type="button" data-action="setFilter" data-filter-key="stat" data-filter-value="{{this}}">{{this}}</button>{{/each}}
+  </div>
+  {{/if}}
+  {{#if checks}}
+  <div class="filter-group">
+    <button type="button" data-action="setFilter" data-filter-key="check" data-filter-value="">{{localize "CRAWLSPACE.Filter.anyCheck"}}</button>
+    {{#each checks}}<button type="button" data-action="setFilter" data-filter-key="check" data-filter-value="{{this}}">{{this}}</button>{{/each}}
+  </div>
+  {{/if}}
+</div>

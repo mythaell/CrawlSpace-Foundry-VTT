@@ -105,6 +105,45 @@ abstract class CrawlActorData extends foundry.abstract.TypeDataModel {
   }
 }
 
+/** A row in the crawler's Attacks table: links a weapon/skill/spell and can override its numbers. */
+const crawlerAttackSchema = () => {
+  const fields = f()
+  return new fields.SchemaField({
+    id: new fields.StringField({ required: true, blank: false, initial: () => foundry.utils.randomID() }),
+    name: text('Attack'),
+    img: text(),
+    /** Weapon, skill, spell or consumable on this actor that the attack uses. */
+    sourceId: text(),
+    /** Skill whose Rank and stat give the to-hit bonus (defaults to the weapon's skill). */
+    skillId: text(),
+    ammunitionId: text(),
+    hitBonus: integer(0),
+    /** Replaces the source's damage formula when set. */
+    damage: text(),
+    damageBonus: text(),
+    damageTypes: new fields.ArrayField(new fields.StringField({ blank: false })),
+    armorPiercing: new fields.BooleanField(),
+    magic: new fields.BooleanField(),
+    ranged: new fields.BooleanField(),
+    notes: text(),
+  })
+}
+
+/** A row in the Actions or Interrupt Actions table. */
+const sheetActionSchema = () => {
+  const fields = f()
+  return new fields.SchemaField({
+    id: new fields.StringField({ required: true, blank: false, initial: () => foundry.utils.randomID() }),
+    kind: new fields.StringField({ required: true, initial: 'action', choices: ['action', 'interrupt'] }),
+    name: text('Action'),
+    img: text(),
+    sourceId: text(),
+    skillId: text(),
+    formula: text(),
+    notes: text(),
+  })
+}
+
 export class CrawlerData extends CrawlActorData {
   
 
@@ -160,6 +199,10 @@ export class CrawlerData extends CrawlActorData {
       clubs: new fields.ArrayField(new fields.StringField({ blank: true })),
       personalSpace: new fields.SchemaField({ tier: text(), size: text() }),
       hotlist: new fields.SchemaField({ items: new fields.ArrayField(new fields.StringField({ blank: true })) }),
+      attacks: new fields.ArrayField(crawlerAttackSchema()),
+      sheetActions: new fields.ArrayField(sheetActionSchema()),
+      /** DR an equipped shield has lost to damage; current Shield DR = max − lost. */
+      shieldDr: new fields.SchemaField({ lost: integer(0, { min: 0 }) }),
       upkeep: new fields.SchemaField({
         pendingStatPoints: integer(0, { min: 0 }),
         allocatedThroughLevel: integer(1, { min: 0 }),
@@ -181,14 +224,19 @@ export class CrawlerData extends CrawlActorData {
     this.mana.max = this.mana.override ?? (int === null ? 0 : int + this.mana.bonus)
     this.mana.pct = this.mana.max > 0 ? Math.clamp((this.mana.value / this.mana.max) * 100, 0, 100) : 0
 
-    // DR = armor (base + equipped armor DR) + DR buffs (App.tsx automaticDrTotal).
-    const equippedArmor = items.reduce(
-      (total: number, item: any) =>
-        total + (item.system?.equipped && Number.isFinite(item.system?.armorDr) ? Number(item.system.armorDr) : 0),
-      0,
-    )
+    // DR = armor (base + equipped armor DR) + current Shield DR + DR buffs (App.tsx automaticDrTotal).
+    let equippedArmor = 0
+    let shieldMax = 0
+    for (const item of items) {
+      if (item.type !== 'equipment' || !item.system?.equipped) continue
+      const dr = Number(item.system.armorDr) || 0
+      if (item.system.isShield) shieldMax += dr
+      else equippedArmor += dr
+    }
+    this.shieldDr.max = shieldMax
+    this.shieldDr.value = Math.clamp(shieldMax - this.shieldDr.lost, 0, shieldMax)
     this.dr.armorTotal = this.dr.armor + equippedArmor
-    this.dr.total = this.dr.override ?? this.dr.armorTotal + this.dr.buff + this.dr.bonus
+    this.dr.total = this.dr.override ?? this.dr.armorTotal + this.shieldDr.value + this.dr.buff + this.dr.bonus
 
     // Evade = DEX mod + Evade buffs.
     const hasDex = this.attributes.dex.total !== null || this.attributes.dex.modOverride !== null

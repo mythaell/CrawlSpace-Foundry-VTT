@@ -1,25 +1,26 @@
-<section class="tab effects {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-  <div class="list-header">
-    <span class="item-name">{{localize "CRAWLSPACE.Effect.ItemEffects"}}</span>
-    <span class="item-controls">{{#if editable}}<a data-action="createEffect" data-tooltip="{{localize 'CRAWLSPACE.Effect.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
-  </div>
-  <ol class="item-list">
-    {{#each effects as |effect|}}
-    <li class="effect-row draggable {{#if effect.disabled}}disabled{{/if}}" data-effect-id="{{effect.id}}">
-      <img class="item-img" src="{{effect.img}}" alt="">
-      <div class="item-name">
-        <a data-action="editEffect">{{effect.name}}</a>
-        {{#if effect.requiredRank}}<span class="tag">{{localize "CRAWLSPACE.Effect.AtRank" rank=effect.requiredRank}}</span>{{/if}}
-        {{#unless effect.transfer}}<span class="tag" data-tooltip="{{localize 'CRAWLSPACE.Effect.ApplyHint'}}">{{localize "CRAWLSPACE.Effect.OnTarget"}}</span>{{/unless}}
-        <ul class="changes">{{#each effect.changes}}<li><code>{{this}}</code></li>{{/each}}</ul>
-      </div>
-      <span class="item-controls">
-        <a data-action="toggleEffect"><i class="fa-solid {{#if effect.disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}"></i></a>
-        <a data-action="editEffect"><i class="fa-solid fa-pen-to-square"></i></a>
-        {{#if @root.editable}}<a data-action="deleteEffect"><i class="fa-solid fa-trash"></i></a>{{/if}}
+<section class="tab rules {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  {{#each effects as |effect|}}
+  <section class="effect-block {{#if effect.disabled}}disabled{{/if}}" data-effect-id="{{effect.id}}">
+    <header class="effect-block-header">
+      <img src="{{effect.img}}" alt="">
+      <a class="effect-name" data-action="editEffect" data-tooltip="{{localize 'CRAWLSPACE.Effect.Edit'}}">{{effect.name}}</a>
+      {{#if effect.requiredRank}}<span class="pf-tag">{{localize "CRAWLSPACE.Effect.AtRank" rank=effect.requiredRank}}</span>{{/if}}
+      <a class="pf-tag {{#unless effect.transfer}}on-target{{/unless}}" {{#if @root.editable}}data-action="toggleTransfer"{{/if}} data-tooltip="{{localize 'CRAWLSPACE.Effect.ApplyHint'}}">
+        {{localize (ifThen effect.transfer "CRAWLSPACE.Effect.OnSelf" "CRAWLSPACE.Effect.OnTarget")}}
+      </a>
+      <span class="controls">
+        <a data-action="toggleEffect" data-tooltip="{{localize (ifThen effect.disabled 'CRAWLSPACE.Effect.Enable' 'CRAWLSPACE.Effect.Disable')}}"><i class="fa-solid {{#if effect.disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}"></i></a>
+        <a data-action="editEffect" data-tooltip="{{localize 'CRAWLSPACE.Effect.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
+        {{#if @root.editable}}<a data-action="deleteEffect" data-tooltip="{{localize 'CRAWLSPACE.Effect.Delete'}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
       </span>
-    </li>
-    {{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.ItemEffects"}}</li>{{/each}}
-  </ol>
+    </header>
+    {{> "systems/crawlspace/templates/effects/rules.hbs" effectId=effect.id rules=effect.rules ruleTypes=@root.ruleTypes editable=@root.editable}}
+  </section>
+  {{else}}
+  <p class="rules-empty">{{localize "CRAWLSPACE.Empty.ItemEffects"}}</p>
+  {{/each}}
+  {{#if editable}}<button type="button" class="pf-add" data-action="createEffect"><i class="fa-solid fa-plus"></i> {{localize "CRAWLSPACE.Effect.Create"}}</button>{{/if}}
   <p class="hint">{{localize "CRAWLSPACE.Effect.ItemHint"}}</p>
+  <h3 class="pf-section">{{localize "CRAWLSPACE.Ids.Title"}}</h3>
+  {{> "systems/crawlspace/templates/sheets/ids.hbs" ids=ids}}
 </section>

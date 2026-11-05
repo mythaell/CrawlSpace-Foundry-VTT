@@ -1,39 +1,33 @@
-<div class="npc-body">
-  <header class="crawl-header">
-    <img class="profile" src="{{document.img}}" alt="{{document.name}}" data-action="editImage" data-edit="img">
-    <div class="identity">
-      <input class="crawler-name" type="text" name="name" value="{{document.name}}">
-      <div class="identity-grid">
-        <label>{{localize "CRAWLSPACE.Npc.Job"}}<input type="text" name="system.job" value="{{systemSource.job}}"></label>
-        <label>{{localize "CRAWLSPACE.Crawler.Race"}}<input type="text" name="system.race" value="{{systemSource.race}}"></label>
-        <label>{{localize "CRAWLSPACE.Crawler.Floor"}}<input type="number" name="system.floor" value="{{systemSource.floor}}"></label>
-      </div>
+<section class="tab main {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <section class="crawl-table">
+    <div class="table-head plain-head pf-bar">
+      <span class="head-name">{{localize "CRAWLSPACE.Npc.StatBlock"}}</span>
+      <span class="head-controls">{{#if (and statBlock editable)}}<a data-action="clearStatBlock" data-tooltip="{{localize 'CRAWLSPACE.Npc.ClearStatBlock'}}"><i class="fa-solid fa-link-slash"></i></a>{{/if}}</span>
     </div>
-  </header>
-
-  <div class="npc-statblock">
     {{#if statBlock}}
-      <a data-action="openStatBlock"><i class="fa-solid fa-skull"></i> {{localize "CRAWLSPACE.Npc.StatBlock"}}: {{statBlock.name}}</a>
+    <div class="npc-statblock">
+      <a data-action="openStatBlock"><img src="{{statBlock.img}}" alt=""> {{statBlock.name}}</a>
+      {{#if statBlock.system.evade}}<span class="pf-tags">
+        <span class="pf-tag">{{localize "CRAWLSPACE.Stat.Evade"}} {{statBlock.system.evade.total}}</span>
+        <span class="pf-tag">{{localize "CRAWLSPACE.Stat.DR"}} {{statBlock.system.dr.total}}</span>
+        <span class="pf-tag">{{localize "CRAWLSPACE.Stat.Health"}} {{statBlock.system.health.value}}/{{statBlock.system.health.max}}</span>
+      </span>{{/if}}
+    </div>
     {{else}}
-      <p class="hint">{{localize "CRAWLSPACE.Npc.DropMob"}}</p>
+    <p class="hint npc-statblock">{{localize "CRAWLSPACE.Npc.DropMob"}}</p>
     {{/if}}
-  </div>
+  </section>
 
-  <table class="stats">
-    <thead><tr><th></th><th>{{localize "CRAWLSPACE.Stat.Base"}}</th><th>{{localize "CRAWLSPACE.Stat.Mod"}}</th></tr></thead>
-    <tbody>
-      {{#each stats as |stat|}}
-      <tr>
-        <th><a class="rollable" data-action="rollStat" data-stat="{{stat.key}}">{{stat.label}}</a></th>
-        <td><input type="number" name="system.attributes.{{stat.key}}.value" value="{{crawlNumberOrBlank stat.source.value}}"></td>
-        <td class="derived-value mod">{{crawlSigned stat.mod}}</td>
-      </tr>
-      {{/each}}
-    </tbody>
-  </table>
+  <section class="crawl-table">
+    <div class="table-head plain-head pf-bar">
+      <span class="head-name">{{localize "CRAWLSPACE.Mob.Items"}}</span>
+      <span class="head-controls">{{#if editable}}<a data-action="createItem" data-type="loot"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
+    </div>
+    <ol class="table-rows">
+      {{#each items as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="plain"}}{{else}}<li class="empty">—</li>{{/each}}
+    </ol>
+  </section>
 
-  <h3>{{localize "CRAWLSPACE.Item.Description"}}</h3>
+  <h3 class="pf-section">{{localize "CRAWLSPACE.Item.Description"}}</h3>
   {{#if editable}}<prose-mirror name="system.description" value="{{systemSource.description}}" toggled>{{{enriched.description}}}</prose-mirror>{{else}}{{{enriched.description}}}{{/if}}
-  <h3>{{localize "CRAWLSPACE.Crawler.Notes"}}</h3>
-  {{#if editable}}<prose-mirror name="system.notes" value="{{systemSource.notes}}" toggled>{{{enriched.notes}}}</prose-mirror>{{else}}{{{enriched.notes}}}{{/if}}
-</div>
+</section>

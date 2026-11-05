@@ -1,0 +1,9 @@
+<div class="pf-ids">
+  {{#each ids}}
+  <div class="pf-id-row">
+    <span class="pf-id-label" data-tooltip="{{localize hint}}">{{localize label}} <i class="fa-solid fa-circle-info"></i></span>
+    <input type="text" value="{{value}}" readonly tabindex="-1" placeholder="—">
+    {{#if value}}<a data-action="copyId" data-value="{{value}}" data-tooltip="{{localize 'CRAWLSPACE.Ids.Copy'}}"><i class="fa-solid fa-clipboard"></i></a>{{else}}<span></span>{{/if}}
+  </div>
+  {{/each}}
+</div>

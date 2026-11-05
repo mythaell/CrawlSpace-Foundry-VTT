@@ -3,20 +3,32 @@
     <label class="gold"><i class="fa-solid fa-coins"></i> {{localize "CRAWLSPACE.Crawler.Gold"}} <input type="number" name="system.details.gold" value="{{systemSource.details.gold}}" min="0"></label>
     <div class="paper-doll">
       {{#each paperDoll as |slot|}}
-      <div class="doll-slot {{#if slot.items.length}}filled{{/if}}" data-tooltip="{{#each slot.items}}{{name}}<br>{{/each}}">
+      <div class="doll-slot {{#if slot.items.length}}filled{{/if}}">
         <span class="slot-label">{{slot.label}}</span>
         <span class="slot-item">{{#each slot.items}}{{name}}{{#unless @last}}, {{/unless}}{{else}}—{{/each}}</span>
       </div>
       {{/each}}
     </div>
   </div>
-  {{#each inventoryGroups as |group|}}
-  <div class="list-header">
-    <span class="item-name">{{group.label}}</span>
-    <span class="item-controls">{{#if @root.editable}}<a data-action="createItem" data-type="{{group.type}}" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
+  {{> "systems/crawlspace/templates/actor/filter-bar.hbs" table="inventory" categories=categories stats=false checks=false}}
+  <div class="inventory-sections" data-filter-scope="inventory">
+    {{#each inventorySections as |section|}}
+    <section class="crawl-table inventory-table" data-filter-section>
+      <div class="table-head">
+        <span></span>
+        <span>{{section.label}}</span>
+        <span>{{localize "CRAWLSPACE.Item.Quantity"}}</span>
+        <span class="head-controls">
+          {{#if @root.editable}}
+          <a data-action="createItem" data-type="{{section.createType}}" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>
+          <a data-action="openPack" data-packs="{{@root.packs}}" data-tooltip="{{localize 'CRAWLSPACE.Table.AddFromDatabase'}}"><i class="fa-solid fa-database"></i></a>
+          {{/if}}
+        </span>
+      </div>
+      <ol class="table-rows">
+        {{#each section.items as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="inventory"}}{{else}}<li class="empty">—</li>{{/each}}
+      </ol>
+    </section>
+    {{/each}}
   </div>
-  <ol class="item-list">
-    {{#each group.items as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item}}{{/each}}
-  </ol>
-  {{/each}}
 </section>

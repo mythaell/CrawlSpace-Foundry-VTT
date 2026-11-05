@@ -1,0 +1,4 @@
+<section class="tab notes {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <h3 class="pf-section">{{localize "CRAWLSPACE.Crawler.Notes"}}</h3>
+  {{#if editable}}<prose-mirror name="system.notes" value="{{systemSource.notes}}" toggled>{{{enriched.notes}}}</prose-mirror>{{else}}{{{enriched.notes}}}{{/if}}
+</section>

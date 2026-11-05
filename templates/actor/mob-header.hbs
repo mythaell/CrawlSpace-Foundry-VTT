@@ -1,32 +1,17 @@
-<header class="crawl-header mob-header">
-  <img class="profile" src="{{document.img}}" alt="{{document.name}}" data-action="editImage" data-edit="img">
-  <div class="identity">
-    <input class="crawler-name" type="text" name="name" value="{{document.name}}">
-    <div class="identity-grid">
-      <label>{{localize "CRAWLSPACE.Mob.Kind"}}
-        <select name="system.kind">{{selectOptions kindChoices selected=systemSource.kind localize=true}}</select>
-      </label>
-      {{#if (eq systemSource.kind "boss")}}
-      <label>{{localize "CRAWLSPACE.Mob.BossTier"}}
-        <select name="system.bossTier">{{selectOptions bossTierChoices selected=systemSource.bossTier}}</select>
-      </label>
-      {{/if}}
-      <label>{{localize "CRAWLSPACE.Crawler.Level"}}<input type="number" name="system.level" value="{{systemSource.level}}" min="0"></label>
-      <label>{{localize "CRAWLSPACE.Crawler.Floor"}}<input type="number" name="system.floor" value="{{systemSource.floor}}" min="0"></label>
-      <label>{{localize "CRAWLSPACE.Crawler.Size"}}<input type="text" name="system.size" value="{{systemSource.size}}"></label>
-      <label>{{localize "CRAWLSPACE.Mob.Type"}}<input type="text" name="system.type" value="{{systemSource.type}}"></label>
-    </div>
+<header class="pf-actor-header">
+  <div class="pf-actor-title">
+    <input class="pf-name" type="text" name="name" value="{{document.name}}">
+    <div class="pf-level-badge">{{levelLabel}} <input type="number" name="system.level" value="{{systemSource.level}}" min="0" aria-label="{{localize 'CRAWLSPACE.Crawler.Level'}}"></div>
   </div>
-  <div class="vitals">
-    <div class="vital health">
-      <span class="label">{{localize "CRAWLSPACE.Stat.Health"}}</span>
-      <span class="value">{{system.health.value}} / {{system.health.max}} <small>({{localize "CRAWLSPACE.Mob.PerSlot" value=system.health.perSlot}})</small></span>
-    </div>
-    <div class="derived">
-      <a class="pill rollable" data-action="rollStat" data-stat="evade"><b>{{system.evade.total}}</b> {{localize "CRAWLSPACE.Stat.Evade"}}</a>
-      <span class="pill"><b>{{system.dr.total}}</b> {{localize "CRAWLSPACE.Stat.DR"}}</span>
-      <span class="pill"><b>{{system.move.total}}</b> {{localize "CRAWLSPACE.Stat.Move"}}</span>
-      {{#if system.surpriseTotal}}<span class="pill"><b>{{system.surpriseTotal}}</b> {{localize "CRAWLSPACE.Mob.Surprise"}}</span>{{/if}}
-    </div>
+  {{#if tagList.length}}<div class="pf-tags">{{#each tagList}}<span class="pf-tag">{{this}}</span>{{/each}}</div>{{/if}}
+  <div class="pf-actor-fields">
+    <label><span>{{localize "CRAWLSPACE.Mob.Kind"}}</span><select name="system.kind">{{selectOptions kindChoices selected=systemSource.kind localize=true}}</select></label>
+    {{#if (eq systemSource.kind "boss")}}
+    <label><span>{{localize "CRAWLSPACE.Mob.BossTier"}}</span><select name="system.bossTier">{{selectOptions bossTierChoices selected=systemSource.bossTier}}</select></label>
+    {{/if}}
+    <label><span>{{localize "CRAWLSPACE.Crawler.Floor"}}</span><input type="number" name="system.floor" value="{{systemSource.floor}}" min="0"></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.Size"}}</span><input type="text" name="system.size" value="{{systemSource.size}}"></label>
+    <label><span>{{localize "CRAWLSPACE.Mob.Type"}}</span><input type="text" name="system.type" value="{{systemSource.type}}"></label>
+    <label class="wide"><span>{{localize "CRAWLSPACE.Mob.Tags"}}</span><input type="text" name="system.tags" value="{{systemSource.tags}}"></label>
   </div>
 </header>

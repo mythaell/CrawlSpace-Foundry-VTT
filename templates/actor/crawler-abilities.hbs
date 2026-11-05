@@ -1,25 +1,25 @@
 <section class="tab abilities {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-  <div class="list-header">
-    <span class="item-name">{{localize "CRAWLSPACE.Section.Identity"}}</span>
-    <span class="item-controls">{{#if editable}}<a data-action="createItem" data-type="background" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
+  <div class="table-head plain-head">
+    <span class="head-name">{{localize "CRAWLSPACE.Section.Identity"}}</span>
+    <span class="head-controls">{{#if editable}}<a data-action="createItem" data-type="background" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
   </div>
-  <ol class="item-list">
-    {{#each identity as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Identity"}}</li>{{/each}}
+  <ol class="table-rows">
+    {{#each identity as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="plain"}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Identity"}}</li>{{/each}}
   </ol>
   {{#each abilityGroups as |group|}}
-  <div class="list-header">
-    <span class="item-name">{{group.label}}</span>
-    <span class="item-controls">{{#if @root.editable}}<a data-action="createItem" data-type="ability" data-category="{{group.category}}" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
+  <div class="table-head plain-head">
+    <span class="head-name">{{group.label}}</span>
+    <span class="head-controls">{{#if @root.editable}}<a data-action="createItem" data-type="ability" data-category="{{group.category}}" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
   </div>
-  <ol class="item-list">
-    {{#each group.items as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item}}{{/each}}
+  <ol class="table-rows">
+    {{#each group.items as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="plain"}}{{/each}}
   </ol>
   {{/each}}
-  <div class="list-header">
-    <span class="item-name">{{localize "TYPES.Item.achievement"}}</span>
-    <span class="item-controls">{{#if editable}}<a data-action="createItem" data-type="achievement" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
+  <div class="table-head plain-head">
+    <span class="head-name">{{localize "TYPES.Item.achievement"}}</span>
+    <span class="head-controls">{{#if editable}}<a data-action="createItem" data-type="achievement" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
   </div>
-  <ol class="item-list">
-    {{#each achievements as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item}}{{/each}}
+  <ol class="table-rows">
+    {{#each achievements as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="plain"}}{{/each}}
   </ol>
 </section>

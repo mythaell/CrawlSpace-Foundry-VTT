@@ -1,16 +1,74 @@
 <section class="tab actions {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-  <section class="list-panel">
-    <h2 class="table-section-title">{{localize "CRAWLSPACE.Section.Attacks"}}</h2>
-    <ol class="item-list attacks">
-      {{#each attacks as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="attack"}}{{/each}}
-      <li class="item-row unarmed"><a class="item-name rollable" data-action="attackUnarmed"><i class="fa-solid fa-hand-fist"></i> {{localize "CRAWLSPACE.Attack.Unarmed"}}</a></li>
-    </ol>
-  </section>
-
-  <section class="list-panel">
-    <h2 class="table-section-title">{{localize "CRAWLSPACE.Section.Hotlist"}} <small>({{hotlist.length}}/{{system.hotlist.capacity}})</small></h2>
-    <ol class="item-list hotlist" data-hotlist>
+  <section class="crawl-table hotlist-table" data-hotlist>
+    <div class="table-head plain-head">
+      <span class="head-name">{{localize "CRAWLSPACE.Section.Hotlist"}} <small>({{hotlist.length}}/{{system.hotlist.capacity}})</small></span>
+      <span class="head-hint">{{localize "CRAWLSPACE.Hotlist.Hint"}}</span>
+    </div>
+    <ol class="table-rows">
       {{#each hotlist as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="hotlist"}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Hotlist.Empty"}}</li>{{/each}}
     </ol>
   </section>
+
+  <section class="crawl-table attack-table" data-attack-drop>
+    <div class="table-head plain-head">
+      <span class="head-name">{{localize "CRAWLSPACE.Section.Attacks"}}</span>
+      <span class="head-controls">{{#if editable}}<a data-action="addAttack" data-tooltip="{{localize 'CRAWLSPACE.Attack.Add'}}"><i class="fa-solid fa-plus"></i> {{localize "CRAWLSPACE.Attack.Add"}}</a>{{/if}}</span>
+    </div>
+    <ol class="table-rows">
+      {{#each attacks as |attack|}}
+      <li class="pf-strike {{#if attack.expanded}}expanded{{/if}}" data-attack-id="{{attack.id}}" data-expand-key="{{attack.expandKey}}">
+        <div class="strike-main">
+          <img class="row-img" src="{{attack.img}}" alt="" data-action="attackRoll" data-tooltip="{{localize 'CRAWLSPACE.Attack.Roll'}}">
+          <div class="strike-body">
+            <div class="strike-title">
+              <a class="row-name" data-action="toggleExpand">{{attack.name}}</a>
+              {{#if attack.tags.length}}<span class="pf-tags">{{#each attack.tags}}<span class="pf-tag">{{this}}</span>{{/each}}</span>{{/if}}
+            </div>
+            <div class="strike-buttons">
+              <button type="button" class="strike-attack" data-action="attackRoll" data-tooltip="{{attack.modifiers}}">{{localize "CRAWLSPACE.Attack.Attack"}} {{attack.toHit}}</button>
+              <button type="button" data-action="attackDamage" data-tier="normal" data-tooltip="{{attack.types}}"><i class="fa-solid fa-burst"></i> {{#if attack.damage}}{{attack.damage}}{{else}}{{localize "CRAWLSPACE.Attack.Damage"}}{{/if}}</button>
+              <button type="button" data-action="attackDamage" data-tier="critical"><i class="fa-solid fa-star"></i> {{localize "CRAWLSPACE.Attack.Critical"}}</button>
+            </div>
+          </div>
+          <span class="row-controls">
+            <a data-action="attackToChat" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
+            {{#if @root.editable}}
+            <a data-action="editAttack" data-tooltip="{{localize 'CRAWLSPACE.Attack.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
+            {{#if attack.saved}}<a data-action="deleteAttack" data-tooltip="{{localize 'CRAWLSPACE.Attack.Delete'}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
+            {{/if}}
+          </span>
+        </div>
+        <div class="row-details"><div class="row-description">{{{attack.notes}}}</div></div>
+      </li>
+      {{/each}}
+    </ol>
+  </section>
+
+  {{#each actionGroups as |group|}}
+  <section class="crawl-table action-table">
+    <div class="table-head plain-head">
+      <span class="head-name">{{group.label}}</span>
+      <span class="head-controls">{{#if @root.editable}}<a data-action="addAction" data-kind="{{group.kind}}" data-tooltip="{{localize 'CRAWLSPACE.Actions.Add'}}"><i class="fa-solid fa-plus"></i> {{localize "CRAWLSPACE.Actions.Add"}}</a>{{/if}}</span>
+    </div>
+    <ol class="table-rows">
+      {{#each group.rows as |action|}}
+      <li class="crawl-row {{#if action.expanded}}expanded{{/if}}" data-action-index="{{action.index}}" data-expand-key="{{action.expandKey}}">
+        <div class="row-main">
+          <img class="row-img" src="{{action.img}}" alt="" data-action="useAction" data-tooltip="{{localize 'CRAWLSPACE.Item.Use'}}">
+          <a class="row-name" data-action="toggleExpand">{{action.name}}{{#if action.sourceName}} <small>({{action.sourceName}})</small>{{/if}}</a>
+          <span class="col">{{action.formula}}</span>
+          <span class="row-controls">
+            <a data-action="actionToChat" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
+            {{#if @root.editable}}
+            <a data-action="editAction" data-tooltip="{{localize 'CRAWLSPACE.Item.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
+            <a data-action="deleteAction" data-tooltip="{{localize 'CRAWLSPACE.Item.Delete'}}"><i class="fa-solid fa-trash"></i></a>
+            {{/if}}
+          </span>
+        </div>
+        <div class="row-details"><div class="row-description">{{{action.notesHtml}}}</div></div>
+      </li>
+      {{else}}<li class="empty">—</li>{{/each}}
+    </ol>
+  </section>
+  {{/each}}
 </section>

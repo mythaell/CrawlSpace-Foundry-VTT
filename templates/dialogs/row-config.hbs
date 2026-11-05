@@ -1,0 +1,53 @@
+<div class="row-config-body">
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Item.Name"}}</label><input type="text" name="name" value="{{row.name}}"></div>
+
+  {{#if isAttack}}
+  <div class="form-group"><label>{{localize "CRAWLSPACE.RowConfig.Source"}}</label>
+    <select name="sourceId"><option value="">—</option>{{#each sources}}<option value="{{id}}" {{#if (eq id ../row.sourceId)}}selected{{/if}}>{{name}}</option>{{/each}}</select></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.RowConfig.Skill"}}</label>
+    <select name="skillId"><option value="">{{localize "CRAWLSPACE.RowConfig.SkillAuto"}}</option>{{#each skills}}<option value="{{id}}" {{#if (eq id ../row.skillId)}}selected{{/if}}>{{name}}</option>{{/each}}</select></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Item.Ammunition"}}</label>
+    <select name="ammunitionId"><option value="">—</option>{{#each ammunition}}<option value="{{id}}" {{#if (eq id ../row.ammunitionId)}}selected{{/if}}>{{name}}</option>{{/each}}</select></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Attack.HitBonus"}}</label><input type="number" name="hitBonus" value="{{row.hitBonus}}"></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.RowConfig.Damage"}}</label><input type="text" name="damage" value="{{row.damage}}" placeholder="{{localize 'CRAWLSPACE.RowConfig.DamageHint'}}"></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Item.DamageBonus"}}</label><input type="text" name="damageBonus" value="{{row.damageBonus}}" placeholder="+2"></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Item.DamageTypes"}}</label><input type="text" name="damageTypes" value="{{damageTypesText}}" data-tooltip="{{damageTypeList}}"></div>
+  <div class="form-group checks">
+    <label class="check"><input type="checkbox" name="ranged" {{checked row.ranged}}> {{localize "CRAWLSPACE.Item.Ranged"}}</label>
+    <label class="check"><input type="checkbox" name="armorPiercing" {{checked row.armorPiercing}}> {{localize "CRAWLSPACE.Item.ArmorPiercing"}}</label>
+    <label class="check"><input type="checkbox" name="magic" {{checked row.magic}}> {{localize "CRAWLSPACE.Item.Magic"}}</label>
+  </div>
+  {{/if}}
+
+  {{#if isAction}}
+  <div class="form-group"><label>{{localize "CRAWLSPACE.RowConfig.ActionKind"}}</label>
+    <select name="kind">{{selectOptions kindChoices selected=row.kind localize=true}}</select></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.RowConfig.Source"}}</label>
+    <select name="sourceId"><option value="">—</option>{{#each sources}}<option value="{{id}}" {{#if (eq id ../row.sourceId)}}selected{{/if}}>{{name}}</option>{{/each}}</select></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.RowConfig.CheckSkill"}}</label>
+    <select name="skillId"><option value="">—</option>{{#each skills}}<option value="{{id}}" {{#if (eq id ../row.skillId)}}selected{{/if}}>{{name}}</option>{{/each}}</select></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.RowConfig.Formula"}}</label><input type="text" name="formula" value="{{row.formula}}" placeholder="1d6+F"></div>
+  {{/if}}
+
+  {{#if isMobAttack}}
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Item.Stat"}}</label><input type="text" name="stat" value="{{row.stat}}"></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Mob.PublishedToHit"}}</label><input type="text" name="publishedToHit" value="{{row.publishedToHit}}" placeholder="15+F"></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Item.Damage"}}</label><input type="text" name="damage" value="{{row.damage}}" placeholder="1d8+F"></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Item.DamageTypes"}}</label><input type="text" name="damageTypes" value="{{damageTypesText}}" data-tooltip="{{damageTypeList}}"></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Item.Range"}}</label><input type="text" name="range" value="{{row.range}}"></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Mob.AoeType"}}</label><input type="text" name="aoeType" value="{{row.aoeType}}"></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Mob.AreaFeet"}}</label><input type="text" name="areaFeet" value="{{row.areaFeet}}"></div>
+  <div class="form-group"><label>{{localize "CRAWLSPACE.Mob.FailedDebuff"}}</label><input type="text" name="failedDebuff" value="{{row.failedDebuff}}"></div>
+  <div class="form-group checks">
+    <label class="check"><input type="checkbox" name="ranged" {{checked row.ranged}}> {{localize "CRAWLSPACE.Item.Ranged"}}</label>
+    <label class="check"><input type="checkbox" name="armorPiercing" {{checked row.armorPiercing}}> {{localize "CRAWLSPACE.Item.ArmorPiercing"}}</label>
+    <label class="check"><input type="checkbox" name="magic" {{checked row.magic}}> {{localize "CRAWLSPACE.Item.Magic"}}</label>
+  </div>
+  {{/if}}
+
+  {{#if isMobAbility}}
+  <div class="form-group stacked"><label>{{localize "CRAWLSPACE.Item.Description"}}</label><textarea name="description" rows="6">{{row.description}}</textarea></div>
+  {{else}}
+  <div class="form-group stacked"><label>{{localize "CRAWLSPACE.Item.Notes"}}</label><textarea name="notes" rows="3">{{row.notes}}</textarea></div>
+  {{/if}}
+</div>

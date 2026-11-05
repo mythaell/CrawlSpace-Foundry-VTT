@@ -19,10 +19,10 @@
 
   {{#if (eq type "weapon")}}
     <label>{{localize "CRAWLSPACE.Item.WeaponType"}}<select name="system.weaponType">{{selectOptions weaponTypeChoices selected=systemSource.weaponType localize=true}}</select></label>
-    <label>{{localize "CRAWLSPACE.Item.Skill"}}<input type="text" name="system.skill" value="{{systemSource.skill}}" placeholder="{{localize 'CRAWLSPACE.Item.SkillHint'}}"></label>
-    <label>{{localize "CRAWLSPACE.Item.Hands"}}<input type="text" name="system.hands" value="{{systemSource.hands}}"></label>
-    <label>{{localize "CRAWLSPACE.Item.Ammunition"}}<input type="text" name="system.ammunition" value="{{systemSource.ammunition}}"></label>
-    <label>{{localize "CRAWLSPACE.Item.ArmorDr"}}<input type="number" name="system.armorDr" value="{{systemSource.armorDr}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Skill"}}<input type="text" name="system.skill" value="{{systemSource.skill}}" list="skills-{{item.id}}" placeholder="{{localize 'CRAWLSPACE.Item.SkillHint'}}"></label>
+    <datalist id="skills-{{item.id}}">{{#each skillSuggestions}}<option value="{{this}}"></option>{{/each}}</datalist>
+    <label>{{localize "CRAWLSPACE.Item.Ammunition"}}<input type="text" name="system.ammunition" value="{{systemSource.ammunition}}" list="ammo-{{item.id}}"></label>
+    <datalist id="ammo-{{item.id}}">{{#each ammoSuggestions}}<option value="{{this}}"></option>{{/each}}</datalist>
     <label class="check"><input type="checkbox" name="system.twoHanded" {{checked systemSource.twoHanded}}> {{localize "CRAWLSPACE.Item.TwoHanded"}}</label>
   {{/if}}
 
@@ -45,9 +45,9 @@
 
   {{#if (eq type "lootBox")}}
     <label>{{localize "CRAWLSPACE.Item.Tier"}}<input type="text" name="system.tier" value="{{systemSource.tier}}"></label>
-    <label>{{localize "CRAWLSPACE.Item.BoxType"}}<input type="text" name="system.boxType" value="{{systemSource.boxType}}"></label>
     <label>{{localize "CRAWLSPACE.Item.Quantity"}}<input type="number" name="system.quantity" value="{{systemSource.quantity}}"></label>
-    <label class="check"><input type="checkbox" name="system.sealed" {{checked systemSource.sealed}}> {{localize "CRAWLSPACE.Item.Sealed"}}</label>
+    <label>{{localize "CRAWLSPACE.Item.BoxType"}}<input type="text" name="system.boxType" value="{{systemSource.boxType}}"></label>
+        <label class="check"><input type="checkbox" name="system.sealed" {{checked systemSource.sealed}}> {{localize "CRAWLSPACE.Item.Sealed"}}</label>
     <label class="wide">{{localize "CRAWLSPACE.Item.Contents"}}<textarea name="system.contents">{{systemSource.contents}}</textarea></label>
   {{/if}}
 
@@ -78,16 +78,13 @@
     <label>{{localize "CRAWLSPACE.Item.Tags"}}<input type="text" name="system.tags" value="{{systemSource.tags}}"></label>
   {{/if}}
 
-  {{#if isPhysical}}
-    <label class="check"><input type="checkbox" name="system.equipped" {{checked systemSource.equipped}}> {{localize "CRAWLSPACE.Item.Equipped"}}</label>
-  {{/if}}
   </div>
 
   {{#if hasDamage}}
   <fieldset class="damage">
-    <legend>{{localize "CRAWLSPACE.Item.Damage"}}</legend>
+    <legend>{{localize damageLegend}}</legend>
     <div class="details-grid">
-      <label>{{localize "CRAWLSPACE.Item.Formula"}}<input type="text" name="system.damage.formula" value="{{systemSource.damage.formula}}" placeholder="1d6+F"></label>
+      <label>{{localize "CRAWLSPACE.Item.Formula"}}<input type="text" name="system.damage.formula" value="{{systemSource.damage.formula}}" placeholder="{{#if (eq type 'weapon')}}+2{{else}}1d6+F{{/if}}"></label>
       <label>{{localize "CRAWLSPACE.Item.DamageTypes"}}<input type="text" name="system.damage.typesText" value="{{damageTypesText}}" data-tooltip="{{damageTypeList}}"></label>
       <label class="check"><input type="checkbox" name="system.damage.armorPiercing" {{checked systemSource.damage.armorPiercing}}> {{localize "CRAWLSPACE.Item.ArmorPiercing"}}</label>
       <label class="check"><input type="checkbox" name="system.damage.magic" {{checked systemSource.damage.magic}}> {{localize "CRAWLSPACE.Item.Magic"}}</label>

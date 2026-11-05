@@ -9,10 +9,12 @@ import { CrawlCombat, promptDeclaration } from './combat/combat'
 import { createCombatTracker } from './combat/tracker'
 import { CrawlerSheet, MobSheet, NpcSheet } from './sheets/actor-sheets'
 import { CrawlItemSheet } from './sheets/item-sheet'
+import { CrawlEffectSheet } from './sheets/effect-sheet'
 import { DEBUFFS } from './rules/debuffs'
 import { registerSocket } from './socket'
 import { registerChatHandlers } from './chat/cards'
 import { characterToActor } from './import/convert'
+import { fillActorDamage, fillDamageData } from './import/fill-damage'
 import { openUpkeep } from './apps/upkeep'
 
 const TEMPLATES = [
@@ -28,11 +30,22 @@ const TEMPLATES = [
   'actor/crawler-biography',
   'actor/effects',
   'actor/item-row',
+  'actor/filter-bar',
+  'actor/mob-sidebar',
   'actor/mob-header',
-  'actor/mob-stats',
+  'actor/mob-main',
   'actor/mob-description',
+  'actor/npc-sidebar',
+  'actor/npc-header',
   'actor/npc',
+  'actor/npc-notes',
+  'sheets/pf-tabs',
+  'sheets/ids',
+  'effects/rules',
+  'effects/effect-sheet',
+  'dialogs/row-config',
   'item/header',
+  'item/summary',
   'item/description',
   'item/details',
   'item/effects',
@@ -109,6 +122,7 @@ Hooks.once('init', () => {
   sheets.registerSheet(Actor, 'crawlspace', MobSheet, { types: ['mob'], makeDefault: true, label: 'CRAWLSPACE.Sheet.Mob' })
   sheets.registerSheet(Actor, 'crawlspace', NpcSheet, { types: ['npc'], makeDefault: true, label: 'CRAWLSPACE.Sheet.Npc' })
   sheets.registerSheet(Item, 'crawlspace', CrawlItemSheet, { makeDefault: true, label: 'CRAWLSPACE.Sheet.Item' })
+  sheets.registerSheet(ActiveEffect, 'crawlspace', CrawlEffectSheet, { makeDefault: true, label: 'CRAWLSPACE.Sheet.Effect' })
 
   CONFIG.Combat.initiative = { formula: '1d20', decimals: 0 }
 
@@ -125,7 +139,7 @@ Hooks.once('init', () => {
   foundry.applications.handlebars.loadTemplates(TEMPLATES)
   registerChatHandlers()
 
-  game.crawlspace = { config, importCharacter, openUpkeep, declareAttack: () => game.combat && promptDeclaration(game.combat) }
+  game.crawlspace = { config, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
 })
 
 Hooks.once('ready', () => {
@@ -181,6 +195,7 @@ export async function importCharacter(json: any) {
   const created: any[] = []
   for (const entry of entries) {
     const data = characterToActor(entry)
+    await fillDamageData(data.items ?? [])
     const actor = await Actor.implementation.create(data, { keepEmbeddedIds: true })
     if (actor) created.push(actor)
   }
@@ -198,5 +213,6 @@ function registerHandlebarsHelpers() {
   Handlebars.registerHelper('crawlJoin', (value: unknown, separator: unknown) =>
     Array.isArray(value) || value instanceof Set ? [...(value as any)].join(typeof separator === 'string' ? separator : ', ') : '',
   )
+  Handlebars.registerHelper('crawlLower', (value: unknown) => String(value ?? '').toLowerCase())
   Handlebars.registerHelper('crawlNumberOrBlank', (value: unknown) => (value === null || value === undefined ? '' : value))
 }

@@ -1,5 +1,6 @@
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage, type Modifier } from '../dice/rolls'
 import { STATS, statKeyFromCode } from '../config'
+import { attackWithRow, rowForItem } from '../actors/attacks'
 
 export class CrawlItem extends Item {
   get isRanked() {
@@ -26,7 +27,13 @@ export class CrawlItem extends Item {
       const skill = this.actor.items.find((item: any) => item.type === 'skill' && item.name.toLowerCase() === name)
       if (skill) return skill
     }
-    return null
+    // No skill named: the longest skill name that appears as a word in the weapon's name ("Dagger of the Night Stalker" → Dagger).
+    const words = (text: string) => ` ${text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()} `
+    const weaponName = words(this.name)
+    const contained = this.actor.items
+      .filter((item: any) => item.type === 'skill' && item.name.length > 2 && weaponName.includes(words(item.name)))
+      .sort((a: any, b: any) => b.name.length - a.name.length)
+    return contained[0] ?? null
   }
 
   /** Spend mana for a spell; refuses when there is not enough (spellCasting.ts). */
@@ -109,37 +116,9 @@ export class CrawlItem extends Item {
   }
 
   async #useWeapon(options: { fast?: boolean }) {
-    const actor = this.actor
-    const skill = this.weaponSkill()
-    const system = this.system
-    const ammunitionName = String(system.ammunition || '').trim().toLowerCase()
-    const ammunition = ammunitionName
-      ? actor.items.find((item: any) => item.name.toLowerCase() === ammunitionName && item.id !== this.id)
-      : null
-    const strength = actor.system.statMod?.(system.weaponType === 'ranged' ? 'DEX' : 'STR') ?? 0
-    const modifiers: Modifier[] = skill
-      ? skill.checkModifiers()
-      : [
-          { label: system.weaponType === 'ranged' ? 'Dexterity' : 'Strength', value: strength },
-          ...penaltyModifiers(actor),
-        ]
-    return rollAttack(
-      actor,
-      {
-        label: skill ? `${this.name} (${skill.name})` : this.name,
-        modifiers,
-        sources: ['Weapon', this.name, ...(skill ? [skill.name] : [])],
-        ranged: system.weaponType === 'ranged' || system.weaponType === 'thrown',
-        damage: {
-          formula: system.damage.formula || skill?.system?.damage?.atRank || '',
-          types: system.damage.types.length ? system.damage.types : (skill?.system?.damage?.types ?? []),
-          armorPiercing: system.damage.armorPiercing,
-          magic: system.damage.magic,
-        },
-        pay: ammunition ? () => ammunition.spendOne() : undefined,
-      },
-      options,
-    )
+    // A saved Attacks row for this weapon keeps its overrides; otherwise use the weapon as is.
+    const saved = (this.actor.system.attacks ?? []).find((row: any) => row.sourceId === this.id)
+    return attackWithRow(this.actor, saved ?? rowForItem(this), options)
   }
 
   async #useConsumable() {

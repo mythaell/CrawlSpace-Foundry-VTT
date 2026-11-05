@@ -1,0 +1,12 @@
+<aside class="pf-summary">
+  {{#if isPhysical}}
+  <label><span>{{localize "CRAWLSPACE.Item.Quantity"}}</span><input type="number" name="system.quantity" value="{{systemSource.quantity}}" min="0"></label>
+  {{#unless (eq type "loot")}}<label class="check"><input type="checkbox" name="system.equipped" {{checked systemSource.equipped}}> {{localize "CRAWLSPACE.Item.Equipped"}}</label>{{/unless}}
+  {{/if}}
+  <dl>
+    {{#each summaryRows}}<dt>{{label}}</dt><dd>{{value}}</dd>{{/each}}
+  </dl>
+  {{#if (or systemSource.source.book systemSource.source.pages)}}
+  <p class="pf-source">{{systemSource.source.book}} {{systemSource.source.pages}}</p>
+  {{/if}}
+</aside>
