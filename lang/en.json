@@ -86,6 +86,8 @@
       "DR": "DR",
       "Move": "Move",
       "Step": "Step",
+      "Actions": "Actions",
+      "ActionsHint": "Actions each round: 2, plus Extra Actions effects.",
       "Base": "Base",
       "Total": "Total",
       "Mod": "Mod",
@@ -216,6 +218,10 @@
       "DamageTypes": "Damage types",
       "ArmorPiercing": "Armor piercing",
       "Magic": "Magic",
+      "Area": "Area",
+      "AreaHint": "Hits an area. Targets with a halve-area-damage effect take half.",
+      "HealingHint": "Health slots restored. RANK and RANK_DIE (Core Rulebook p.176) use the current Rank.",
+      "HealingAtRank": "From Rank {rank}",
       "Ranged": "Ranged",
       "Upgrades": "Rank upgrades",
       "UpgradeText": "What changes at this rank",
@@ -243,6 +249,8 @@
       "other": "Other"
     },
     "Effect": {
+      "Title": "Effects",
+      "Regeneration": "Regeneration",
       "AddDebuff": "Add debuff",
       "Debuffs": "Debuffs",
       "Buffs": "Buffs",
@@ -268,7 +276,7 @@
       "Duration": "Duration",
       "Effect": "Effect",
       "Kind": "Kind",
-      "MagicOnly": "Blocks magic damage only",
+      "NonMagic": "Blocks non-magic damage only",
       "MaxStacks": "Max stacks",
       "OnSelf": "On self",
       "PerSlot": "Per slot",
@@ -490,7 +498,8 @@
       "Formula": "Roll formula",
       "Skill": "Attack skill",
       "SkillAuto": "(automatic)",
-      "Source": "Item"
+      "Source": "Item",
+      "Missing": "This row no longer exists."
     },
     "Rules": {
       "Title": "Rules",

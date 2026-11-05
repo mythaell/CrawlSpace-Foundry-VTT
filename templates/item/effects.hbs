@@ -1,4 +1,7 @@
 <section class="tab rules {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <h3 class="pf-section">{{localize "CRAWLSPACE.Ids.Title"}}</h3>
+  {{> "systems/crawlspace/templates/sheets/ids.hbs" ids=ids}}
+  <h3 class="pf-section">{{localize "CRAWLSPACE.Effect.Title"}}</h3>
   {{#each effects as |effect|}}
   <section class="effect-block {{#if effect.disabled}}disabled{{/if}}" data-effect-id="{{effect.id}}">
     <header class="effect-block-header">
@@ -21,6 +24,4 @@
   {{/each}}
   {{#if editable}}<button type="button" class="pf-add" data-action="createEffect"><i class="fa-solid fa-plus"></i> {{localize "CRAWLSPACE.Effect.Create"}}</button>{{/if}}
   <p class="hint">{{localize "CRAWLSPACE.Effect.ItemHint"}}</p>
-  <h3 class="pf-section">{{localize "CRAWLSPACE.Ids.Title"}}</h3>
-  {{> "systems/crawlspace/templates/sheets/ids.hbs" ids=ids}}
 </section>

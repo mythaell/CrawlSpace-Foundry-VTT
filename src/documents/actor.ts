@@ -2,12 +2,19 @@ import { HEALTH_MAX } from '../config'
 import { applySlotDamage, dyingAfterHealthChange, type ConditionShield } from '../rules/core'
 import { debuffById } from '../rules/debuffs'
 import { CUSTOM_CHANGE_TYPES } from '../effects/mapping'
+import { capsMagicDamage, halvesAreaDamage, hasRegen, regenAdvance } from '../effects/specials'
 
 export type DamageOptions = {
   types?: string[]
   multiplier?: number
   armorPiercing?: boolean
   magic?: boolean
+  /** Area damage: halved for an actor with an areaDamageHalf effect. */
+  area?: boolean
+  /** Skill or spell damage, for magicDamageCap targets. */
+  damageKind?: 'skill' | 'spell'
+  /** The spell's Rank 1 base damage, rolled with the card (magicDamageCap). */
+  magicBase?: number
   shieldBlock?: { rank: number; strength: number }
   /** Post a health-change card with an Undo button. */
   chat?: boolean
@@ -76,17 +83,31 @@ export class CrawlActor extends Actor {
   /*  Health                                                             */
   /* ------------------------------------------------------------------ */
 
-  /** Active condition shields (e.g. Hot Stuff Aura) as damage-rule input. */
+  /**
+   * Active condition shields (e.g. Hot Stuff Aura) as damage-rule input. A condition's Shield effect gives
+   * the slot count and health per slot (numbers or a stat), and a shield at 0 remaining starts full: a used-up
+   * shield deletes its condition (conditionShields.ts activeConditionShields).
+   */
   conditionShields(): (ConditionShield & { effect: any })[] {
+    const statMod = (value: unknown) => {
+      const text = String(value ?? '').trim()
+      return /^(STR|INT|CON|DEX|CHA)$/i.test(text) ? Number(this.system.statMod?.(text.toUpperCase())) || 0 : Math.floor(Number(text) || 0)
+    }
+    const specials = (this.system.specials ?? []).filter((special: any) => special.type === 'shield')
     return this.effects
-      .filter((effect: any) => effect.active && (effect.system?.shield?.remaining ?? 0) > 0)
-      .map((effect: any) => ({
-        id: effect.id,
-        effect,
-        remaining: effect.system.shield.remaining,
-        perSlot: effect.system.shield.perSlot,
-        magicOnly: effect.system.shield.magicOnly,
-      }))
+      .filter((effect: any) => effect.active)
+      .map((effect: any) => {
+        const special = specials.find((entry: any) => entry.effectId === effect.id)
+        const shield = effect.system?.shield ?? {}
+        return {
+          id: effect.id,
+          effect,
+          remaining: Number(shield.remaining) || (special ? statMod(special.value) : 0),
+          perSlot: Number(shield.perSlot) || (special ? statMod(special.target) : 0),
+          nonMagic: !!shield.nonMagic || special?.scope === 'nonMagic',
+        }
+      })
+      .filter((shield: any) => shield.remaining > 0 && shield.perSlot > 0)
   }
 
   /**
@@ -95,7 +116,10 @@ export class CrawlActor extends Actor {
    */
   async applyDamage(amount: number, options: DamageOptions = {}) {
     const multiplier = options.multiplier ?? 1
-    const incoming = Math.floor(Math.max(0, amount) * multiplier)
+    const halved = options.area && halvesAreaDamage(this)
+    const incoming = Math.floor(Math.max(0, amount) * multiplier * (halved ? 0.5 : 1))
+    const magicDamageCap =
+      options.magic && options.magicBase != null && capsMagicDamage(this, options.damageKind) ? Number(options.magicBase) : undefined
     const system = this.system
     const types = options.types ?? []
     const armorPiercing = !!options.armorPiercing
@@ -119,6 +143,7 @@ export class CrawlActor extends Actor {
         shieldBlock: options.shieldBlock,
         conditionShields: shields,
         magic: options.magic,
+        magicDamageCap,
       })
       const health = Math.max(0, system.health.value - result.slotsLost * 10)
       await this.update({ 'system.health.value': health, 'system.shield.slots': result.shieldStates })
@@ -138,12 +163,26 @@ export class CrawlActor extends Actor {
       responses: system.damageResponses,
       conditionShields: shields,
       magic: options.magic,
+      magicDamageCap,
     })
     await this.update({ 'system.slotsLost': system.slotsLost + result.slotsLost })
     await this.#updateConditionShields(shields, result.conditionShields)
     if (system.slotsLost + result.slotsLost >= system.health.max) await this.#markDefeated()
     const summary = this.#describe(result, types, incoming)
     return this.#postHealthCard(`${this.name} lost ${result.slotsLost} health slot${result.slotsLost === 1 ? '' : 's'}. ${summary}`, before, options)
+  }
+
+  /** Mana and health regeneration effects, for in-game seconds that passed (combat rounds or the clock). */
+  async regenerate(seconds: number) {
+    if (!(seconds > 0) || !hasRegen(this)) return
+    const result = regenAdvance(this, this.getFlag('crawlspace', 'regen') ?? {}, seconds)
+    const update: Record<string, unknown> = { 'flags.crawlspace.regen': result.elapsed }
+    const mana = this.system.mana
+    if (result.mana > 0 && mana && Number(mana.value) < Number(mana.max))
+      update['system.mana.value'] = Math.min(Number(mana.max) || 0, (Number(mana.value) || 0) + result.mana)
+    await this.update(update)
+    const hurt = this.type === 'crawler' ? this.system.health.value < HEALTH_MAX : Number(this.system.slotsLost) > 0
+    if (result.slots > 0 && hurt) await this.applyHealing(result.slots, { source: game.i18n.localize('CRAWLSPACE.Effect.Regeneration') })
   }
 
   /** Heal whole health slots (CrawlSpace heals in slots, not points). */
@@ -201,6 +240,7 @@ export class CrawlActor extends Actor {
 
   #describe(result: ReturnType<typeof applySlotDamage>, types: string[], incoming: number) {
     const parts = [`${incoming}${types.length ? ` ${types.join('/')}` : ''} incoming`]
+    if (result.magicCapBlockedDamage) parts.push(`magic damage capped, ${result.magicCapBlockedDamage} ignored`)
     if (result.shieldBlockedDamage) parts.push(`shields blocked ${result.shieldBlockedDamage}`)
     if (result.physicalShieldBlockedDamage) parts.push(`Shield Block blocked ${result.physicalShieldBlockedDamage}`)
     if (result.drBlockedDamage) parts.push(`DR blocked ${result.drBlockedDamage}`)

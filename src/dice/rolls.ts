@@ -1,5 +1,6 @@
 import { attackOutcome, doubleDice, outcomeLabel, resolveFormulaTokens, SUCCESS_OUTCOMES, type AttackOutcome } from '../rules/core'
 import { debuffById } from '../rules/debuffs'
+import type { AttackDamage } from '../actors/attacks'
 
 export type RollModeName = 'normal' | 'advantage' | 'disadvantage'
 export type Modifier = { label: string; value: number; enabled?: boolean }
@@ -16,12 +17,14 @@ export type CheckOptions = {
   fast?: boolean
   flavor?: string
   flags?: Record<string, unknown>
+  /** Attacked actors: their incomingAttackMode effects change an attack's mode. */
+  targets?: any[]
 }
 
 const MODE_FORMULA: Record<RollModeName, string> = { normal: '1d20', advantage: '2d20kh', disadvantage: '2d20kl' }
 
 /** Advantage and Disadvantage cancel out, whatever their number (conditionEffects.ts effectRollMode). */
-export function effectRollMode(actor: any, kind: CheckOptions['kind'], sources: string[] = []): RollModeName {
+export function effectRollMode(actor: any, kind: CheckOptions['kind'], sources: string[] = [], targets: any[] = []): RollModeName {
   const type = kind === 'attack' ? 'attackMode' : kind === 'evade' ? 'evadeMode' : 'checkMode'
   const lowered = sources.map((source) => source.toLowerCase())
   const modes = new Set<string>()
@@ -34,6 +37,12 @@ export function effectRollMode(actor: any, kind: CheckOptions['kind'], sources: 
     if (!targets.length || targets.includes('all') || lowered.some((source) => targets.includes(source)))
       modes.add(entry.value)
   }
+  // incomingAttackMode: attacks against the effect's owner. Attacking it applies the mode as is; when the owner
+  // rolls Evade instead (crawlers against Mobs), the mode reaches the table inverted (combat.ts crawlerEvadeMode).
+  const incoming = (owner: any) => (owner?.system?.rollModes ?? []).filter((entry: any) => entry.kind === 'incomingAttackMode')
+  if (kind === 'attack') for (const target of targets) for (const entry of incoming(target)) modes.add(entry.value)
+  if (kind === 'evade')
+    for (const entry of incoming(actor)) modes.add(entry.value === 'disadvantage' ? 'advantage' : 'disadvantage')
   for (const status of actor?.statuses ?? []) {
     const debuff = debuffById(status)
     if (debuff?.disadvantage === 'checks' || (debuff?.disadvantage === 'attacks' && kind === 'attack'))
@@ -78,7 +87,7 @@ async function promptCheck(options: CheckOptions, mode: RollModeName) {
 
 /** Roll a d20 check with toggled modifiers. Returns the evaluated Roll and the chosen mode. */
 export async function rollD20(actor: any, options: CheckOptions) {
-  let mode = effectRollMode(actor, options.kind, options.sources)
+  let mode = effectRollMode(actor, options.kind, options.sources, options.targets)
   let modifiers = options.modifiers.filter((modifier) => modifier.value !== 0 || modifier.enabled === false)
   if (!options.fast) {
     const answer = await promptCheck({ ...options, modifiers }, mode)
@@ -130,7 +139,7 @@ export type AttackSource = {
   label: string
   modifiers: Modifier[]
   sources: string[]
-  damage: { formula: string; types: string[]; armorPiercing?: boolean; magic?: boolean }
+  damage: AttackDamage
   /** Run before rolling: spend mana or ammunition; false cancels. */
   pay?: () => Promise<boolean>
   ranged?: boolean
@@ -153,6 +162,7 @@ export async function rollAttack(actor: any, attack: AttackSource, options: { fa
     modifiers: attack.modifiers,
     sources: [...attack.sources, ...(attack.ranged ? ['Ranged'] : []), ...(attack.damage.magic ? ['Spells'] : [])],
     fast: options.fast,
+    targets,
   })
   if (!result) return null
   if (attack.pay && !(await attack.pay())) return null
@@ -200,7 +210,7 @@ export async function rollAttack(actor: any, attack: AttackSource, options: { fa
 /** Roll damage and post a card with Apply ×½/×1/×2 and Heal buttons. */
 export async function rollDamage(
   actor: any,
-  damage: { formula: string; types: string[]; armorPiercing?: boolean; magic?: boolean; floor?: number },
+  damage: AttackDamage & { floor?: number },
   options: { label?: string; tier?: 'normal' | 'amazing' | 'critical'; targets?: string[]; healing?: boolean } = {},
 ) {
   const floor = damage.floor ?? (Number(actor?.system?.details?.floor ?? actor?.system?.floor) || 0)
@@ -208,8 +218,19 @@ export async function rollDamage(
   if (!formula) return null
   if (options.tier === 'critical') formula = doubleDice(formula)
   if (options.tier === 'amazing' && floor) formula = `${formula}+${floor}`
-  const roll = new Roll(formula, actor?.getRollData?.() ?? {})
+  const rollData = actor?.getRollData?.() ?? {}
+  const roll = new Roll(formula, rollData)
   await roll.evaluate()
+  // Wisp Armor: the spell's Rank 1 base damage, rolled once, caps what this card does to a protected target.
+  let magicBase: number | null = null
+  const base = damage.magic && !options.healing ? resolveFormulaTokens(damage.baseFormula ?? '', { floor, rank: 1 }) : ''
+  if (base) {
+    try {
+      magicBase = (await new Roll(base, rollData).evaluate()).total
+    } catch {
+      magicBase = null
+    }
+  }
   const tierLabel = options.tier && options.tier !== 'normal' ? game.i18n.localize(`CRAWLSPACE.Damage.Tier.${options.tier}`) : ''
   const flavor = await foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/chat/damage.hbs', {
     label: options.label ?? game.i18n.localize('CRAWLSPACE.Damage.Damage'),
@@ -218,6 +239,7 @@ export async function rollDamage(
     armorPiercing: damage.armorPiercing,
     magic: damage.magic,
     healing: options.healing,
+    area: damage.area && !options.healing,
   })
   await roll.toMessage(
     {
@@ -229,6 +251,9 @@ export async function rollDamage(
           types: damage.types,
           armorPiercing: !!damage.armorPiercing,
           magic: !!damage.magic,
+          area: !!damage.area,
+          damageKind: damage.kind ?? null,
+          magicBase,
           targets: options.targets ?? [],
         },
       },

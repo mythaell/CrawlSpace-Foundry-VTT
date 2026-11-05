@@ -76,7 +76,16 @@ export const CHANGE_TYPE_HANDLERS: Record<string, { label: string; defaultPriori
       } catch {
         data = { value: change.value }
       }
-      actor.system?.specials?.push({ type: String(change.key), source: change.effect?.name ?? '', ...data })
+      const effect = change.effect
+      const item = effect?.parent?.documentName === 'Item' ? effect.parent : null
+      actor.system?.specials?.push({
+        type: String(change.key),
+        source: item?.name ?? effect?.name ?? '',
+        ...data,
+        itemId: item?.id ?? '',
+        effectId: effect?.id ?? '',
+        stacks: Number(effect?.system?.stacks) || 1,
+      })
     },
   },
 }

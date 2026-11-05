@@ -88,6 +88,19 @@
       <label>{{localize "CRAWLSPACE.Item.DamageTypes"}}<input type="text" name="system.damage.typesText" value="{{damageTypesText}}" data-tooltip="{{damageTypeList}}"></label>
       <label class="check"><input type="checkbox" name="system.damage.armorPiercing" {{checked systemSource.damage.armorPiercing}}> {{localize "CRAWLSPACE.Item.ArmorPiercing"}}</label>
       <label class="check"><input type="checkbox" name="system.damage.magic" {{checked systemSource.damage.magic}}> {{localize "CRAWLSPACE.Item.Magic"}}</label>
+      <label class="check" data-tooltip="{{localize 'CRAWLSPACE.Item.AreaHint'}}"><input type="checkbox" name="system.damage.area" {{checked systemSource.damage.area}}> {{localize "CRAWLSPACE.Item.Area"}}</label>
+    </div>
+  </fieldset>
+  {{/if}}
+
+  {{#if isRanked}}
+  <fieldset class="healing">
+    <legend data-tooltip="{{localize 'CRAWLSPACE.Item.HealingHint'}}">{{localize "CRAWLSPACE.Item.Healing"}}{{#if system.healing.atRank}} <span class="hint">{{system.healing.atRank}}</span>{{/if}}</legend>
+    <div class="details-grid">
+      <label>{{localize "CRAWLSPACE.Item.Formula"}}<input type="text" name="system.healing.formula" value="{{systemSource.healing.formula}}" placeholder="RANK_DIE"></label>
+      <label>{{localize "CRAWLSPACE.Item.HealingAtRank" rank=5}}<input type="text" name="system.healing.rank5" value="{{systemSource.healing.rank5}}"></label>
+      <label>{{localize "CRAWLSPACE.Item.HealingAtRank" rank=10}}<input type="text" name="system.healing.rank10" value="{{systemSource.healing.rank10}}"></label>
+      <label>{{localize "CRAWLSPACE.Item.HealingAtRank" rank=15}}<input type="text" name="system.healing.rank15" value="{{systemSource.healing.rank15}}"></label>
     </div>
   </fieldset>
   {{/if}}

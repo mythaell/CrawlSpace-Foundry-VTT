@@ -125,6 +125,7 @@ const crawlerAttackSchema = () => {
     armorPiercing: new fields.BooleanField(),
     magic: new fields.BooleanField(),
     ranged: new fields.BooleanField(),
+    area: new fields.BooleanField(),
     notes: text(),
   })
 }
@@ -266,6 +267,8 @@ export class CrawlerData extends CrawlActorData {
 
     this.checkPenalty = this.checkPenaltyFromStatuses(statuses, (id) => actor?.debuffStacks?.(id) ?? 1)
     this.hotlist.capacity = Math.max(0, 10 + Math.trunc(this.hotlist.bonus))
+    // Two actions a round, plus Extra Actions effects (encounterActions.ts), at most 20 extra.
+    this.actions.total = 2 + Math.max(0, Math.min(20, Math.floor(Number(this.actions.extra) || 0)))
     this.isDying = statuses.has('dying')
   }
 

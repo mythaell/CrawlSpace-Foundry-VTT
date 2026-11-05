@@ -4,6 +4,7 @@
  */
 import { penaltyModifiers, rollAttack, rollDamage, type AttackSource, type Modifier } from '../dice/rolls'
 import { resolveFormulaTokens } from '../rules/core'
+import { damageBonuses, piercesArmor, type DamageKind } from '../effects/specials'
 
 export type AttackRow = {
   id: string
@@ -19,6 +20,7 @@ export type AttackRow = {
   armorPiercing?: boolean
   magic?: boolean
   ranged?: boolean
+  area?: boolean
   notes?: string
 }
 
@@ -31,6 +33,24 @@ const joinFormula = (...parts: (string | undefined)[]) =>
     .join('+')
     .replace(/\+\s*-/g, '-')
     .replace(/\+\+/g, '+')
+
+export type AttackDamage = { formula: string; types: string[]; armorPiercing?: boolean; magic?: boolean; area?: boolean; baseFormula?: string; kind?: DamageKind }
+
+/**
+ * Add what the actor's effects give an attack: Damage Modifier bonuses (with their damage types) and Armor
+ * Piercing (conditionEffects.ts conditionDamageBonuses / passiveDamageBonuses / damageModifierPiercesArmor).
+ */
+export function withEffectBonuses(actor: any, damage: AttackDamage, context: { names: string[]; itemIds: string[]; weapon: boolean; kind: DamageKind; rank?: number }): AttackDamage {
+  const names = [...new Set(context.names.filter(Boolean))]
+  const bonuses = damage.formula ? damageBonuses(actor, names, context.weapon, context.kind, context.rank ?? 0) : []
+  return {
+    ...damage,
+    formula: joinFormula(damage.formula, ...bonuses.map((bonus) => bonus.formula)),
+    types: [...new Set([...damage.types, ...bonuses.flatMap((bonus) => bonus.types)])],
+    armorPiercing: !!damage.armorPiercing || piercesArmor(actor, context.itemIds.filter(Boolean), names, context.weapon, context.kind),
+    kind: context.kind,
+  }
+}
 
 /** A weapon's own damage is a bonus on top of its skill's damage at the current Rank. */
 export function weaponDamage(weapon: any, skill: any) {
@@ -83,6 +103,9 @@ export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHi
     : [{ label: statLabel, value: actor.system.statMod?.(ranged ? 'DEX' : 'STR') ?? 0 }, ...penaltyModifiers(actor)]
   if (row.hitBonus) modifiers.push({ label: game.i18n.localize('CRAWLSPACE.Attack.HitBonus'), value: Number(row.hitBonus) })
 
+  const spell = source?.type === 'spell' ? source : skill?.type === 'spell' ? skill : null
+  const weapon = !source || source.type === 'weapon'
+  const kind: DamageKind = source?.type === 'spell' ? 'spell' : source?.type === 'skill' ? 'skill' : undefined
   let formula = String(row.damage ?? '').trim()
   if (!formula && source?.type === 'weapon') formula = weaponDamage(source, skill)
   if (!formula && skill) formula = skill.system.damage?.atRank || skill.system.damage?.formula || ''
@@ -97,7 +120,6 @@ export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHi
     : ammunitionName
       ? items.find((item: any) => item.name.toLowerCase() === ammunitionName && item.id !== source?.id)
       : null
-  const spell = source?.type === 'spell' ? source : skill?.type === 'spell' ? skill : null
   const pay = async () => {
     if (spell && !(await spell.payMana())) return false
     if (ammunition && !(await ammunition.spendOne())) return false
@@ -110,14 +132,27 @@ export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHi
     img: row.img || source?.img || 'icons/svg/sword.svg',
     modifiers,
     toHit: modifiers.reduce((total, modifier) => total + (Number(modifier.value) || 0), 0),
-    sources: ['Weapon', row.name, ...(source ? [source.name] : []), ...(skill ? [skill.name] : []), ...(row.id === UNARMED_ID ? ['Unarmed'] : [])],
+    sources: [...(weapon ? ['Weapon'] : []), row.name, ...(source ? [source.name] : []), ...(skill ? [skill.name] : []), ...(row.id === UNARMED_ID ? ['Unarmed'] : [])],
     ranged,
-    damage: {
-      formula,
-      types: [...types],
-      armorPiercing: !!(row.armorPiercing || sourceDamage.armorPiercing),
-      magic: !!(row.magic || sourceDamage.magic || spell),
-    },
+    damage: withEffectBonuses(
+      actor,
+      {
+        formula,
+        types: [...types],
+        armorPiercing: !!(row.armorPiercing || sourceDamage.armorPiercing),
+        magic: !!(row.magic || sourceDamage.magic || spell),
+        area: !!(row.area || sourceDamage.area),
+        // Wisp Armor caps magic damage at the spell's Rank 1 base damage.
+        baseFormula: spell?.system?.damage?.formula ?? '',
+      },
+      {
+        names: [row.name, source?.name, skill?.name, ...(row.id === UNARMED_ID ? ['Unarmed'] : [])],
+        itemIds: [source?.id, skill?.id],
+        weapon,
+        kind,
+        rank: Number(skill?.system?.rank?.total) || 0,
+      },
+    ),
     pay,
   }
 }

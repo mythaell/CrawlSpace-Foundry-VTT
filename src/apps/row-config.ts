@@ -30,29 +30,49 @@ export class CrawlRowConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
   actor: any
   kind: RowKind
-  index: number
+  /** The row's id when it has one (attacks, actions), else its index (mob abilities). */
+  key: string | number
 
-  constructor(options: { actor: any; kind: RowKind; index: number }) {
-    super({ id: `crawl-row-${options.actor.id}-${options.kind}-${options.index}`, ...options } as any)
-    this.actor = options.actor
-    this.kind = options.kind
-    this.index = options.index
+  /**
+   * The actor is kept on the instance, not in the application options: ApplicationV2 deep-merges its options,
+   * which must never walk a Document.
+   */
+  constructor(actor: any, kind: RowKind, key: string | number) {
+    super({ id: CrawlRowConfig.idFor(actor, kind, key) } as any)
+    this.actor = actor
+    this.kind = kind
+    this.key = key
   }
 
-  /** Open (or bring forward) the editor for a row. */
+  /** Token actors share their base actor's id, so key by UUID. */
+  static idFor(actor: any, kind: RowKind, key: string | number) {
+    return `crawl-row-${actor.uuid.replace(/\./g, '-')}-${kind}-${key}`
+  }
+
+  /** Open (or bring forward) the editor for the row at `index`. */
   static open(actor: any, kind: RowKind, index: number) {
-    const id = `crawl-row-${actor.id}-${kind}-${index}`
-    const existing = foundry.applications.instances.get(id)
+    const row = foundry.utils.getProperty(actor._source, PATHS[kind])?.[index]
+    const key = row?.id || index
+    const existing = foundry.applications.instances.get(CrawlRowConfig.idFor(actor, kind, key))
     if (existing) return existing.render({ force: true })
-    return new CrawlRowConfig({ actor, kind, index }).render({ force: true })
+    return new CrawlRowConfig(actor, kind, key).render({ force: true })
   }
 
   get title() {
     return `${game.i18n.localize(`CRAWLSPACE.RowConfig.${this.kind}`)}: ${this.row?.name ?? ''}`
   }
 
+  /** Rows are read from the source data, which an update changes at once (token actors re-prepare later). */
+  get rows(): any[] {
+    return foundry.utils.getProperty(this.actor._source, PATHS[this.kind]) ?? []
+  }
+
+  get rowIndex() {
+    return typeof this.key === 'number' ? this.key : this.rows.findIndex((row) => row.id === this.key)
+  }
+
   get row() {
-    return foundry.utils.getProperty(this.actor, PATHS[this.kind])?.[this.index]
+    return this.rows[this.rowIndex]
   }
 
   _onFirstRender(context: any, options: any) {
@@ -67,10 +87,8 @@ export class CrawlRowConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
   async _prepareContext() {
     const row = this.row
-    if (!row) {
-      this.close()
-      return {}
-    }
+    // The row was deleted: say so instead of closing mid-render.
+    if (!row) return { missing: true }
     const items = [...this.actor.items].sort((a: any, b: any) => a.name.localeCompare(b.name))
     const option = (item: any) => ({ id: item.id, name: `${item.name} (${game.i18n.localize(`TYPES.Item.${item.type}`)})` })
     return {
@@ -92,13 +110,14 @@ export class CrawlRowConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static async #onSubmit(this: CrawlRowConfig, _event: Event, _form: HTMLFormElement, formData: any) {
     const path = PATHS[this.kind]
-    const rows = foundry.utils.deepClone(foundry.utils.getProperty(this.actor._source, path) ?? [])
-    if (!rows[this.index]) return
+    const rows = foundry.utils.deepClone(this.rows)
+    const index = this.rowIndex
+    if (!rows[index]) return
     const changes = foundry.utils.expandObject(formData.object)
     if (typeof changes.damageTypes === 'string')
       changes.damageTypes = changes.damageTypes.split(',').map((type: string) => type.trim()).filter(Boolean)
     if ('hitBonus' in changes) changes.hitBonus = Number(changes.hitBonus) || 0
-    rows[this.index] = foundry.utils.mergeObject(rows[this.index], changes, { inplace: false })
+    rows[index] = foundry.utils.mergeObject(rows[index], changes, { inplace: false })
     await this.actor.update({ [path]: rows })
   }
 }

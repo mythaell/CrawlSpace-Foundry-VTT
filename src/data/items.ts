@@ -1,4 +1,5 @@
 import { GEAR_SLOTS } from '../config'
+import { rankDie } from '../rules/core'
 
 const f = () => foundry.data.fields
 const text = (initial = '') => new (f().StringField)({ required: true, blank: true, initial })
@@ -25,7 +26,24 @@ const damageSchema = () =>
     types: stringList(),
     armorPiercing: new (f().BooleanField)(),
     magic: new (f().BooleanField)(),
+    /** Hits an area (areaDamageHalf halves it for some targets). */
+    area: new (f().BooleanField)(),
   })
+
+/** A heal: slots restored, with formulas that replace it from Rank 5, 10 and 15 (healing.ts). */
+const healingSchema = () =>
+  new (f().SchemaField)({
+    formula: text(),
+    rank5: text(),
+    rank10: text(),
+    rank15: text(),
+  })
+
+/** RANK and RANK_DIE filled in for one Rank; floor and stat tokens wait for the roll. */
+export const withRank = (formula: string, rank: number) =>
+  String(formula ?? '')
+    .replace(/\bRANK_DIE\b/gi, `(${rankDie(rank)})`)
+    .replace(/\bRANK\b/gi, String(rank))
 
 /** Shared by skills and spells: ranks, rank upgrades and their damage formulas. */
 const rankedSchema = () => {
@@ -44,6 +62,7 @@ const rankedSchema = () => {
     isAttack: new fields.BooleanField(),
     isUnarmed: new fields.BooleanField(),
     damage: damageSchema(),
+    healing: healingSchema(),
     upgrades: new fields.SchemaField({
       rank5: text(),
       rank10: text(),
@@ -74,7 +93,10 @@ function prepareRanked(model: any, kind: 'skill' | 'spell') {
         : rank >= 5 && model.upgrades.rank5Damage
           ? model.upgrades.rank5Damage
           : model.damage.formula
-  model.damage.atRank = upgraded
+  model.damage.atRank = withRank(upgraded, rank)
+  const heal = model.healing ?? {}
+  const healing = (rank >= 15 && heal.rank15) || (rank >= 10 && heal.rank10) || (rank >= 5 && heal.rank5) || heal.formula || ''
+  model.healing.atRank = withRank(String(healing).trim(), rank)
   model.checkBonus = rank + model.rank.mod
 }
 

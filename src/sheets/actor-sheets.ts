@@ -148,6 +148,8 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }
     const damage = system.damage?.atRank || system.damage?.formula
     if (damage) add(item.type === 'weapon' ? 'CRAWLSPACE.Item.DamageBonus' : 'CRAWLSPACE.Item.Damage', `${damage} ${(system.damage.types ?? []).join(', ')}`)
+    add('CRAWLSPACE.Item.Healing', system.healing?.atRank || system.healing?.formula || '')
+    if (item.type === 'consumable') add('CRAWLSPACE.Item.ManaRestore', system.manaRestore)
     if (item.type === 'equipment') add('CRAWLSPACE.Item.ArmorDr', system.armorDr || '')
     if (item.type === 'weapon') {
       add('CRAWLSPACE.Item.Skill', system.skill)
@@ -1003,7 +1005,7 @@ export class MobSheet extends CrawlActorSheet {
       modifiers: [{ label: game.i18n.localize('CRAWLSPACE.Mob.ToHit'), value: (attack.toHit ?? 10) - 10 }, ...penaltyModifiers(this.actor)],
       sources: [attack.name],
       ranged: attack.ranged,
-      damage: { formula: attack.damage, types: attack.damageTypes, armorPiercing: attack.armorPiercing, magic: attack.magic },
+      damage: { formula: attack.damage, types: attack.damageTypes, armorPiercing: attack.armorPiercing, magic: attack.magic, area: !!(String(attack.areaFeet ?? '').trim() || String(attack.aoeType ?? '').trim()) },
     }
   }
 

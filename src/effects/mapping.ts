@@ -127,6 +127,10 @@ export function effectPropertyToChanges(effect: CrawlEffectProperty): ChangeData
             damageScope: effect.damageScope ?? '',
             armorPiercing: !!effect.armorPiercing,
             ...(effect.cooldown ? { cooldown: String(effect.cooldown) } : {}),
+            ...(effect.scope ? { scope: String(effect.scope) } : {}),
+            ...(effect.interval ? { interval: String(effect.interval) } : {}),
+            ...(effect.fastInterval ? { fastInterval: String(effect.fastInterval) } : {}),
+            ...(effect.fastStat ? { fastStat: String(effect.fastStat) } : {}),
           }),
         ),
       ]

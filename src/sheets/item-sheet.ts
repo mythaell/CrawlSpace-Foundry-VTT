@@ -153,6 +153,11 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
           }
         }
         if (system.damage?.formula || system.damage?.atRank) row(context.damageLegend, system.damage.atRank || system.damage.formula)
+        if (context.isRanked) row('CRAWLSPACE.Item.Healing', system.healing?.atRank)
+        if (item.type === 'consumable') {
+          row('CRAWLSPACE.Item.Healing', system.healing?.formula)
+          row('CRAWLSPACE.Item.ManaRestore', system.manaRestore)
+        }
         if (item.type === 'equipment') row('CRAWLSPACE.Item.ArmorDr', system.armorDr)
         if (item.type === 'weapon') {
           row('CRAWLSPACE.Item.Skill', system.skill)

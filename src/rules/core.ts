@@ -32,11 +32,27 @@ export const outcomeLabel = (outcome: AttackOutcome, check = false) =>
       )[outcome]
     : outcome
 
-/** Replace F (floor) and RANK tokens in published formulas such as `1d8+F` or `18+F`. */
+/** Core Rulebook p.176, Table 37: the die a RANK_DIE token stands for at a Rank (healing.ts healingRankDie). */
+export function rankDie(rank: number) {
+  if (rank >= 20) return '2d10'
+  if (rank >= 18) return '1d10+1d8'
+  if (rank >= 16) return '2d8'
+  if (rank >= 14) return '1d8+1d6'
+  if (rank >= 12) return '1d12'
+  if (rank >= 10) return '1d10'
+  if (rank >= 8) return '1d8'
+  if (rank >= 6) return '1d6'
+  if (rank >= 4) return '1d4'
+  if (rank >= 2) return '1d2'
+  return rank >= 1 ? '1' : '0'
+}
+
+/** Replace F (floor), RANK and RANK_DIE tokens in published formulas such as `1d8+F` or `18+F`. */
 export function resolveFormulaTokens(formula: string, values: { floor?: number; rank?: number } = {}) {
   return String(formula ?? '')
     // Stat tokens mean the stat's modifier (creatureMath.ts); Foundry fills @xMod from roll data.
     .replace(/(?<!@)\b(STR|INT|CON|DEX|CHA)(?:\s*MOD)?\b/gi, (_match, stat: string) => `@${stat.toLowerCase()}Mod`)
+    .replace(/\bRANK_DIE\b/gi, `(${rankDie(values.rank ?? 0)})`)
     .replace(/\bRANK\b/gi, String(values.rank ?? 0))
     .replace(/(?<![a-z])F(?![a-z])/g, String(values.floor ?? 0))
     .replace(/\s+/g, '')
@@ -79,7 +95,8 @@ export function blockedDamage(amount: number, rank: number, strength: number) {
   return Math.max(0, amount / 2 - (rank >= 15 ? Math.max(0, strength) : 0))
 }
 
-export type ConditionShield = { id: string; remaining: number; perSlot: number; magicOnly?: boolean }
+/** `nonMagic` shields let magic damage through. */
+export type ConditionShield = { id: string; remaining: number; perSlot: number; nonMagic?: boolean }
 
 export type SlotDamageOptions = {
   armorPiercing?: boolean
@@ -88,6 +105,8 @@ export type SlotDamageOptions = {
   shieldBlock?: { rank: number; strength: number }
   conditionShields?: readonly ConditionShield[]
   magic?: boolean
+  /** Wisp Armor: magic damage is first reduced to the spell's Rank 1 base damage. */
+  magicDamageCap?: number
 }
 
 /**
@@ -103,11 +122,15 @@ export function applySlotDamage(
   healthValues: number[],
   options: SlotDamageOptions = {},
 ) {
-  let damage = incomingDamage
+  let damage =
+    options.magic && options.magicDamageCap !== undefined
+      ? Math.min(incomingDamage, Math.max(0, options.magicDamageCap))
+      : incomingDamage
+  const magicCapBlockedDamage = incomingDamage - damage
   const conditionShields = (options.conditionShields ?? []).map((shield) => ({ ...shield }))
   let conditionBlocked = 0
   for (const shield of conditionShields) {
-    if (shield.magicOnly && !options.magic) continue
+    if (shield.nonMagic && options.magic) continue
     while (shield.remaining > 0 && damage > 0 && shield.perSlot > 0 && damage >= shield.perSlot) {
       damage -= shield.perSlot
       conditionBlocked += shield.perSlot
@@ -143,6 +166,7 @@ export function applySlotDamage(
   return {
     shieldStates,
     conditionShields,
+    magicCapBlockedDamage,
     shieldBlockedDamage,
     physicalShieldBlockedDamage,
     drBlockedDamage,

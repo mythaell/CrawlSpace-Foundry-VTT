@@ -1,6 +1,12 @@
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage, type Modifier } from '../dice/rolls'
 import { STATS, statKeyFromCode } from '../config'
-import { attackWithRow, rowForItem } from '../actors/attacks'
+import { attackWithRow, rowForItem, withEffectBonuses } from '../actors/attacks'
+
+/** Targeted tokens, or the user themself when nothing is targeted. */
+const healTargets = (actor: any): string[] => {
+  const targeted = [...game.user.targets].map((token: any) => token.actor?.uuid).filter(Boolean)
+  return targeted.length ? targeted : [actor.uuid]
+}
 
 export class CrawlItem extends Item {
   get isRanked() {
@@ -85,6 +91,7 @@ export class CrawlItem extends Item {
   async #useRanked(options: { fast?: boolean }) {
     const system = this.system
     const pay = this.type === 'spell' ? () => this.payMana() : undefined
+    const kind = this.type as 'skill' | 'spell'
     if (system.isAttack) {
       return rollAttack(
         this.actor,
@@ -92,15 +99,31 @@ export class CrawlItem extends Item {
           label: this.name,
           modifiers: this.checkModifiers(),
           sources: [this.name, ...(this.type === 'spell' ? ['Spells'] : [])],
-          damage: {
-            formula: system.damage.atRank || system.damage.formula,
-            types: system.damage.types,
-            armorPiercing: system.damage.armorPiercing,
-            magic: this.type === 'spell' || system.damage.magic,
-          },
+          damage: withEffectBonuses(
+            this.actor,
+            {
+              formula: system.damage.atRank || system.damage.formula,
+              types: [...system.damage.types],
+              armorPiercing: system.damage.armorPiercing,
+              magic: this.type === 'spell' || system.damage.magic,
+              area: system.damage.area,
+              baseFormula: this.type === 'spell' ? system.damage.formula : '',
+            },
+            { names: [this.name], itemIds: [this.id], weapon: false, kind, rank: Number(system.rank?.total) || 0 },
+          ),
           pay,
         },
         options,
+      )
+    }
+    // Heal spells and skills: pay, roll the healing at the current Rank, and let the card apply the slots.
+    const healing = String(system.healing?.atRank ?? '').trim()
+    if (healing) {
+      if (pay && !(await pay())) return null
+      return rollDamage(
+        this.actor,
+        { formula: healing, types: [] },
+        { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, healing: true, targets: healTargets(this.actor) },
       )
     }
     if (pay && !(await pay())) return null
@@ -133,7 +156,7 @@ export class CrawlItem extends Item {
     }
     // Healing rolls give health slots; the card's Heal button applies them.
     if (system.healing?.formula)
-      await rollDamage(actor, { formula: system.healing.formula, types: [] }, { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, healing: true })
+      await rollDamage(actor, { formula: system.healing.formula, types: [] }, { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, healing: true, targets: [actor.uuid] })
     if (system.damage?.formula) await rollDamage(actor, { ...system.damage, types: system.damage.types }, { label: this.name })
     return this.toMessage()
   }

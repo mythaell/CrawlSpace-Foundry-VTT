@@ -63,6 +63,8 @@ const TEMPLATES = [
 Hooks.once('init', () => {
   console.log('CrawlSpace | Initializing')
   CONFIG.CRAWLSPACE = config
+  // A CrawlSpace round is 10 seconds of game time (regen effects count in it).
+  CONFIG.time.roundTime = 10
 
   // Documents and data models.
   CONFIG.Actor.documentClass = CrawlActor
@@ -144,6 +146,17 @@ Hooks.once('init', () => {
 
 Hooks.once('ready', () => {
   registerSocket()
+})
+
+/**
+ * Game time passing (combat rounds or the GM's clock) ticks mana and health regeneration. The active GM's
+ * client does it once, for world actors and the unlinked tokens on the viewed scene.
+ */
+Hooks.on('updateWorldTime', async (_worldTime: number, delta: number) => {
+  if (!game.user.isActiveGM || !(delta > 0)) return
+  const actors = new Set<any>(game.actors)
+  for (const token of canvas?.scene?.tokens ?? []) if (!token.actorLink && token.actor) actors.add(token.actor)
+  for (const actor of actors) await actor.regenerate?.(delta).catch?.((error: unknown) => console.error('CrawlSpace | regen', error))
 })
 
 /** Dragging an owned item to the hotbar makes a macro that uses it. */

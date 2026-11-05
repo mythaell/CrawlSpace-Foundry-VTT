@@ -28,7 +28,8 @@ export function createEffectDataModel() {
         shield: new fields.SchemaField({
           remaining: new fields.NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
           perSlot: new fields.NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
-          magicOnly: new fields.BooleanField(),
+          /** Blocks only non-magic damage (CrawlSpace scope `nonMagic`). */
+          nonMagic: new fields.BooleanField(),
         }),
         castBy: new fields.StringField({ required: true, blank: true, initial: '' }),
         durationText: new fields.StringField({ required: true, blank: true, initial: '' }),

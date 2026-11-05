@@ -124,8 +124,24 @@ const ICONS: Record<string, string> = {
 /*  Skills and spells                                                  */
 /* ------------------------------------------------------------------ */
 
+const HEALING_KEYS = ['healingFormula', 'rank5HealingFormula', 'rank10HealingFormula', 'rank15HealingFormula'] as const
+
+/** healing.ts isHealingSource: an explicit isHealing wins; older records heal when they have a formula. */
+export function isHealingSource(data: Record<string, any>) {
+  return typeof data.isHealing === 'boolean' ? data.isHealing : HEALING_KEYS.some((key) => str(data[key]).trim())
+}
+
+export function healingFields(data: Record<string, any>) {
+  const heals = isHealingSource(data)
+  const value = (key: (typeof HEALING_KEYS)[number]) => (heals ? str(data[key]) : '')
+  return { formula: value('healingFormula'), rank5: value('rank5HealingFormula'), rank10: value('rank10HealingFormula'), rank15: value('rank15HealingFormula') }
+}
+
+/** An area template at any Rank (abilityTemplates.ts), or an explosive. */
+const hasArea = (data: Record<string, any>) =>
+  ['template', 'rank5Template', 'rank10Template', 'rank15Template'].some((key) => Array.isArray(data[key]?.areas) && data[key].areas.length > 0)
+
 export function rankedSystem(data: Record<string, any>, kind: 'skill' | 'spell'): Record<string, any> {
-  const healing = data.isHealing && str(data.healingFormula)
   return {
     description: toHtml(data.details),
     notes: str(data.notes),
@@ -137,11 +153,13 @@ export function rankedSystem(data: Record<string, any>, kind: 'skill' | 'spell')
     isAttack: !!(kind === 'skill' ? data.isAttackSkill : data.isAttackSpell),
     isUnarmed: !!data.isUnarmed,
     damage: {
-      formula: str(data.damageFormula) || (healing ? '' : ''),
+      formula: str(data.damageFormula),
       types: types(data.damageTypes),
       armorPiercing: !!data.armorPiercing,
       magic: kind === 'spell',
+      area: hasArea(data),
     },
+    healing: healingFields(data),
     upgrades: {
       rank5: str(data.rank5),
       rank10: str(data.rank10),
@@ -195,7 +213,7 @@ export function buffToEffect(data: Record<string, any>, img = ICONS.buff) {
       stacks: Math.max(1, int(data.stacks, 1)),
       maxStacks: nullableInt(data.maxStacks),
       cleanup: { formula: str(data.cleanupFormula), types: types(data.cleanupDamageTypes) },
-      shield: { remaining: shieldSlots, perSlot: int(data.shield?.healthPerSlot, 0), magicOnly: data.shield?.scope === 'nonMagic' ? false : false },
+      shield: { remaining: shieldSlots, perSlot: int(data.shield?.healthPerSlot, 0), nonMagic: data.shield?.scope === 'nonMagic' },
       durationText: str(data.duration),
     },
   }
@@ -271,7 +289,7 @@ export function inventoryToItem(entry: Record<string, any>, contentType = '') {
         ...base,
         consumableType: str(properties.consumable?.type) || 'other',
         damage,
-        healing: { formula: str(properties.healingFormula), slots: true },
+        healing: { formula: isHealingSource(properties) ? str(properties.healingFormula) : '', slots: true },
         manaRestore: properties.isManaRestore ? str(properties.manaRestoreAmount) : '',
       }
       break

@@ -1,3 +1,4 @@
+{{#if missing}}<p class="hint">{{localize "CRAWLSPACE.RowConfig.Missing"}}</p>{{else}}
 <div class="row-config-body">
   <div class="form-group"><label>{{localize "CRAWLSPACE.Item.Name"}}</label><input type="text" name="name" value="{{row.name}}"></div>
 
@@ -16,6 +17,7 @@
     <label class="check"><input type="checkbox" name="ranged" {{checked row.ranged}}> {{localize "CRAWLSPACE.Item.Ranged"}}</label>
     <label class="check"><input type="checkbox" name="armorPiercing" {{checked row.armorPiercing}}> {{localize "CRAWLSPACE.Item.ArmorPiercing"}}</label>
     <label class="check"><input type="checkbox" name="magic" {{checked row.magic}}> {{localize "CRAWLSPACE.Item.Magic"}}</label>
+    <label class="check" data-tooltip="{{localize 'CRAWLSPACE.Item.AreaHint'}}"><input type="checkbox" name="area" {{checked row.area}}> {{localize "CRAWLSPACE.Item.Area"}}</label>
   </div>
   {{/if}}
 
@@ -51,3 +53,4 @@
   <div class="form-group stacked"><label>{{localize "CRAWLSPACE.Item.Notes"}}</label><textarea name="notes" rows="3">{{row.notes}}</textarea></div>
   {{/if}}
 </div>
+{{/if}}

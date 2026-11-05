@@ -32,6 +32,9 @@ async function onAction(message: any, button: HTMLElement) {
           multiplier,
           armorPiercing: flags.armorPiercing,
           magic: flags.magic,
+          area: flags.area,
+          damageKind: flags.damageKind ?? undefined,
+          magicBase: flags.magicBase ?? undefined,
           source: message.flavor ? '' : '',
         })
       return

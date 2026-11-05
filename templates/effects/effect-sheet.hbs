@@ -33,7 +33,7 @@
         <legend>{{localize "CRAWLSPACE.Effect.ShieldSlots"}}</legend>
         <label><span>{{localize "CRAWLSPACE.Effect.Remaining"}}</span><input type="number" name="system.shield.remaining" value="{{systemSource.shield.remaining}}" min="0"></label>
         <label><span>{{localize "CRAWLSPACE.Effect.PerSlot"}}</span><input type="number" name="system.shield.perSlot" value="{{systemSource.shield.perSlot}}" min="0"></label>
-        <label class="check"><input type="checkbox" name="system.shield.magicOnly" {{checked systemSource.shield.magicOnly}}> {{localize "CRAWLSPACE.Effect.MagicOnly"}}</label>
+        <label class="check"><input type="checkbox" name="system.shield.nonMagic" {{checked systemSource.shield.nonMagic}}> {{localize "CRAWLSPACE.Effect.NonMagic"}}</label>
       </fieldset>
       <h3 class="pf-section">{{localize "CRAWLSPACE.Item.Description"}}</h3>
       {{#if editable}}<prose-mirror name="description" value="{{source.description}}" toggled>{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
