@@ -3,13 +3,15 @@ import { attackOutcome, outcomeLabel, resolveFormulaTokens, SUCCESS_OUTCOMES } f
 import { debuffById } from '../rules/debuffs'
 import { naturalD20, penaltyModifiers, rollD20, rollDamage } from '../dice/rolls'
 import { combatAction } from '../socket'
+import { shieldBlockAllowed, shieldBlockFor, shieldBlockSkill } from '../rules/shield-block'
 
-export type DefenseKind = 'evade' | 'tank'
+export type DefenseKind = 'evade' | 'tank' | 'block'
 export type DeclarationTarget = {
   combatantId: string
   actorUuid: string
   name: string
-  response?: { kind: DefenseKind; total?: number; natural?: number; outcome?: string; hit: boolean; half: boolean }
+  /** `blocked`: a successful Shield Block, which halves the damage when it is applied. */
+  response?: { kind: DefenseKind; total?: number; natural?: number; outcome?: string; hit: boolean; half: boolean; blocked?: boolean }
 }
 export type Declaration = {
   id: string
@@ -22,6 +24,13 @@ export type Declaration = {
   messageId?: string
   damageRolled?: boolean
 }
+
+/** A defense roll's card header, like other checks. */
+const defenseFlavor = (label: string, mode: string) =>
+  foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/chat/check.hbs', {
+    label,
+    mode: mode === 'normal' ? '' : game.i18n.localize(`CRAWLSPACE.Roll.Mode.${mode}`),
+  })
 
 type CrawlFlags = { phase: number; done: string[]; declarations: Declaration[] }
 
@@ -177,9 +186,22 @@ export class CrawlCombat extends Combat {
       total = result.roll.total
       natural = naturalD20(result.roll)
       await result.roll.toMessage(
-        { speaker: ChatMessage.getSpeaker({ actor }), flavor: game.i18n.format('CRAWLSPACE.Combat.EvadeAgainst', { attack: declaration.attack.name }) },
+        { speaker: ChatMessage.getSpeaker({ actor }), flavor: await defenseFlavor(game.i18n.format('CRAWLSPACE.Combat.EvadeAgainst', { attack: declaration.attack.name }), result.mode) },
         { messageMode: game.settings.get('core', 'messageMode') },
       )
+    }
+    if (kind === 'block') {
+      // A Shield Block check: the Shield Block skill against the attack's to-hit.
+      const skill = shieldBlockSkill(actor)
+      const block = shieldBlockFor(actor)
+      if (!skill || !block || !shieldBlockAllowed({ area: declaration.attack.isArea, types: declaration.attack.damageTypes }, block.rank))
+        return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Combat.CannotBlock'))
+      const label = game.i18n.format('CRAWLSPACE.Combat.BlockAgainst', { attack: declaration.attack.name })
+      const result = await rollD20(actor, { label, kind: 'check', modifiers: skill.checkModifiers(), sources: [skill.name] })
+      if (!result) return
+      total = result.roll.total
+      natural = naturalD20(result.roll)
+      await result.roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: await defenseFlavor(label, result.mode) }, { messageMode: game.settings.get('core', 'messageMode') })
     }
     return combatAction(this, 'respondToDeclaration', declarationId, combatantId, kind, total ?? null, natural ?? null)
   }
@@ -205,7 +227,10 @@ export class CrawlCombat extends Combat {
     } else {
       const outcome = attackOutcome(total, declaration.attack.toHit, natural ?? undefined)
       const success = SUCCESS_OUTCOMES.includes(outcome)
-      target.response = {
+      // A Shield Block never avoids the hit: a successful one halves the damage when it is applied.
+      if (kind === 'block')
+        target.response = { kind, total, natural: natural ?? undefined, outcome: outcomeLabel(outcome, true), hit: true, half: false, blocked: success }
+      else target.response = {
         kind,
         total,
         natural: natural ?? undefined,
@@ -231,8 +256,12 @@ export class CrawlCombat extends Combat {
     if (!hit.length && !unanswered.length) return ui.notifications.info(game.i18n.localize('CRAWLSPACE.Combat.AllAvoided'))
     await rollDamage(
       mob,
-      { formula: declaration.attack.damage, types: declaration.attack.damageTypes, armorPiercing: declaration.attack.armorPiercing, magic: declaration.attack.magic },
-      { label: `${declaration.mobName}: ${declaration.attack.name}`, targets: [...hit, ...unanswered].map((target) => target.actorUuid) },
+      { formula: declaration.attack.damage, types: declaration.attack.damageTypes, armorPiercing: declaration.attack.armorPiercing, magic: declaration.attack.magic, area: declaration.attack.isArea },
+      {
+        label: `${declaration.mobName}: ${declaration.attack.name}`,
+        targets: [...hit, ...unanswered].map((target) => target.actorUuid),
+        blocked: hit.filter((target) => target.response?.blocked).map((target) => target.actorUuid),
+      },
     )
     declaration.damageRolled = true
     await this.update({ 'flags.crawlspace.declarations': declarations })
@@ -241,6 +270,10 @@ export class CrawlCombat extends Combat {
   }
 
   async #renderDeclaration(declaration: Declaration) {
+    const canBlock = (uuid: string, entry: Declaration) => {
+      const block = shieldBlockFor(fromUuidSync(uuid))
+      return !!block && shieldBlockAllowed({ area: entry.attack.isArea, types: entry.attack.damageTypes }, block.rank)
+    }
     return foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/chat/declaration.hbs', {
       declaration,
       combatId: this.id,
@@ -248,6 +281,7 @@ export class CrawlCombat extends Combat {
       targets: declaration.targets.map((target) => ({
         ...target,
         halfNote: target.response?.half,
+        canBlock: canBlock(target.actorUuid, declaration),
         failedDebuff: target.response?.hit && declaration.attack.failedDebuff ? declaration.attack.failedDebuff : '',
       })),
     })

@@ -1,9 +1,11 @@
 <div class="crawl-card damage {{#if healing}}healing{{/if}}">
-  <h4 class="card-title">{{label}}{{#if tier}} <span class="roll-mode">{{tier}}</span>{{/if}}</h4>
-  <p class="damage-tags">
-    {{#if types}}<span class="tag">{{types}}</span>{{/if}}
-    {{#if armorPiercing}}<span class="tag">{{localize "CRAWLSPACE.Item.ArmorPiercing"}}</span>{{/if}}
-    {{#if magic}}<span class="tag">{{localize "CRAWLSPACE.Item.Magic"}}</span>{{/if}}
-    {{#if area}}<span class="tag">{{localize "CRAWLSPACE.Item.Area"}}</span>{{/if}}
-  </p>
+  <header class="card-head">
+    {{#if img}}<img src="{{img}}" alt="">{{/if}}
+    <div class="card-heading">
+      <h4 class="card-title">{{#if healing}}<i class="fa-solid fa-heart"></i> {{/if}}{{label}}</h4>
+      {{#if subtitle}}<span class="card-sub">{{subtitle}}</span>{{/if}}
+    </div>
+    {{#if tier}}<span class="roll-mode">{{tier}}</span>{{/if}}
+  </header>
+  {{#if tags.length}}<p class="damage-tags">{{#each tags}}<span class="tag">{{this}}</span>{{/each}}</p>{{/if}}
 </div>

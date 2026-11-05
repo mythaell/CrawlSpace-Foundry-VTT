@@ -1,24 +1,11 @@
 <div class="crawl-card attack">
-  <h4 class="card-title">{{label}}{{#if mode}} <span class="roll-mode">{{mode}}</span>{{/if}}</h4>
-  {{#if targets.length}}
-  <ul class="attack-targets">
-    {{#each targets}}
-    <li class="{{#if success}}success{{else}}failure{{/if}}">
-      <span class="target-name">{{name}}</span>
-      <span class="target-evade">{{localize "CRAWLSPACE.Stat.Evade"}} {{difficulty}}</span>
-      <span class="outcome">{{outcome}}</span>
-    </li>
-    {{/each}}
-  </ul>
-  {{else}}
-  <p class="hint">{{localize "CRAWLSPACE.Roll.NoTargets"}}</p>
-  {{/if}}
-  {{#if hasDamage}}
-  <div class="card-buttons">
-    <button type="button" data-crawl-action="damage-tier" data-tier="normal"><i class="fa-solid fa-burst"></i> {{localize "CRAWLSPACE.Damage.Damage"}}</button>
-    <button type="button" data-crawl-action="damage-tier" data-tier="amazing" data-tooltip="{{localize 'CRAWLSPACE.Damage.AmazingHint'}}">{{localize "CRAWLSPACE.Damage.Tier.amazing"}}</button>
-    <button type="button" data-crawl-action="damage-tier" data-tier="critical" data-tooltip="{{localize 'CRAWLSPACE.Damage.CriticalHint'}}">{{localize "CRAWLSPACE.Damage.Tier.critical"}}</button>
-  </div>
-  {{#if damageTypes}}<p class="hint">{{damageTypes}}</p>{{/if}}
-  {{/if}}
+  <header class="card-head">
+    {{#if img}}<img src="{{img}}" alt="">{{/if}}
+    <div class="card-heading">
+      <h4 class="card-title">{{label}}</h4>
+      {{#if subtitle}}<span class="card-sub">{{subtitle}}</span>{{/if}}
+    </div>
+    {{#if mode}}<span class="roll-mode">{{mode}}</span>{{/if}}
+  </header>
+  {{#if tags.length}}<p class="damage-tags">{{#each tags}}<span class="tag">{{this}}</span>{{/each}}</p>{{/if}}
 </div>

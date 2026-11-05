@@ -1,0 +1,43 @@
+<div class="crawl-card crawl-footer">
+  {{#if isAttack}}
+    {{#if targets.length}}
+    <ul class="attack-targets">
+      {{#each targets}}
+      <li class="{{#if success}}success{{else}}failure{{/if}}">
+        <span class="target-name">{{name}}</span>
+        <span class="target-evade">{{localize "CRAWLSPACE.Stat.Evade"}} {{difficulty}}</span>
+        <span class="outcome">{{outcome}}</span>
+      </li>
+      {{/each}}
+    </ul>
+    {{else}}
+    <p class="hint">{{localize "CRAWLSPACE.Roll.NoTargets"}}</p>
+    {{/if}}
+    {{#if hasDamage}}
+    <div class="card-buttons {{#if allMissed}}muted{{/if}}">
+      <button type="button" data-crawl-action="damage-tier" data-tier="normal"><i class="fa-solid fa-burst"></i> {{localize "CRAWLSPACE.Damage.Damage"}}</button>
+      <button type="button" data-crawl-action="damage-tier" data-tier="amazing" data-tooltip="{{localize 'CRAWLSPACE.Damage.AmazingHint'}}">{{localize "CRAWLSPACE.Damage.Tier.amazing"}}</button>
+      <button type="button" data-crawl-action="damage-tier" data-tier="critical" data-tooltip="{{localize 'CRAWLSPACE.Damage.CriticalHint'}}">{{localize "CRAWLSPACE.Damage.Tier.critical"}}</button>
+    </div>
+    {{/if}}
+  {{else}}
+    {{#each rows as |row|}}
+    <div class="apply-row" data-target="{{row.uuid}}">
+      <span class="target-name">{{#if row.uuid}}{{row.name}}{{else}}<i class="fa-solid fa-hand-pointer"></i> {{localize "CRAWLSPACE.Damage.Selected"}}{{/if}}</span>
+      <span class="apply-buttons">
+        {{#if @root.healing}}
+        <button type="button" data-crawl-action="apply-heal" data-tooltip="{{localize 'CRAWLSPACE.Damage.HealHint'}}"><i class="fa-solid fa-heart"></i> {{localize "CRAWLSPACE.Damage.ApplyHeal"}}</button>
+        {{else}}
+        <button type="button" data-crawl-action="apply-damage" data-multiplier="0.5" data-tooltip="{{localize 'CRAWLSPACE.Damage.HalfHint'}}">½</button>
+        <button type="button" class="primary" data-crawl-action="apply-damage" data-multiplier="1" data-tooltip="{{localize 'CRAWLSPACE.Damage.ApplyHint'}}"><i class="fa-solid fa-burst"></i></button>
+        <button type="button" data-crawl-action="apply-damage" data-multiplier="2" data-tooltip="{{localize 'CRAWLSPACE.Damage.DoubleHint'}}">×2</button>
+        {{#if row.canBlock}}
+        <button type="button" class="toggle {{#if row.blocked}}active{{/if}}" data-crawl-action="toggle-block" aria-pressed="{{#if row.blocked}}true{{else}}false{{/if}}" {{#unless row.blockAllowed}}disabled{{/unless}} data-tooltip="{{localize (ifThen row.blockAllowed 'CRAWLSPACE.Damage.BlockHint' 'CRAWLSPACE.Damage.BlockUnavailable')}}"><i class="fa-solid fa-shield-halved"></i></button>
+        {{/if}}
+        <button type="button" data-crawl-action="apply-heal" data-tooltip="{{localize 'CRAWLSPACE.Damage.HealHint'}}"><i class="fa-solid fa-heart"></i></button>
+        {{/if}}
+      </span>
+    </div>
+    {{/each}}
+  {{/if}}
+</div>

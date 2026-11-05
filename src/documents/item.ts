@@ -97,6 +97,7 @@ export class CrawlItem extends Item {
         this.actor,
         {
           label: this.name,
+          img: this.img,
           modifiers: this.checkModifiers(),
           sources: [this.name, ...(this.type === 'spell' ? ['Spells'] : [])],
           damage: withEffectBonuses(
@@ -118,7 +119,7 @@ export class CrawlItem extends Item {
       // An attack that also heals (Drain Life) heals its caster once the attack goes through.
       const drain = String(system.healing?.atRank ?? '').trim()
       if (attacked && drain)
-        await rollDamage(this.actor, { formula: drain, types: [] }, { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, healing: true, targets: [this.actor.uuid] })
+        await rollDamage(this.actor, { formula: drain, types: [] }, { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, img: this.img, healing: true, targets: [this.actor.uuid] })
       return attacked
     }
     // Heal spells and skills: pay, roll the healing at the current Rank, and let the card apply the slots.
@@ -128,7 +129,7 @@ export class CrawlItem extends Item {
       return rollDamage(
         this.actor,
         { formula: healing, types: [] },
-        { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, healing: true, targets: healTargets(this.actor) },
+        { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, img: this.img, healing: true, targets: healTargets(this.actor) },
       )
     }
     if (pay && !(await pay())) return null
@@ -162,7 +163,7 @@ export class CrawlItem extends Item {
     }
     // Healing rolls give health slots; the card's Heal button applies them.
     if (system.healing?.formula)
-      await rollDamage(actor, { formula: system.healing.formula, types: [] }, { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, healing: true, targets: [actor.uuid] })
+      await rollDamage(actor, { formula: system.healing.formula, types: [] }, { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, img: this.img, healing: true, targets: [actor.uuid] })
     if (system.damage?.formula) await rollDamage(actor, { ...system.damage, types: system.damage.types }, { label: this.name })
     // Conditions the item gives when used (a potion's Good Mana Refill) go on the user, timed by core durations.
     const conditions = this.effects.filter((effect: any) => !effect.transfer)

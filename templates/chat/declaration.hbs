@@ -13,15 +13,16 @@
     <li>
       <span class="target-name">{{target.name}}</span>
       {{#if target.response}}
-        <span class="outcome {{#if target.response.hit}}failure{{else}}success{{/if}}">
-          {{#if (eq target.response.kind "tank")}}{{localize "CRAWLSPACE.Combat.Tanked"}}{{else}}{{localize "CRAWLSPACE.Combat.Evaded" total=target.response.total}} · {{target.response.outcome}}{{/if}}
+        <span class="outcome {{#if target.response.blocked}}success{{else if target.response.hit}}failure{{else}}success{{/if}}">
+          {{#if (eq target.response.kind "tank")}}{{localize "CRAWLSPACE.Combat.Tanked"}}{{else if (eq target.response.kind "block")}}{{#if target.response.blocked}}{{localize "CRAWLSPACE.Combat.Blocked" total=target.response.total}}{{else}}{{localize "CRAWLSPACE.Combat.BlockFailed" total=target.response.total}}{{/if}}{{else}}{{localize "CRAWLSPACE.Combat.Evaded" total=target.response.total}} · {{target.response.outcome}}{{/if}}
           {{#if target.halfNote}} ({{localize "CRAWLSPACE.Combat.Half"}}){{/if}}
         </span>
         {{#if target.failedDebuff}}<button type="button" data-crawl-action="apply-debuff" data-debuff="{{target.failedDebuff}}" data-target="{{target.actorUuid}}">{{target.failedDebuff}}</button>{{/if}}
       {{else}}
         <span class="defend-buttons">
           <button type="button" data-crawl-action="defend" data-actor="{{target.actorUuid}}" data-target="{{target.combatantId}}" data-kind="evade"><i class="fa-solid fa-person-running"></i> {{localize "CRAWLSPACE.Combat.Evade"}}</button>
-          <button type="button" data-crawl-action="defend" data-actor="{{target.actorUuid}}" data-target="{{target.combatantId}}" data-kind="tank"><i class="fa-solid fa-shield"></i> {{localize "CRAWLSPACE.Combat.Tank"}}</button>
+          {{#if target.canBlock}}<button type="button" data-crawl-action="defend" data-actor="{{target.actorUuid}}" data-target="{{target.combatantId}}" data-kind="block" data-tooltip="{{localize 'CRAWLSPACE.Combat.BlockHint'}}"><i class="fa-solid fa-shield-halved"></i> {{localize "CRAWLSPACE.Combat.Block"}}</button>{{/if}}
+          <button type="button" data-crawl-action="defend" data-actor="{{target.actorUuid}}" data-target="{{target.combatantId}}" data-kind="tank"><i class="fa-solid fa-person-falling-burst"></i> {{localize "CRAWLSPACE.Combat.Tank"}}</button>
         </span>
       {{/if}}
     </li>

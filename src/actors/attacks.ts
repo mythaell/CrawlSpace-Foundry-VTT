@@ -126,9 +126,9 @@ export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHi
     if (source?.type === 'consumable' && !(await source.spendOne())) return false
     return true
   }
-  const label = skill && source && skill.id !== source.id ? `${row.name} (${skill.name})` : row.name
   return {
-    label,
+    label: row.name,
+    subtitle: skill && skill.name !== row.name ? skill.name : '',
     img: row.img || source?.img || 'icons/svg/sword.svg',
     modifiers,
     toHit: modifiers.reduce((total, modifier) => total + (Number(modifier.value) || 0), 0),
@@ -177,5 +177,5 @@ export async function damageWithRow(actor: any, row: AttackRow, tier: 'normal' |
   const attack = resolveAttack(actor, row)
   if (!attack.damage.formula) return ui.notifications.warn(game.i18n.format('CRAWLSPACE.Warn.NoDamage', { name: row.name }))
   const targets = [...game.user.targets].map((token: any) => token.actor?.uuid).filter(Boolean)
-  return rollDamage(actor, attack.damage, { label: attack.label, tier, targets })
+  return rollDamage(actor, attack.damage, { label: attack.label, subtitle: attack.subtitle, img: attack.img, tier, targets })
 }

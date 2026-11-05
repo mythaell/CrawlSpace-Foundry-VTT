@@ -18,6 +18,7 @@ import { fillActorDamage, fillDamageData } from './import/fill-damage'
 import { openUpkeep } from './apps/upkeep'
 
 const TEMPLATES = [
+  'chat/card-footer',
   'actor/crawler-sidebar',
   'actor/crawler-header',
   'actor/crawler-tabs',

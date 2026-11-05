@@ -137,6 +137,9 @@ export async function rollCheck(actor: any, options: CheckOptions) {
 
 export type AttackSource = {
   label: string
+  /** Shown under the name, e.g. the skill a weapon attacks with. */
+  subtitle?: string
+  img?: string
   modifiers: Modifier[]
   sources: string[]
   damage: AttackDamage
@@ -183,11 +186,10 @@ export async function rollAttack(actor: any, attack: AttackSource, options: { fa
   const formula = resolveFormulaTokens(attack.damage.formula, { floor })
   const flavor = await foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/chat/attack.hbs', {
     label: attack.label,
+    subtitle: attack.subtitle,
+    img: attack.img,
     mode: mode === 'normal' ? '' : game.i18n.localize(`CRAWLSPACE.Roll.Mode.${mode}`),
-    targets: rows,
-    natural,
-    hasDamage: !!formula,
-    damageTypes: attack.damage.types.join(', '),
+    tags: damageTags(attack.damage, formula),
   })
   await roll.toMessage(
     {
@@ -198,6 +200,8 @@ export async function rollAttack(actor: any, attack: AttackSource, options: { fa
           kind: 'attack',
           damage: { ...attack.damage, formula, floor },
           label: attack.label,
+          subtitle: attack.subtitle ?? '',
+          img: attack.img ?? '',
           targets: rows,
         },
       },
@@ -207,11 +211,32 @@ export async function rollAttack(actor: any, attack: AttackSource, options: { fa
   return { roll, targets: rows }
 }
 
+/** Tags under a card's title: damage formula (attacks), types, Armor Piercing, Magic, Area. */
+function damageTags(damage: AttackDamage, formula = '') {
+  const tag = (key: string) => game.i18n.localize(key)
+  return [
+    ...(formula ? [formula] : []),
+    ...damage.types,
+    ...(damage.armorPiercing ? [tag('CRAWLSPACE.Item.ArmorPiercing')] : []),
+    ...(damage.magic ? [tag('CRAWLSPACE.Item.Magic')] : []),
+    ...(damage.area ? [tag('CRAWLSPACE.Item.Area')] : []),
+  ]
+}
+
 /** Roll damage and post a card with Apply ×½/×1/×2 and Heal buttons. */
 export async function rollDamage(
   actor: any,
   damage: AttackDamage & { floor?: number },
-  options: { label?: string; tier?: 'normal' | 'amazing' | 'critical'; targets?: string[]; healing?: boolean } = {},
+  options: {
+    label?: string
+    subtitle?: string
+    img?: string
+    tier?: 'normal' | 'amazing' | 'critical'
+    targets?: string[]
+    healing?: boolean
+    /** Targets whose Shield Block succeeded: their Block toggle starts on. */
+    blocked?: string[]
+  } = {},
 ) {
   const floor = damage.floor ?? (Number(actor?.system?.details?.floor ?? actor?.system?.floor) || 0)
   let formula = resolveFormulaTokens(damage.formula, { floor })
@@ -234,12 +259,11 @@ export async function rollDamage(
   const tierLabel = options.tier && options.tier !== 'normal' ? game.i18n.localize(`CRAWLSPACE.Damage.Tier.${options.tier}`) : ''
   const flavor = await foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/chat/damage.hbs', {
     label: options.label ?? game.i18n.localize('CRAWLSPACE.Damage.Damage'),
+    subtitle: options.subtitle,
+    img: options.img,
     tier: tierLabel,
-    types: damage.types.join(', '),
-    armorPiercing: damage.armorPiercing,
-    magic: damage.magic,
     healing: options.healing,
-    area: damage.area && !options.healing,
+    tags: options.healing ? [] : damageTags(damage),
   })
   await roll.toMessage(
     {
@@ -255,6 +279,7 @@ export async function rollDamage(
           damageKind: damage.kind ?? null,
           magicBase,
           targets: options.targets ?? [],
+          blocked: options.blocked ?? [],
         },
       },
     },
