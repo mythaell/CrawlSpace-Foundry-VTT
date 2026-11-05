@@ -21,7 +21,14 @@
       "formula": "",
       "types": [],
       "armorPiercing": false,
-      "magic": false
+      "magic": false,
+      "area": false
+    },
+    "healing": {
+      "formula": "1",
+      "rank5": "",
+      "rank10": "",
+      "rank15": "2"
     },
     "upgrades": {
       "rank5": "Spend five minutes to remove a Minor Injury.",

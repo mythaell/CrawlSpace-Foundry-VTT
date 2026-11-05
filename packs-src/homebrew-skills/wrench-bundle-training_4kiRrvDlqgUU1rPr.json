@@ -23,7 +23,14 @@
         "Bludgeoning"
       ],
       "armorPiercing": false,
-      "magic": false
+      "magic": false,
+      "area": false
+    },
+    "healing": {
+      "formula": "",
+      "rank5": "",
+      "rank10": "",
+      "rank15": ""
     },
     "upgrades": {
       "rank5": "Add 1d4 base damage. May also throw it Rank × 5 feet.",

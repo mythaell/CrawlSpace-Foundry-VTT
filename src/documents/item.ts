@@ -93,7 +93,7 @@ export class CrawlItem extends Item {
     const pay = this.type === 'spell' ? () => this.payMana() : undefined
     const kind = this.type as 'skill' | 'spell'
     if (system.isAttack) {
-      return rollAttack(
+      const attacked = await rollAttack(
         this.actor,
         {
           label: this.name,
@@ -115,6 +115,11 @@ export class CrawlItem extends Item {
         },
         options,
       )
+      // An attack that also heals (Drain Life) heals its caster once the attack goes through.
+      const drain = String(system.healing?.atRank ?? '').trim()
+      if (attacked && drain)
+        await rollDamage(this.actor, { formula: drain, types: [] }, { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, healing: true, targets: [this.actor.uuid] })
+      return attacked
     }
     // Heal spells and skills: pay, roll the healing at the current Rank, and let the card apply the slots.
     const healing = String(system.healing?.atRank ?? '').trim()
@@ -151,13 +156,25 @@ export class CrawlItem extends Item {
     if (system.manaRestore) {
       const max = Number(actor.system.mana?.max) || 0
       const text = String(system.manaRestore).trim()
-      const restore = text.endsWith('%') ? Math.floor((max * Number(text.slice(0, -1))) / 100) : Number(text) || 0
+      // manaRestore.ts manaRestorePoints: a share of max mana rounds up, points round down.
+      const restore = text.endsWith('%') ? Math.ceil((max * Number(text.slice(0, -1))) / 100) : Math.floor(Number(text) || 0)
       await actor.update({ 'system.mana.value': Math.min(max, (Number(actor.system.mana.value) || 0) + restore) })
     }
     // Healing rolls give health slots; the card's Heal button applies them.
     if (system.healing?.formula)
       await rollDamage(actor, { formula: system.healing.formula, types: [] }, { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, healing: true, targets: [actor.uuid] })
     if (system.damage?.formula) await rollDamage(actor, { ...system.damage, types: system.damage.types }, { label: this.name })
+    // Conditions the item gives when used (a potion's Good Mana Refill) go on the user, timed by core durations.
+    const conditions = this.effects.filter((effect: any) => !effect.transfer)
+    if (conditions.length)
+      await actor.createEmbeddedDocuments(
+        'ActiveEffect',
+        conditions.map((effect: any) => {
+          const data = effect.toObject()
+          delete data._id
+          return { ...data, transfer: true, disabled: false, origin: this.uuid }
+        }),
+      )
     return this.toMessage()
   }
 

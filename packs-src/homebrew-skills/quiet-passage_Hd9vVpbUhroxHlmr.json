@@ -21,7 +21,14 @@
       "formula": "",
       "types": [],
       "armorPiercing": false,
-      "magic": false
+      "magic": false,
+      "area": false
+    },
+    "healing": {
+      "formula": "",
+      "rank5": "",
+      "rank10": "",
+      "rank15": ""
     },
     "upgrades": {
       "rank5": "May make a surprise attack with Advantage.",

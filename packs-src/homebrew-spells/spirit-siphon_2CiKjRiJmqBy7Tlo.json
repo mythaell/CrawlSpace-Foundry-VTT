@@ -23,7 +23,14 @@
         "Necrotic"
       ],
       "armorPiercing": false,
-      "magic": true
+      "magic": true,
+      "area": false
+    },
+    "healing": {
+      "formula": "",
+      "rank5": "",
+      "rank10": "",
+      "rank15": ""
     },
     "upgrades": {
       "rank5": "Add 1d4 base damage. A killing blow against a foe of at least half your level grants +1 damage until a long rest, stacking up to your spell Rank.",

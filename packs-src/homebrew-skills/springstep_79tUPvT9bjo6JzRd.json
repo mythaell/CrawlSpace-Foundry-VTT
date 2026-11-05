@@ -21,7 +21,14 @@
       "formula": "",
       "types": [],
       "armorPiercing": false,
-      "magic": false
+      "magic": false,
+      "area": false
+    },
+    "healing": {
+      "formula": "",
+      "rank5": "",
+      "rank10": "",
+      "rank15": ""
     },
     "upgrades": {
       "rank5": "Use × 3 for both distances.",

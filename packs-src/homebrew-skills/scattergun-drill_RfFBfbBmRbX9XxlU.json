@@ -23,7 +23,14 @@
         "Piercing"
       ],
       "armorPiercing": false,
-      "magic": false
+      "magic": false,
+      "area": true
+    },
+    "healing": {
+      "formula": "",
+      "rank5": "",
+      "rank10": "",
+      "rank15": ""
     },
     "upgrades": {
       "rank5": "Add 1d10 base damage.",

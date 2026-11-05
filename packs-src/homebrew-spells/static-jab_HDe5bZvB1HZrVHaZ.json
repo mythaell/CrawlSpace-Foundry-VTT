@@ -23,7 +23,14 @@
         "Electric"
       ],
       "armorPiercing": false,
-      "magic": true
+      "magic": true,
+      "area": false
+    },
+    "healing": {
+      "formula": "",
+      "rank5": "",
+      "rank10": "",
+      "rank15": ""
     },
     "upgrades": {
       "rank5": "Add 1d2 base damage. May inflict Stunned instead of damage.",

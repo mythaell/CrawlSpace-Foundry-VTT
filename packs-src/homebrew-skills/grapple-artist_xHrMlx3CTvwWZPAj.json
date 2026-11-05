@@ -23,7 +23,14 @@
         "Bludgeoning"
       ],
       "armorPiercing": false,
-      "magic": false
+      "magic": false,
+      "area": false
+    },
+    "healing": {
+      "formula": "",
+      "rank5": "",
+      "rank10": "",
+      "rank15": ""
     },
     "upgrades": {
       "rank5": "Maintain Held without spending an Action, but the check has Disadvantage.",

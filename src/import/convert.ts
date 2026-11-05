@@ -137,6 +137,15 @@ export function healingFields(data: Record<string, any>) {
   return { formula: value('healingFormula'), rank5: value('rank5HealingFormula'), rank10: value('rank10HealingFormula'), rank15: value('rank15HealingFormula') }
 }
 
+/** manaRestore.ts normalizeManaRestore: the checkbox and amount, or the older `manaRestore: 'full' | '<points>'`. */
+function manaRestoreAmount(properties: Record<string, any>) {
+  const legacy = str(properties.manaRestore).trim()
+  const legacyAmount = legacy.toLowerCase() === 'full' ? '100%' : legacy
+  const restores = typeof properties.isManaRestore === 'boolean' ? properties.isManaRestore : !!legacyAmount
+  if (!restores) return ''
+  return str(properties.manaRestoreAmount).trim() || legacyAmount
+}
+
 /** An area template at any Rank (abilityTemplates.ts), or an explosive. */
 const hasArea = (data: Record<string, any>) =>
   ['template', 'rank5Template', 'rank10Template', 'rank15Template'].some((key) => Array.isArray(data[key]?.areas) && data[key].areas.length > 0)
@@ -192,6 +201,28 @@ function useEffectConditions(data: Record<string, any>, img: string) {
 /*  Buffs / debuffs                                                    */
 /* ------------------------------------------------------------------ */
 
+/**
+ * A CrawlSpace duration as Foundry effect duration data, so core expires the effect: `10 rounds` stays in
+ * rounds, anything else (`1 minute`, `30 seconds`) becomes seconds of game time. Unparsed text gives none.
+ */
+export function effectDuration(text: unknown): { value: number; units: string } | null {
+  const value = str(text).trim().toLowerCase().replace(/\.$/, '').replace(/^(?:for |lasts )/, '')
+  if (!value) return null
+  const rounds = /^(\d+)\s*rounds?$/.exec(value)
+  if (rounds) return { value: Number(rounds[1]), units: 'rounds' }
+  const units: Record<string, number> = { d: 86400, day: 86400, days: 86400, h: 3600, hr: 3600, hrs: 3600, hour: 3600, hours: 3600, m: 60, min: 60, mins: 60, minute: 60, minutes: 60, s: 1, sec: 1, secs: 1, second: 1, seconds: 1, round: 10, rounds: 10 }
+  let seconds = 0
+  let found = false
+  const rest = value
+    .replace(/(\d+(?:\.\d+)?)\s*(days?|d|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s|rounds?)\b/g, (_match: string, amount: string, unit: string) => {
+      seconds += Number(amount) * units[unit]
+      found = true
+      return ''
+    })
+    .replace(/\band\b|[\s,]/g, '')
+  return found && !rest && seconds > 0 ? { value: Math.round(seconds), units: 'seconds' } : null
+}
+
 export function buffToEffect(data: Record<string, any>, img = ICONS.buff) {
   const properties = data.properties ?? {}
   const standard = debuffByName(data.standardDebuff ?? data.name)
@@ -216,6 +247,7 @@ export function buffToEffect(data: Record<string, any>, img = ICONS.buff) {
       shield: { remaining: shieldSlots, perSlot: int(data.shield?.healthPerSlot, 0), nonMagic: data.shield?.scope === 'nonMagic' },
       durationText: str(data.duration),
     },
+    ...(effectDuration(data.duration) ? { duration: effectDuration(data.duration) } : {}),
   }
 }
 
@@ -290,7 +322,7 @@ export function inventoryToItem(entry: Record<string, any>, contentType = '') {
         consumableType: str(properties.consumable?.type) || 'other',
         damage,
         healing: { formula: isHealingSource(properties) ? str(properties.healingFormula) : '', slots: true },
-        manaRestore: properties.isManaRestore ? str(properties.manaRestoreAmount) : '',
+        manaRestore: manaRestoreAmount(properties),
       }
       break
     case 'tattoo':
@@ -299,7 +331,11 @@ export function inventoryToItem(entry: Record<string, any>, contentType = '') {
     default:
       system = base
   }
-  const effects = effectsFor(name, img, [...list(properties.effects), ...legacyBonusEffects(properties)])
+  // A consumable's cast-time conditions (Good Mana Refill) are applied to the user when it is used.
+  const effects = [
+    ...effectsFor(name, img, [...list(properties.effects), ...legacyBonusEffects(properties)]),
+    ...(type === 'consumable' ? useEffectConditions(properties, img) : []),
+  ]
   return { name, type, img, system, effects }
 }
 
