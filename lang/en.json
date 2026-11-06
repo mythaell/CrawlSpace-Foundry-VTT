@@ -466,7 +466,8 @@
       },
       "Untrained": "Learn an untrained skill",
       "UntrainedHint": "Choose one marked Rank 0 skill to learn at Rank 1. All other untrained skills are removed, as in CrawlSpace.",
-      "Learned": "Learned {name} at Rank 1; other untrained skills removed."
+      "Learned": "Learned {name} at Rank 1; other untrained skills removed.",
+      "AdvanceModifiers": "Rolled {formula} ({sources})."
     },
     "Import": {
       "Character": "Import CrawlSpace character",
@@ -968,7 +969,33 @@
       "ClassTypes": "Class types",
       "Prerequisites": "Prerequisites and class restrictions",
       "BackgroundSkills": "Skills",
-      "BackgroundSkillsHint": "Crawlers taking this background pick two of these skills in the character builder."
+      "BackgroundSkillsHint": "Crawlers taking this background pick two of these skills in the character builder.",
+      "Kind": "Type",
+      "Unlisted": "Published / not on the list",
+      "Unlink": "Remove link",
+      "AddDamage": "Add this damage type",
+      "LinkKind": {
+        "skill": "skill",
+        "spell": "spell",
+        "item": "item",
+        "effect": "buff or condition",
+        "actor": "pet or creature",
+        "damage": "damage type"
+      },
+      "DropOne": "Drop a {kinds} here to link it.",
+      "DropMany": "Drop any number of: {kinds}.",
+      "WrongLink": "{name} can't link that. It takes: {kinds}.",
+      "Mechanic": {
+        "rankCap": "Linked skills can reach rank 20 (from floor 7).",
+        "allRankCaps": "All skills can reach rank 20 (from floor 7).",
+        "skillBonus": "Each linked skill gets +1 rank per count.",
+        "resistance": "The crawler resists the linked damage types.",
+        "immunity": "The crawler is immune to the linked damage types and conditions.",
+        "vulnerability": "The crawler is vulnerable to the linked damage types.",
+        "advanceBonus": "+1 per count on end-of-floor advancement checks for linked skills.",
+        "advanceAdvantage": "Advantage on advancement checks for the linked skill.",
+        "advancePenalty": "−1 per count on advancement checks for the linked skill once it is rank 5 or higher."
+      }
     }
   }
 }

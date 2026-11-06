@@ -2731,3 +2731,47 @@
     opacity: 0.7;
   }
 }
+
+@layer system {
+  .crawlspace .tab.build .build-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.3rem;
+    border: 1px dashed var(--crawl-border);
+    border-radius: 4px;
+  }
+  .crawlspace .tab.build .build-links .build-type {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .crawlspace .tab.build .build-link-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    align-items: center;
+  }
+  .crawlspace .tab.build .build-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 999px;
+    background: var(--crawl-accent-soft);
+  }
+  .crawlspace .tab.build .build-link-remove {
+    opacity: 0.7;
+  }
+  .crawlspace .tab.build .build-damage {
+    display: inline-flex;
+    gap: 0.25rem;
+    align-items: center;
+  }
+  .crawlspace .tab.build .build-damage select {
+    width: auto;
+  }
+  .crawlspace .tab.build .build-mechanic {
+    color: var(--crawl-good);
+  }
+}

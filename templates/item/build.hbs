@@ -72,6 +72,29 @@
       {{#if @root.editable}}<a class="build-delete" data-action="deleteBuildRow" data-list="{{list.key}}" data-index="{{entry.index}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
       <input class="build-notes" type="text" name="system.{{list.key}}.{{entry.index}}.target" value="{{entry.target}}" placeholder="{{localize 'CRAWLSPACE.Build.Target'}}">
       <textarea class="build-notes" name="system.{{list.key}}.{{entry.index}}.description" placeholder="{{localize 'CRAWLSPACE.Build.Details'}}">{{entry.description}}</textarea>
+      <div class="build-links build-notes" data-link-list="{{list.key}}" data-index="{{entry.index}}">
+        <label class="build-type">{{localize "CRAWLSPACE.Build.Kind"}}<select name="system.{{list.key}}.{{entry.index}}.templateId">{{selectOptions list.typeChoices selected=entry.templateId blank=list.unlisted}}</select></label>
+        {{#if entry.canLink}}
+        <div class="build-link-chips">
+          {{#each entry.links as |link|}}
+          <span class="build-link">
+            {{#if link.uuid}}<a class="content-link" draggable="true" data-link data-uuid="{{link.uuid}}"><i class="{{link.icon}}"></i> {{link.name}}</a>{{else}}<i class="{{link.icon}}"></i> {{link.name}}{{/if}}
+            {{#if @root.editable}}<a class="build-link-remove" data-action="removeBuildLink" data-list="{{list.key}}" data-index="{{entry.index}}" data-link="{{link.index}}" data-tooltip="{{localize 'CRAWLSPACE.Build.Unlink'}}"><i class="fa-solid fa-xmark"></i></a>{{/if}}
+          </span>
+          {{/each}}
+          {{#if @root.editable}}
+          {{#if entry.acceptsDamage}}
+          <span class="build-damage">
+            <select data-damage-for="{{list.key}}.{{entry.index}}" aria-label="{{localize 'CRAWLSPACE.Item.DamageTypes'}}">{{selectOptions @root.damageTypeChoices}}</select>
+            <a data-action="addDamageLink" data-list="{{list.key}}" data-index="{{entry.index}}" data-tooltip="{{localize 'CRAWLSPACE.Build.AddDamage'}}"><i class="fa-solid fa-plus"></i></a>
+          </span>
+          {{/if}}
+          {{/if}}
+        </div>
+        {{#if entry.dropHint}}<p class="hint">{{entry.dropHint}}</p>{{/if}}
+        {{/if}}
+        {{#if entry.mechanicHint}}<p class="hint build-mechanic"><i class="fa-solid fa-gears"></i> {{entry.mechanicHint}}</p>{{/if}}
+      </div>
     </div>
     {{else}}
     <p class="build-empty">—</p>

@@ -1,6 +1,7 @@
 import { CHECK_TYPES, DAMAGE_TYPES, GEAR_SLOTS, STATS } from '../config'
 import { prepareLootBox } from '../apps/awards'
 import { boxSummary, databaseRows, rowKey } from '../loot/database'
+import { linkSpec, type BuildLink, type LinkKind } from '../rules/build-links'
 import { benefitTemplates, benefitTiers, createBuildEntry, detrimentTemplates, detrimentTiers, getRaceClassBuild } from '../crawlspace-shared/shared/raceClassRules'
 import { bindRulesEditor, rulesContext, ruleTypeChoices } from '../effects/rules'
 import { documentIds } from './ids'
@@ -45,6 +46,8 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       toggleTransfer: CrawlItemSheet.#onToggleTransfer,
       addBuildRow: CrawlItemSheet.#onAddBuildRow,
       deleteBuildRow: CrawlItemSheet.#onDeleteBuildRow,
+      removeBuildLink: CrawlItemSheet.#onRemoveBuildLink,
+      addDamageLink: CrawlItemSheet.#onAddDamageLink,
       copyId: CrawlItemSheet.#onCopyId,
       prepareLoot: CrawlItemSheet.#onPrepareLoot,
       openBox: CrawlItemSheet.#onOpenBox,
@@ -129,6 +132,7 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         text: item._source.system.upgrades?.[key] ?? '',
         damage: item._source.system.upgrades?.[`${key}Damage`] ?? '',
       })),
+      damageTypeChoices: Object.fromEntries(DAMAGE_TYPES.map((type) => [type, type])),
       statChoicesLower: Object.fromEntries(Object.values(STATS).map((stat) => [stat.code.toLowerCase(), stat.label])),
       originChoices: { Earth: 'CRAWLSPACE.Build.Earth', Alien: 'CRAWLSPACE.Build.Alien' },
       speciesChoices: { human: 'CRAWLSPACE.Builder.Human', animal: 'CRAWLSPACE.Builder.Animal' },
@@ -254,6 +258,12 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         zone.addEventListener('dragover', (event) => event.preventDefault())
         zone.addEventListener('drop', (event) => this.#onBuildDrop(event, (zone as HTMLElement).dataset.dropList as string))
       }
+    if (this.isEditable)
+      for (const zone of this.element.querySelectorAll('[data-link-list]')) {
+        const { linkList, index } = (zone as HTMLElement).dataset
+        zone.addEventListener('dragover', (event) => event.preventDefault())
+        zone.addEventListener('drop', (event) => this.#onLinkDrop(event as DragEvent, linkList as 'benefits' | 'detriments', Number(index)))
+      }
   }
 
   /** Comma-separated damage types become an array. */
@@ -328,6 +338,38 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     const tierChoices = (tiers: readonly { value: string; label: string }[]) =>
       Object.fromEntries(tiers.map((tier) => [tier.value, tier.label]))
     const entries = (key: string) => (source[key] ?? []).map((entry: any, index: number) => ({ ...entry, index }))
+    const linkIcons: Record<LinkKind, string> = {
+      skill: 'fa-solid fa-book',
+      spell: 'fa-solid fa-wand-sparkles',
+      item: 'fa-solid fa-suitcase',
+      effect: 'fa-solid fa-person-rays',
+      actor: 'fa-solid fa-paw',
+      damage: 'fa-solid fa-burst',
+    }
+    /** A benefit or detriment row, with what it can link and what its links do. */
+    const linkedEntries = (key: 'benefits' | 'detriments') =>
+      entries(key).map((entry: any) => {
+        const spec = linkSpec(key, entry.templateId)
+        const kinds = (spec?.accepts ?? []).filter((kind) => kind !== 'damage')
+        const kindNames = kinds.map((kind) => game.i18n.localize(`CRAWLSPACE.Build.LinkKind.${kind}`))
+        return {
+          ...entry,
+          canLink: !!spec?.accepts.length,
+          acceptsDamage: !!spec?.accepts.includes('damage'),
+          links: (entry.links ?? []).map((link: BuildLink, index: number) => ({
+            ...link,
+            index,
+            uuid: link.uuid || rows.find((row) => rowKey(row) === link.ref)?.uuid || '',
+            icon: linkIcons[link.kind] ?? 'fa-solid fa-link',
+          })),
+          dropHint: kindNames.length
+            ? game.i18n.format(spec?.multiple ? 'CRAWLSPACE.Build.DropMany' : 'CRAWLSPACE.Build.DropOne', { kinds: kindNames.join(', ') })
+            : '',
+          mechanicHint: spec?.mechanic ? localize(`Mechanic.${spec.mechanic}`) : '',
+        }
+      })
+    const typeChoices = (templates: typeof benefitTemplates, tiers: readonly { value: string; label: string }[]) =>
+      tiers.flatMap((tier) => templates.filter((preset) => preset.tier === tier.value).map((preset) => ({ value: preset.id, label: preset.name, group: tier.label })))
     return {
       build: { ...build, isClass: item.type === 'class', over: build.remaining < 0, capped: build.earned > 5 },
       statRows: Object.values(STATS).map((stat) => ({
@@ -346,7 +388,9 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
           tierLabel: localize('PointCost'),
           groups: groups(benefitTemplates, benefitTiers),
           tierChoices: tierChoices(benefitTiers),
-          entries: entries('benefits'),
+          entries: linkedEntries('benefits'),
+          typeChoices: typeChoices(benefitTemplates, benefitTiers),
+          unlisted: localize('Unlisted'),
         },
         {
           key: 'detriments',
@@ -358,7 +402,9 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
           tierLabel: localize('PointsEarned'),
           groups: groups(detrimentTemplates, detrimentTiers),
           tierChoices: tierChoices(detrimentTiers),
-          entries: entries('detriments'),
+          entries: linkedEntries('detriments'),
+          typeChoices: typeChoices(detrimentTemplates, detrimentTiers),
+          unlisted: localize('Unlisted'),
           skillPenalties: rankList('skillDetriments', 'skill', true),
           statPenalties: entries('statSkillDetriments'),
         },
@@ -375,8 +421,53 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       const preset = (key === 'benefits' ? benefitTemplates : detrimentTemplates).find((entry) => entry.id === choice)
       if (!preset) return
       const { id: _id, ...entry } = createBuildEntry(preset)
-      list.push(entry)
+      list.push({ ...entry, links: foundry.utils.deepClone(linkSpec(key, preset.id)?.preset ?? []) })
     } else list.push(NEW_ROWS[key]?.() ?? {})
+    await this.item.update({ [`system.${key}`]: list })
+  }
+
+  /** Add a link to a benefit or detriment; an entry that takes one link swaps it. */
+  async #addBuildLink(key: 'benefits' | 'detriments', index: number, link: BuildLink) {
+    const list = this.item.system.toObject()[key]
+    const entry = list[index]
+    if (!entry) return
+    const spec = linkSpec(key, entry.templateId)
+    if (!spec?.accepts.includes(link.kind)) {
+      const kinds = (spec?.accepts ?? []).map((kind) => game.i18n.localize(`CRAWLSPACE.Build.LinkKind.${kind}`)).join(', ')
+      return ui.notifications.warn(game.i18n.format('CRAWLSPACE.Build.WrongLink', { name: entry.name, kinds: kinds || '—' }))
+    }
+    const links: BuildLink[] = entry.links ?? []
+    const same = (other: BuildLink) => (link.uuid && other.uuid === link.uuid) || (other.kind === link.kind && other.name.toLowerCase() === link.name.toLowerCase())
+    if (links.some(same)) return ui.notifications.info(game.i18n.format('CRAWLSPACE.Build.AlreadyListed', { name: link.name }))
+    entry.links = spec.multiple ? [...links, link] : [link]
+    await this.item.update({ [`system.${key}`]: list })
+  }
+
+  /** Dropping an item, buff/condition or actor on a benefit or detriment links it. */
+  async #onLinkDrop(event: DragEvent, key: 'benefits' | 'detriments', index: number) {
+    const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event)
+    if (!['Item', 'ActiveEffect', 'Actor'].includes(data?.type)) return
+    event.preventDefault()
+    event.stopPropagation()
+    const dropped: any = await fromUuid(data.uuid)
+    if (!dropped) return
+    const kind: LinkKind =
+      data.type === 'ActiveEffect' ? 'effect' : data.type === 'Actor' ? 'actor' : dropped.type === 'skill' || dropped.type === 'spell' ? dropped.type : 'item'
+    return this.#addBuildLink(key, index, { kind, name: dropped.name, uuid: dropped.uuid, ref: String(dropped.flags?.crawlspace?.sourceId ?? '') })
+  }
+
+  static async #onAddDamageLink(this: CrawlItemSheet, _event: PointerEvent, target: HTMLElement) {
+    const { list, index } = target.dataset
+    const type = (this.element.querySelector(`select[data-damage-for="${list}.${index}"]`) as HTMLSelectElement | null)?.value
+    if (type) return this.#addBuildLink(list as 'benefits' | 'detriments', Number(index), { kind: 'damage', name: type, uuid: '', ref: '' })
+  }
+
+  static async #onRemoveBuildLink(this: CrawlItemSheet, _event: PointerEvent, target: HTMLElement) {
+    const key = target.dataset.list as string
+    const list = this.item.system.toObject()[key]
+    const entry = list?.[Number(target.dataset.index)]
+    if (!entry?.links) return
+    entry.links.splice(Number(target.dataset.link), 1)
     await this.item.update({ [`system.${key}`]: list })
   }
 

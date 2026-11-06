@@ -7,6 +7,7 @@ import { normalizeGrinding } from '../rules/grinding.ts'
 import { effectPropertiesToActiveEffects, type CrawlEffectProperty } from '../effects/mapping.ts'
 import { debuffByName } from '../rules/debuffs.ts'
 import { raceClassGrant } from '../crawlspace-shared/shared/raceClassGrants.ts'
+import { linkedEffects } from '../rules/build-links.ts'
 import { durationSeconds, durationEvent } from '../rules/time.ts'
 
 export type ContentRow = { id: number; content_type: string; name: string; data: Record<string, any> }
@@ -360,7 +361,7 @@ export function raceClassEffects(data: Record<string, any>): CrawlEffectProperty
 
 /** A race or class's "Build" effect: the one the build tab keeps in step with its bonuses. */
 export function buildEffect(name: string, img: string, data: Record<string, any>) {
-  const effect = effectPropertiesToActiveEffects(raceClassEffects(data), { name, img }).effects[0]
+  const effect = effectPropertiesToActiveEffects([...raceClassEffects(data), ...linkedEffects(data)], { name, img }).effects[0]
   return effect ? { ...effect, flags: { crawlspace: { build: true } } } : null
 }
 
@@ -372,6 +373,7 @@ const benefitList = (value: unknown) =>
     count: Math.max(0, int(entry.count, 1)),
     target: str(entry.target),
     description: str(entry.description),
+    links: list(entry.links).filter((link) => link?.name),
   }))
 
 const TRAINING = ['standard', 'passive', 'unusual', 'unusualPassive']

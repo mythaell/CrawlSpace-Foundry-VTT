@@ -7,11 +7,12 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { convertRow } from '../src/import/convert.ts'
-import { ROOT, ITEM_TYPE_LABELS, compile, foldersFor, keyify, loadCrawlSpaceEnv, readContent, stamp, writeSource } from './lib.mjs'
+import { ROOT, ITEM_TYPE_LABELS, assertPacksClosed, compile, foldersFor, keyify, loadCrawlSpaceEnv, readContent, stamp, writeSource } from './lib.mjs'
 
 const PACKS = ['homebrew-skills', 'homebrew-spells', 'homebrew-items']
 const SRC = path.join(ROOT, 'packs-src')
 const OUT = path.join(ROOT, 'packs')
+assertPacksClosed(OUT)
 const offline = process.argv.includes('--offline')
 const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'system.json'), 'utf8')).version
 

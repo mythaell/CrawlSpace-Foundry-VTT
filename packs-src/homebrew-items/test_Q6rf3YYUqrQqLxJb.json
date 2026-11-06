@@ -47,7 +47,8 @@
         "tier": "minor",
         "count": 1,
         "target": "",
-        "description": "A specific Skill can reach Rank 20."
+        "description": "A specific Skill can reach Rank 20.",
+        "links": []
       },
       {
         "templateId": "combatHealing",
@@ -55,7 +56,8 @@
         "tier": "moderate",
         "count": 1,
         "target": "",
-        "description": "Heal one Health Bar slot after damaging/killing with a specified attack; maximum five per combat."
+        "description": "Heal one Health Bar slot after damaging/killing with a specified attack; maximum five per combat.",
+        "links": []
       },
       {
         "templateId": "flight",
@@ -63,7 +65,8 @@
         "tier": "epic",
         "count": 1,
         "target": "",
-        "description": "Fly without limitations."
+        "description": "Fly without limitations.",
+        "links": []
       },
       {
         "templateId": "limitedNoncombat",
@@ -71,7 +74,8 @@
         "tier": "extreme",
         "count": 1,
         "target": "",
-        "description": "Advantage on all Skills in a limited non-combat situation."
+        "description": "Advantage on all Skills in a limited non-combat situation.",
+        "links": []
       }
     ],
     "detriments": [],

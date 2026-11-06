@@ -77,6 +77,29 @@ export function writeSource(dir, docs) {
   }
 }
 
+/**
+ * Stop before deleting anything if Foundry has any of these packs open. On Windows an open pack's files can't be
+ * removed, so a rebuild would delete the closed packs and the manifest but leave the open ones, half a module.
+ * Renaming a folder fails while a file in it is open, so each pack folder is renamed and put back.
+ */
+export function assertPacksClosed(outDir) {
+  if (!fs.existsSync(outDir)) return
+  const busy = []
+  const packsRoot = fs.existsSync(path.join(outDir, 'packs')) ? path.join(outDir, 'packs') : outDir
+  for (const name of fs.readdirSync(packsRoot)) {
+    const dir = path.join(packsRoot, name)
+    if (!fs.statSync(dir).isDirectory()) continue
+    try {
+      fs.renameSync(dir, `${dir}.closed-check`)
+      fs.renameSync(`${dir}.closed-check`, dir)
+    } catch {
+      busy.push(name)
+    }
+  }
+  if (busy.length)
+    throw new Error(`Foundry has these packs open: ${busy.join(', ')}. Close Foundry (or the world using them) and run this again. Nothing was changed.`)
+}
+
 /** Compile a JSON source folder into a LevelDB pack, replacing any old build. */
 export async function compile(srcDir, packDir) {
   fs.rmSync(packDir, { recursive: true, force: true })

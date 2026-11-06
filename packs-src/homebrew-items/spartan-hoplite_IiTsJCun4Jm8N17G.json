@@ -71,7 +71,8 @@
         "tier": "",
         "count": 1,
         "target": "",
-        "description": "Once per day, give your allies in your party +1 DR if they are standing adjacent to you (3 Points)"
+        "description": "Once per day, give your allies in your party +1 DR if they are standing adjacent to you (3 Points)",
+        "links": []
       },
       {
         "templateId": "",
@@ -79,7 +80,8 @@
         "tier": "",
         "count": 1,
         "target": "",
-        "description": ""
+        "description": "",
+        "links": []
       }
     ],
     "detriments": [
@@ -89,7 +91,8 @@
         "tier": "",
         "count": 1,
         "target": "",
-        "description": ""
+        "description": "",
+        "links": []
       }
     ],
     "skillDetriments": [],

@@ -1,5 +1,6 @@
 import { clearKillingBlows } from '../effects/killing-blows'
 import { rankCap } from '../effects/rank-cap'
+import { advancementModifiers } from '../rules/build-links'
 import { upkeepAction } from '../socket'
 import { openGrinding } from './grinding'
 import { openAwards } from './awards'
@@ -67,6 +68,7 @@ export async function advanceMarked(actor: any, kind: AdvancementKind) {
     if (removed.length) await actor.deleteEmbeddedDocuments('Item', removed)
     lines.push(game.i18n.format('CRAWLSPACE.Upkeep.Learned', { name: actor.items.get(chosen).name }))
   }
+  const buildItems = actor.items.filter((item: any) => item.type === 'race' || item.type === 'class')
   for (const item of actor.items) {
     if (!['skill', 'spell'].includes(item.type) || !item.system.marked) continue
     const rank = Number(item.system.rank.base) || 0
@@ -80,9 +82,13 @@ export async function advanceMarked(actor: any, kind: AdvancementKind) {
       }
       continue
     }
-    const roll = await Roll.create('1d20').evaluate()
+    // Race and class benefits can add to the check, give it Advantage, or (detriments) take from it (build-links.ts).
+    const modifiers = advancementModifiers(buildItems, item.name, kind, rank)
+    const formula = `${modifiers.advantage ? '2d20kh' : '1d20'}${modifiers.bonus ? (modifiers.bonus > 0 ? ` + ${modifiers.bonus}` : ` - ${-modifiers.bonus}`) : ''}`
+    const roll = await Roll.create(formula).evaluate()
     const advanced = advances(roll.total, rank)
     lines.push(game.i18n.format(advanced ? 'CRAWLSPACE.Upkeep.Advanced' : 'CRAWLSPACE.Upkeep.NotAdvanced', { name: item.name, roll: roll.total, rank, next: rank + 1 }))
+    if (modifiers.sources.length) lines.push(game.i18n.format('CRAWLSPACE.Upkeep.AdvanceModifiers', { formula, sources: modifiers.sources.join(', ') }))
     updates.push({ _id: item.id, 'system.marked': false, ...(advanced ? { 'system.rank.value': item.system.rank.value + 1 } : {}) })
   }
   if (updates.length) await actor.updateEmbeddedDocuments('Item', updates)

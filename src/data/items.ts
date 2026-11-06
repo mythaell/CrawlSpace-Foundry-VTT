@@ -246,9 +246,26 @@ export class AbilityData extends foundry.abstract.TypeDataModel {
   }
 }
 
+/** Something a benefit or detriment names (build-links.ts): an item, effect or actor by UUID, or a damage type. */
+const linkSchema = () =>
+  new (f().SchemaField)({
+    kind: new (f().StringField)({ required: true, initial: 'skill', choices: ['skill', 'spell', 'item', 'effect', 'actor', 'damage'] }),
+    name: text(),
+    uuid: text(),
+    ref: text(),
+  })
+
 /** A benefit or detriment bought with build points (raceClassRules.ts createBuildEntry). */
 const benefitSchema = () =>
-  new (f().SchemaField)({ templateId: text(), name: text(), tier: text(), count: integer(1, { min: 0 }), target: text(), description: text() })
+  new (f().SchemaField)({
+    templateId: text(),
+    name: text(),
+    tier: text(),
+    count: integer(1, { min: 0 }),
+    target: text(),
+    description: text(),
+    links: new (f().ArrayField)(linkSchema()),
+  })
 
 /** Bonus ranks in a skill or spell: `ref` is its CrawlSpace record ("game-40"), `uuid` a Foundry item dropped on the build. */
 const rankBonusSchema = () =>
@@ -289,7 +306,7 @@ const buildSchema = () => {
 }
 
 /** Fields whose change rebuilds the "Build" effect. */
-export const BUILD_EFFECT_FIELDS = ['statBonuses', 'drBonus', 'skillBonuses', 'spellBonuses']
+export const BUILD_EFFECT_FIELDS = ['statBonuses', 'drBonus', 'skillBonuses', 'spellBonuses', 'benefits', 'detriments']
 
 export class RaceData extends foundry.abstract.TypeDataModel {
   [key: string]: any

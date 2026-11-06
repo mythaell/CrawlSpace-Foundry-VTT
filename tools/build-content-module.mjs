@@ -8,7 +8,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { convertRow, stableId } from '../src/import/convert.ts'
-import { ROOT, COLLECTION_FOR, ITEM_TYPE_LABELS, compile, foldersFor, keyify, loadCrawlSpaceEnv, readContent, stamp, writeSource } from './lib.mjs'
+import { ROOT, COLLECTION_FOR, ITEM_TYPE_LABELS, assertPacksClosed, compile, foldersFor, keyify, loadCrawlSpaceEnv, readContent, stamp, writeSource } from './lib.mjs'
 
 const MODULE_ID = 'crawlspace-content'
 const OUT = path.join(ROOT, 'build', MODULE_ID)
@@ -37,6 +37,7 @@ const PACKS = {
 
 const titleCase = (text) => String(text ?? '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 
+assertPacksClosed(OUT)
 loadCrawlSpaceEnv()
 const rows = await readContent(process.env.GAME_CONTENT_DATABASE_URL)
 // The rulebooks' reference tables ship with the CrawlSpace app rather than its database.
