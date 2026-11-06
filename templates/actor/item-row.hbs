@@ -14,7 +14,7 @@
       <span class="col">{{#if @root.editable}}<input type="text" value="{{item.system.range}}" data-item-field="system.range" aria-label="{{localize 'CRAWLSPACE.Item.Range'}}">{{else}}{{item.system.range}}{{/if}}</span>
       {{/if}}
       <span class="col">{{#if @root.editable}}<select data-item-field="system.checkType" aria-label="{{localize 'CRAWLSPACE.Item.CheckType'}}">{{selectOptions @root.checkChoices selected=item.system.checkType}}</select>{{else}}{{item.system.checkType}}{{/if}}</span>
-      <span class="col">{{#if @root.editable}}<input type="text" value="{{item.system.cooldown}}" data-item-field="system.cooldown" aria-label="{{localize 'CRAWLSPACE.Item.Cooldown'}}">{{else}}{{item.system.cooldown}}{{/if}}</span>
+      <span class="col">{{#if @root.editable}}<span class="time-input"><input type="text" value="{{item.system.cooldown}}" data-item-field="system.cooldown" aria-label="{{localize 'CRAWLSPACE.Item.Cooldown'}}"><a class="time-picker" data-time-picker data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span>{{else}}{{item.system.cooldown}}{{/if}}</span>
       <label class="col mark" data-tooltip="{{localize 'CRAWLSPACE.Item.MarkHint'}}"><input type="checkbox" {{checked item.system.marked}} data-item-field="system.marked" {{#unless @root.editable}}disabled{{/unless}}></label>
     {{else if (eq mode "inventory")}}
       <span class="col qty">

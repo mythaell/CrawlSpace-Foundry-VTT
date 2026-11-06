@@ -1,40 +1,48 @@
 <header class="pf-actor-header">
   <div class="pf-actor-title">
     <input class="pf-name" type="text" name="name" value="{{document.name}}">
-    <div class="pf-level-badge">{{levelLabel}} <input type="number" name="system.level" value="{{systemSource.level}}" min="0" aria-label="{{localize 'CRAWLSPACE.Crawler.Level'}}"></div>
+    <div class="pf-level-badge">{{localize "CRAWLSPACE.Crawler.Level"}} <input type="number" name="system.level" value="{{systemSource.level}}" min="0" aria-label="{{localize 'CRAWLSPACE.Crawler.Level'}}"></div>
   </div>
-  {{#if minion}}
-  <div class="minion-banner">
-    <i class="fa-solid fa-skull-crossbones"></i>
-    <span>{{localize "CRAWLSPACE.Minion.Of" caster=minion.caster}}{{#if minion.condition}} · {{minion.condition}}{{/if}}</span>
-    {{#if editable}}<button type="button" data-action="endMinion">{{localize "CRAWLSPACE.Minion.End"}}</button>{{/if}}
-  </div>
-  {{/if}}
-  {{#if companion}}
-  <div class="minion-banner companion-banner">
-    <i class="fa-solid fa-{{#if companion.vehicle}}horse{{else}}paw{{/if}}"></i>
-    {{#if companion.master}}
-    <a data-action="openMaster">{{localize "CRAWLSPACE.Companion.Of" name=companion.master}}</a>
-    {{#if editable}}<button type="button" data-action="clearMaster">{{localize "CRAWLSPACE.Companion.Unlink"}}</button>{{/if}}
+  {{#if follower}}
+  <div class="minion-banner {{#unless follower.raised}}companion-banner{{/unless}}">
+    <i class="fa-solid fa-{{follower.icon}}"></i>
+    {{#if follower.master}}
+    <a data-action="openMaster">{{#if follower.raised}}{{localize "CRAWLSPACE.Minion.Of" caster=follower.master}}{{else}}{{localize "CRAWLSPACE.Companion.Of" name=follower.master}}{{/if}}</a>
     {{else}}
-    <span>{{localize "CRAWLSPACE.Companion.NoMaster"}}</span>
+    <span>{{#if follower.raised}}{{localize "CRAWLSPACE.Minion.Of" caster=(localize "CRAWLSPACE.Minion.NoCaster")}}{{else}}{{localize "CRAWLSPACE.Companion.NoMaster"}}{{/if}}</span>
     {{/if}}
+    {{#if follower.condition}}<span>· {{follower.condition}}</span>{{/if}}
+    {{#if follower.canEnd}}<button type="button" data-action="endMinion">{{localize "CRAWLSPACE.Minion.End"}}</button>
+    {{else if (and follower.master editable)}}<button type="button" data-action="clearMaster">{{localize "CRAWLSPACE.Companion.Unlink"}}</button>{{/if}}
   </div>
   {{/if}}
   {{#if tagList.length}}<div class="pf-tags">{{#each tagList}}<span class="pf-tag">{{this}}</span>{{/each}}</div>{{/if}}
   <div class="pf-actor-fields">
-    <label><span>{{localize "CRAWLSPACE.Mob.Kind"}}</span><select name="system.kind">{{selectOptions kindChoices selected=systemSource.kind localize=true}}</select></label>
-    {{#if (eq systemSource.kind "boss")}}
-    <label><span>{{localize "CRAWLSPACE.Mob.BossTier"}}</span><select name="system.bossTier">{{selectOptions bossTierChoices selected=systemSource.bossTier}}</select></label>
-    {{/if}}
-    {{#unless companion}}<label><span>{{localize "CRAWLSPACE.Crawler.Floor"}}</span><input type="number" name="system.floor" value="{{systemSource.floor}}" min="0"></label>{{/unless}}
-    <label><span>{{localize "CRAWLSPACE.Crawler.Size"}}</span><select name="system.size">{{selectOptions sizeChoices selected=systemSource.size blank=""}}</select></label>
-    {{#if companion.vehicle}}
-    <label><span>{{localize "CRAWLSPACE.Companion.Occupants"}}</span><input type="text" name="system.companion.occupants" value="{{systemSource.companion.occupants}}"></label>
+    <label><span>{{localize "CRAWLSPACE.Mob.Kind"}}</span>
+      <span class="pf-kind">
+        <select name="system.kind">{{selectOptions kindChoices selected=systemSource.kind localize=true}}</select>
+        {{#if (eq systemSource.kind "boss")}}<select name="system.bossTier" aria-label="{{localize 'CRAWLSPACE.Mob.BossTier'}}" data-tooltip="{{localize 'CRAWLSPACE.Mob.BossTier'}}">{{selectOptions bossTierChoices selected=systemSource.bossTier}}</select>{{/if}}
+      </span>
+    </label>
+    {{#if companion}}
+    {{#if companion.vehicle}}<label><span>{{localize "CRAWLSPACE.Companion.Occupants"}}</span><input type="text" name="system.companion.occupants" value="{{systemSource.companion.occupants}}"></label>{{else}}<span></span>{{/if}}
     {{else}}
+    <label><span>{{localize "CRAWLSPACE.Crawler.Floor"}}</span><input type="number" name="system.floor" value="{{systemSource.floor}}" min="0"></label>
+    {{/if}}
+    <label><span>{{localize "CRAWLSPACE.Crawler.Size"}}</span><select name="system.size">{{selectOptions sizeChoices selected=systemSource.size blank=""}}</select></label>
     <label><span>{{localize "CRAWLSPACE.Mob.Type"}}</span><input type="text" name="system.type" value="{{systemSource.type}}" list="crawl-creature-types-{{document.id}}"></label>
     <datalist id="crawl-creature-types-{{document.id}}">{{#each creatureTypes}}<option value="{{this}}"></option>{{/each}}</datalist>
-    {{/if}}
-    <label class="wide"><span>{{localize "CRAWLSPACE.Mob.Tags"}}</span><input type="text" name="system.tags" value="{{systemSource.tags}}"></label>
+    <label class="span-2"><span>{{localize "CRAWLSPACE.Mob.Tags"}}</span><input type="text" name="system.tags" value="{{systemSource.tags}}"></label>
+  </div>
+  <div class="pf-stat-strip">
+    {{#each stats as |stat|}}
+    <span class="pf-strip-stat">
+      <a class="rollable code" data-action="rollStat" data-stat="{{stat.key}}" data-tooltip="{{stat.label}}">{{stat.code}}</a>
+      <input type="number" name="system.attributes.{{stat.key}}.value" value="{{crawlNumberOrBlank stat.source.value}}" aria-label="{{stat.label}}">
+      <span class="slash">/</span>
+      <a class="rollable mod" data-action="rollStat" data-stat="{{stat.key}}">{{crawlSigned stat.mod}}</a>
+    </span>
+    {{/each}}
+    {{#if statBudget}}<small class="pf-strip-budget {{#if statBudget.over}}over-budget{{/if}}" data-tooltip="{{localize 'CRAWLSPACE.Mob.StatBudgetHint'}}">{{localize "CRAWLSPACE.Mob.StatBudget" assigned=statBudget.assigned total=statBudget.total remaining=statBudget.remaining}}</small>{{else}}<small class="pf-strip-budget">{{localize "CRAWLSPACE.Mob.StatPoints" value=system.statPoints}}</small>{{/if}}
   </div>
 </header>

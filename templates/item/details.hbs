@@ -6,11 +6,11 @@
     <label>{{localize "CRAWLSPACE.Item.RankOverride"}}<input type="number" name="system.rank.override" value="{{crawlNumberOrBlank systemSource.rank.override}}" placeholder="—"></label>
     <label>{{localize "CRAWLSPACE.Item.ModOverride"}}<input type="number" name="system.rank.modOverride" value="{{crawlNumberOrBlank systemSource.rank.modOverride}}" placeholder="—"></label>
     <label>{{localize "CRAWLSPACE.Item.CheckType"}}<select name="system.checkType">{{selectOptions checkTypes selected=systemSource.checkType}}</select></label>
-    <label>{{localize "CRAWLSPACE.Item.Cooldown"}}<input type="text" name="system.cooldown" value="{{systemSource.cooldown}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Cooldown"}}<span class="time-input"><input type="text" name="system.cooldown" value="{{systemSource.cooldown}}"><a class="time-picker" data-time-picker data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span></label>
     {{#if (eq type "spell")}}
     <label>{{localize "CRAWLSPACE.Stat.Mana"}}<input type="text" name="system.mana" value="{{systemSource.mana}}"></label>
     <label>{{localize "CRAWLSPACE.Item.Range"}}<input type="text" name="system.range" value="{{systemSource.range}}"></label>
-    <label>{{localize "CRAWLSPACE.Item.Duration"}}<input type="text" name="system.duration" value="{{systemSource.duration}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Duration"}}<span class="time-input"><input type="text" name="system.duration" value="{{systemSource.duration}}"><a class="time-picker" data-time-picker data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span></label>
     <label>{{localize "CRAWLSPACE.Item.Usage"}}<select name="system.usage">{{selectOptions usageChoices selected=systemSource.usage localize=true}}</select></label>
     {{/if}}
     <label class="check"><input type="checkbox" name="system.isAttack" {{checked systemSource.isAttack}}> {{localize "CRAWLSPACE.Item.IsAttack"}}</label>
@@ -62,7 +62,7 @@
 
   {{#if (eq type "ability")}}
     <label>{{localize "CRAWLSPACE.Item.Category"}}<select name="system.category">{{selectOptions abilityCategories selected=systemSource.category localize=true}}</select></label>
-    <label>{{localize "CRAWLSPACE.Item.Cooldown"}}<input type="text" name="system.cooldown" value="{{systemSource.cooldown}}"></label>
+    <label>{{localize "CRAWLSPACE.Item.Cooldown"}}<span class="time-input"><input type="text" name="system.cooldown" value="{{systemSource.cooldown}}"><a class="time-picker" data-time-picker data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span></label>
   {{/if}}
 
   {{#if (eq type "background")}}

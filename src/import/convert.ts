@@ -579,7 +579,8 @@ export function companionToActor(name: string, data: Record<string, any>, kind: 
       healthPerSlotOverride: null,
       abilities: [...base.system.abilities, ...abilities],
       description: toHtml(data.description ?? data.flavor),
-      companion: { master: '', occupants: str(data.occupants), accessories: toHtml(data.accessories) },
+      master: '',
+      companion: { occupants: str(data.occupants), accessories: toHtml(data.accessories) },
     },
     prototypeToken: { ...base.prototypeToken, actorLink: true, disposition: 1 },
   }

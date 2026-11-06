@@ -1,16 +1,22 @@
 /**
- * Minions (minions.ts, PartySceneCanvas raiseTokenAsMinion). A "Raise as minion" condition landing on a mob
- * raises it: a `minion` actor copies the creature at half its Health slots, its token switches to that actor,
- * and the caster's players control it on the crawlers' side. When the minion dies or the raising condition
- * ends (removed, disabled or expired), its token returns to the mob as the dead creature it was.
- * The active GM's client does both, since players can't create actors or change others' tokens.
+ * Raised minions (minions.ts, PartySceneCanvas raiseTokenAsMinion). A "Raise as minion" condition landing on a
+ * mob turns that same mob into its caster's minion: it rises at half its Health slots, its tokens turn friendly,
+ * it fights on the crawlers' side, and the caster's players can move it and roll for it (but not edit it).
+ * Nothing else about the mob changes. When it dies again or the raising condition ends (removed, disabled or
+ * expired), it goes back to being the dead mob it was.
+ *
+ * The active GM's client does both, since players can't change others' ownership or tokens.
  */
 import { raisedHealth } from '../crawlspace-shared/shared/minions'
+import { ownersOf } from './companions'
 
 const RAISE = { type: 'crawlspace.special', key: 'raiseMinion' }
 
 export const raisesMinion = (effect: any) =>
   !effect.disabled && (effect.system?.changes ?? effect.changes ?? []).some((change: any) => change.type === RAISE.type && change.key === RAISE.key)
+
+/** Is this actor a mob raised as a minion right now? */
+export const isRaised = (actor: any) => !!actor?.system?.minion?.temporary
 
 /** The crawler who cast the raising condition: its origin's actor, else the applying user's character. */
 function casterOf(effect: any, userId: string) {
@@ -20,73 +26,82 @@ function casterOf(effect: any, userId: string) {
   return game.users.get(userId)?.character ?? null
 }
 
-/** The scene token showing this actor: its own token for an unlinked actor, else the first on the viewed scene. */
-const tokenOf = (actor: any) => actor.token ?? actor.getActiveTokens(false, true)[0] ?? null
+/** The token documents showing this actor: its own token if unlinked, else its tokens on every scene. */
+const tokensOf = (actor: any): any[] =>
+  actor.isToken ? [actor.token] : game.scenes.contents.flatMap((scene: any) => scene.tokens.filter((token: any) => token.actorLink && token.actorId === actor.id))
+
+const combatantsOf = (tokens: any[]) => {
+  const ids = new Set(tokens.map((token) => token.id))
+  return game.combats.contents.flatMap((combat: any) => combat.combatants.filter((entry: any) => ids.has(entry.tokenId)))
+}
+
+const card = (actor: any, content: string) => ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: `<div class="crawl-card"><p>${content}</p></div>` })
 
 export async function raiseMinion(effect: any, userId: string) {
   const mob = effect.parent
-  const token = tokenOf(mob)
-  if (!token) return ui.notifications.warn(game.i18n.format('CRAWLSPACE.Minion.NoToken', { name: mob.name }))
+  if (isRaised(mob)) return
   const caster = casterOf(effect, userId)
-  const data = mob.toObject()
   const max = Number(mob.system.health.max) || 1
   const health = raisedHealth(max)
-  // The caster's players own the minion, as the app hands it to the caster's controller.
-  const owners = Object.fromEntries(Object.entries(caster?.ownership ?? {}).filter(([id, level]) => id !== 'default' && Number(level) >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER))
-  const minion = await Actor.implementation.create({
-    name: mob.name,
-    type: 'minion',
-    img: mob.img,
-    system: { ...data.system, slotsLost: max - health, minion: { caster: caster?.uuid ?? '', condition: effect.name } },
-    items: data.items,
-    // It rises alive: the corpse's "dead" marker stays behind.
-    effects: data.effects.filter((entry: any) => !(entry.statuses ?? []).includes('dead')),
-    prototypeToken: { ...data.prototypeToken, actorLink: true, disposition: CONST.TOKEN_DISPOSITIONS.FRIENDLY },
-    ownership: { default: CONST.DOCUMENT_OWNERSHIP_LEVELS.NONE, ...owners },
-    flags: { crawlspace: { raisedFrom: mob.uuid } },
+  const owners = ownersOf(caster)
+  // What changes, so it can all go back: who owned it, who it followed, and which way each token faced.
+  const before = { ownership: foundry.utils.deepClone(mob.ownership), master: mob.system.master ?? '' }
+  await mob.update({
+    'system.master': caster?.uuid ?? '',
+    'system.minion': { temporary: true, condition: effect.name },
+    'system.slotsLost': max - health,
+    ownership: { ...mob.ownership, ...owners },
+    'flags.crawlspace.raised': before,
   })
-  const original = { actorId: token.actorId, actorLink: token.actorLink, disposition: token.disposition, delta: token.delta?.toObject?.() ?? null }
-  await token.update({ actorId: minion.id, actorLink: true, disposition: CONST.TOKEN_DISPOSITIONS.FRIENDLY, 'flags.crawlspace.raisedFrom': original })
-  for (const combatant of game.combats.contents.flatMap((combat: any) => combat.combatants.filter((entry: any) => entry.tokenId === token.id)))
-    await combatant.update({ actorId: minion.id, defeated: false })
-  await ChatMessage.create({
-    speaker: ChatMessage.getSpeaker({ actor: minion }),
-    content: `<div class="crawl-card"><p>${game.i18n.format('CRAWLSPACE.Minion.Raised', { name: foundry.utils.escapeHTML(mob.name), caster: foundry.utils.escapeHTML(caster?.name ?? game.i18n.localize('CRAWLSPACE.Minion.NoCaster')), health, max })}</p></div>`,
-  })
-  return minion
+  // It rises alive: the corpse's "dead" marker goes.
+  const dead = mob.effects.filter((entry: any) => entry.statuses?.has?.('dead')).map((entry: any) => entry.id)
+  if (dead.length) await mob.deleteEmbeddedDocuments('ActiveEffect', dead)
+  const tokens = tokensOf(mob)
+  for (const token of tokens)
+    await token.update({ disposition: CONST.TOKEN_DISPOSITIONS.FRIENDLY, 'flags.crawlspace.raisedDisposition': token.disposition })
+  for (const combatant of combatantsOf(tokens)) await combatant.update({ defeated: false })
+  const name = foundry.utils.escapeHTML(mob.name)
+  const casterName = foundry.utils.escapeHTML(caster?.name ?? game.i18n.localize('CRAWLSPACE.Minion.NoCaster'))
+  await card(mob, game.i18n.format('CRAWLSPACE.Minion.Raised', { name, caster: casterName, health, max }))
+  return mob
 }
 
 const ending = new Set<string>()
 
-/** End a minion: every token showing it goes back to its mob, dead, and the minion actor is deleted. */
-export async function endMinion(minion: any, reason: 'died' | 'ended' | 'released') {
-  if (ending.has(minion.id)) return
-  ending.add(minion.id)
+/** End a raised minion: it is the mob it was again, dead, with its old owners and token dispositions. */
+export async function endMinion(mob: any, reason: 'died' | 'ended' | 'released') {
+  if (!isRaised(mob) || ending.has(mob.uuid)) return
+  ending.add(mob.uuid)
   try {
-    for (const scene of game.scenes)
-      for (const token of scene.tokens.filter((entry: any) => entry.actorId === minion.id && entry.flags?.crawlspace?.raisedFrom)) {
-        const original = token.flags.crawlspace.raisedFrom
-        await token.update({ actorId: original.actorId, actorLink: original.actorLink, disposition: original.disposition, 'flags.crawlspace.-=raisedFrom': null })
-        if (!original.actorLink && original.delta) await token.delta?.update?.(original.delta, { diff: false, recursive: false })
-        const mob = token.actor
-        if (!mob) continue
-        // The creature was dead before it rose, and it is dead again; the raising condition stays with the minion.
-        const raises = mob.effects.filter(raisesMinion).map((effect: any) => effect.id)
-        if (raises.length) await mob.deleteEmbeddedDocuments('ActiveEffect', raises)
-        await mob.update({ 'system.slotsLost': Number(mob.system.health.max) || 0 })
-        if (!mob.statuses.has('dead')) await mob.toggleStatusEffect('dead', { active: true, overlay: true })
-        for (const combatant of game.combats.contents.flatMap((combat: any) => combat.combatants.filter((entry: any) => entry.tokenId === token.id)))
-          await combatant.update({ actorId: original.actorId, defeated: true })
-      }
-    await ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: minion }), content: `<div class="crawl-card"><p>${game.i18n.format(`CRAWLSPACE.Minion.Ended.${reason}`, { name: foundry.utils.escapeHTML(minion.name) })}</p></div>` })
-    await minion.delete()
+    const before = mob.flags?.crawlspace?.raised ?? { ownership: {}, master: '' }
+    // Owners the raising added go back to inheriting the default.
+    const ownership: Record<string, number> = { ...before.ownership }
+    for (const id of Object.keys(mob.ownership)) if (!(id in ownership)) ownership[id] = CONST.DOCUMENT_OWNERSHIP_LEVELS.INHERIT
+    await mob.update({
+      'system.master': before.master ?? '',
+      'system.minion': { temporary: false, condition: '' },
+      'system.slotsLost': Number(mob.system.health.max) || 0,
+      ownership,
+      'flags.crawlspace.-=raised': null,
+    })
+    const raises = mob.effects.filter(raisesMinion).map((effect: any) => effect.id)
+    if (raises.length) await mob.deleteEmbeddedDocuments('ActiveEffect', raises)
+    if (!mob.statuses.has('dead')) await mob.toggleStatusEffect('dead', { active: true, overlay: true })
+    const tokens = tokensOf(mob)
+    for (const token of tokens) {
+      const disposition = token.flags?.crawlspace?.raisedDisposition
+      if (disposition === undefined) continue
+      await token.update({ disposition, 'flags.crawlspace.-=raisedDisposition': null })
+    }
+    for (const combatant of combatantsOf(tokens)) await combatant.update({ defeated: true })
+    await card(mob, game.i18n.format(`CRAWLSPACE.Minion.Ended.${reason}`, { name: foundry.utils.escapeHTML(mob.name) }))
   } finally {
-    ending.delete(minion.id)
+    ending.delete(mob.uuid)
   }
 }
 
-/** A minion still raised: alive, with an active raising condition. */
-const stillRaised = (actor: any) => actor.effects.some(raisesMinion)
+/** Paths a player may still change on a raised minion they don't fully control: the damage it takes. */
+const PLAY_PATHS = ['system.slotsLost', 'flags']
 
 export function registerMinions() {
   Hooks.on('createActiveEffect', (effect: any, _options: any, userId: string) => {
@@ -96,13 +111,29 @@ export function registerMinions() {
   })
   const conditionGone = (effect: any) => {
     const actor = effect.parent
-    if (!game.user.isActiveGM || actor?.documentName !== 'Actor' || actor.type !== 'minion' || stillRaised(actor)) return
+    if (!game.user.isActiveGM || actor?.documentName !== 'Actor' || !isRaised(actor) || actor.effects.some(raisesMinion)) return
     endMinion(actor, 'ended').catch((error: any) => console.error('CrawlSpace | end minion', error))
   }
   Hooks.on('deleteActiveEffect', conditionGone)
   Hooks.on('updateActiveEffect', conditionGone)
   Hooks.on('updateActor', (actor: any) => {
-    if (!game.user.isActiveGM || actor.type !== 'minion' || Number(actor.system.health?.value) > 0) return
+    if (!game.user.isActiveGM || !isRaised(actor) || Number(actor.system.health?.value) > 0) return
     endMinion(actor, 'died').catch((error: any) => console.error('CrawlSpace | end minion', error))
   })
+
+  // Players move and roll for a raised minion but can't edit it.
+  const locked = () => {
+    ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Minion.Locked'))
+    return false
+  }
+  Hooks.on('preUpdateActor', (actor: any, changes: any, _options: any, userId: string) => {
+    if (!isRaised(actor) || game.users.get(userId)?.isGM) return
+    const paths = Object.keys(foundry.utils.flattenObject(changes)).filter((path) => path !== '_id')
+    if (paths.some((path) => !PLAY_PATHS.some((allowed) => path === allowed || path.startsWith(`${allowed}.`)))) return locked()
+  })
+  for (const hook of ['preCreateItem', 'preUpdateItem', 'preDeleteItem'])
+    Hooks.on(hook, (item: any, ...rest: any[]) => {
+      const userId = rest[rest.length - 1]
+      if (isRaised(item.parent) && !game.users.get(userId)?.isGM) return locked()
+    })
 }

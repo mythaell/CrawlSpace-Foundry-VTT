@@ -1501,6 +1501,17 @@
   .crawlspace.crawler .gold {
     display: flex;
   }
+  .crawlspace.crawler .inventory-top {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.2rem;
+  }
+  .crawlspace.crawler .loot-box-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+  }
 
   @container (max-width: 720px) {
     .crawlspace.crawler .char-intro,
@@ -2326,8 +2337,54 @@
   }
   .crawlspace .pf-actor-fields {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 4px 8px;
+  }
+  .crawlspace .pf-actor-fields label.span-2 {
+    grid-column: span 2;
+  }
+  .crawlspace .pf-kind {
+    display: flex;
+    gap: 4px;
+  }
+  .crawlspace .pf-kind select {
+    flex: 1;
+    min-width: 0;
+  }
+  .crawlspace .pf-stat-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 0;
+    padding: 4px 0 0;
+    border-top: 1px solid var(--dcc-blue-light);
+  }
+  .crawlspace .pf-strip-stat {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 5px;
+    font-size: 12px;
+  }
+  .crawlspace .pf-strip-stat + .pf-strip-stat {
+    border-left: 1px solid var(--dcc-blue-light);
+  }
+  .crawlspace .pf-strip-stat .code {
+    font-weight: 700;
+  }
+  .application.crawlspace .pf-strip-stat input {
+    width: 34px;
+    height: 22px;
+    text-align: center;
+  }
+  .crawlspace .pf-strip-stat .mod {
+    min-width: 22px;
+    font-weight: 700;
+  }
+  .crawlspace .pf-strip-budget {
+    flex-basis: 100%;
+    text-align: right;
+    font-size: 11px;
   }
   .crawlspace .pf-actor-fields label {
     display: flex;
@@ -2582,7 +2639,10 @@
   .crawlspace.crawler-awards .loot-gold input[type='number'] { width: 110px; }
   .crawlspace.crawler-awards .award-error { margin: 0; color: var(--crawl-bad); font-weight: 700; }
   .crawlspace.crawler-awards .form-footer { padding: 8px 10px; border-top: 1px solid var(--crawl-border); }
+  .crawlspace .loot-box-contents { grid-column: 1 / -1; }
   .crawlspace .loot-box-contents ul { margin: 4px 0; padding-left: 18px; }
+  .crawlspace .loot-box-contents .card-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+  .crawlspace .loot-box-contents .card-buttons button { flex: 0 0 auto; width: auto; white-space: nowrap; padding: 0 12px; }
   .crawl-card .system-ai { font-style: italic; }
 }
 
@@ -2774,4 +2834,126 @@
   .crawlspace .tab.build .build-mechanic {
     color: var(--crawl-good);
   }
+}
+
+/* ---- Upkeep participants and left-column buttons ---- */
+@layer system {
+  .application.crawlspace.upkeep-dialog .upkeep-participants {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2px 12px;
+  }
+  #scene-controls-layers .crawlspace-separator {
+    height: 0;
+    margin: 4px 6px;
+    border-top: 1px solid var(--color-border-light-2, rgba(255, 255, 255, 0.35));
+    pointer-events: none;
+  }
+}
+
+@layer system {
+  .crawlspace .time-input {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .crawlspace .time-input input {
+    flex: 1;
+    min-width: 0;
+  }
+  .crawlspace .time-input .time-picker {
+    flex: 0 0 auto;
+    opacity: 0.8;
+  }
+}
+
+@layer system {
+  #crawl-frames {
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 200px;
+    flex: 0 1 auto;
+    max-height: 60%;
+    overflow-y: auto;
+    margin-top: 8px;
+    color: var(--color-text-light-highlight, #f0f0e0);
+    font-size: 12px;
+  }
+  #crawl-frames .crawl-frames-inner { display: flex; flex-direction: column; gap: 6px; }
+  #crawl-frames .crawl-frames-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgb(0 0 0 / 60%);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  #crawl-frames .crawl-frame {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 5px 6px;
+    border: 1px solid var(--hud-cyan, #8cfff6);
+    border-radius: 4px;
+    background: rgb(8 12 20 / 82%);
+  }
+  #crawl-frames .crawl-frame h3 {
+    margin: 0;
+    border: none;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #crawl-frames .crawl-frame h3 small { font-weight: 400; opacity: 0.75; }
+  #crawl-frames .frame-health,
+  #crawl-frames .frame-mana {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 25%);
+    border-radius: 3px;
+    background: rgb(0 0 0 / 55%);
+  }
+  #crawl-frames .frame-health { height: 16px; }
+  #crawl-frames .frame-health[data-health-track] { cursor: ew-resize; touch-action: none; }
+  #crawl-frames .frame-mana { height: 6px; }
+  #crawl-frames .frame-health .fill,
+  #crawl-frames .frame-mana .fill { position: absolute; inset: 0 auto 0 0; }
+  #crawl-frames .frame-mana .fill { background: #3b7dff; }
+  #crawl-frames .frame-health span {
+    position: relative;
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 14px;
+    text-shadow: 0 0 3px #000;
+  }
+  #crawl-frames .frame-effects { display: flex; flex-wrap: wrap; gap: 3px; }
+  #crawl-frames .frame-effect {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border: 1px solid #3fae5a;
+    border-radius: 3px;
+    background: rgb(0 0 0 / 50%);
+  }
+  #crawl-frames .frame-effect.debuff { border-color: #d24a3c; }
+  #crawl-frames .frame-effect img { width: 100%; height: 100%; border: none; object-fit: cover; }
+  #crawl-frames .frame-effect b {
+    position: absolute;
+    right: -2px;
+    bottom: -3px;
+    font-size: 10px;
+    text-shadow: 0 0 2px #000, 0 0 2px #000;
+  }
+  #crawl-frames .frame-details { display: flex; flex-wrap: wrap; gap: 2px 8px; font-size: 11px; opacity: 0.9; }
+  #crawl-frames .frame-controls { display: flex; gap: 4px; }
+  #crawl-frames .frame-controls button { flex: 1; height: 22px; min-height: 22px; padding: 0 4px; font-size: 11px; line-height: 20px; }
 }

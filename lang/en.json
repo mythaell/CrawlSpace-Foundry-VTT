@@ -419,6 +419,17 @@
       "ClapAgainst": "Blade Clap against {attack}",
       "Clapped": "Blade Clap {total}"
     },
+    "Frames": {
+      "Title": "Crawlers",
+      "Show": "Show crawler frames",
+      "Hide": "Hide crawler frames",
+      "Setting": "Crawler frames",
+      "SettingHint": "Show the party's Health and Mana frames beside the scene list.",
+      "DragHealth": "Drag to set Health in 10% steps (arrow keys work too)",
+      "RightClick": "right-click to remove",
+      "Award": "Award",
+      "Effects": "Effects"
+    },
     "Upkeep": {
       "Button": "Upkeep",
       "Title": "Upkeep: {name}",
@@ -467,7 +478,10 @@
       "Untrained": "Learn an untrained skill",
       "UntrainedHint": "Choose one marked Rank 0 skill to learn at Rank 1. All other untrained skills are removed, as in CrawlSpace.",
       "Learned": "Learned {name} at Rank 1; other untrained skills removed.",
-      "AdvanceModifiers": "Rolled {formula} ({sources})."
+      "AdvanceModifiers": "Rolled {formula} ({sources}).",
+      "Go": "Go",
+      "Hours": "Hours",
+      "HoursError": "Enter 1–30 whole hours."
     },
     "Import": {
       "Character": "Import CrawlSpace character",
@@ -672,7 +686,8 @@
       "Save": "Set timer",
       "SetFloor": "Set floor-collapse timer",
       "FloorPrompt": "Set the remaining time before this floor collapses. A dungeon day lasts 30 hours.",
-      "OverflowHint": "Overflow is converted automatically: 90 minutes becomes 1 hour 30 minutes; 30 hours becomes 1 day."
+      "OverflowHint": "Overflow is converted automatically: 90 minutes becomes 1 hour 30 minutes; 30 hours becomes 1 day.",
+      "PickDuration": "Pick a time"
     },
     "Grinding": {
       "Title": "Grinding",
@@ -791,12 +806,16 @@
       "OpenConfirm": "Open {quantity} × {name} now? Boxes usually open during Safe Room upkeep.",
       "Opened": "{name} opens loot boxes",
       "Empty": "Empty",
-      "NoBoxes": "{name} has no sealed loot boxes."
+      "NoBoxes": "{name} has no sealed loot boxes.",
+      "Pending": "Loot boxes: {count}",
+      "NoPending": "No loot boxes waiting to open"
     },
     "Minion": {
       "Of": "Minion of {caster}",
       "End": "End minion",
       "NoCaster": "no caster",
+      "Label": "Minion",
+      "Locked": "A raised minion can be moved and rolled for, but only the GM can change it.",
       "NoToken": "{name} has no token on a scene to raise.",
       "Raised": "{name} rises as {caster}'s minion with {health} of {max} Health slots.",
       "Ended": {
@@ -806,16 +825,19 @@
       }
     },
     "Companion": {
-      "Title": "Pets & Mounts",
+      "Title": "Pets, Mounts & Minions",
       "pet": "Pet",
       "mount": "Mount",
       "vehicle": "Vehicle",
-      "Of": "Belongs to {name}",
-      "NoMaster": "Belongs to no crawler. Drop a crawler here to link one.",
+      "minion": "Minion",
+      "raised": "Raised minion",
+      "AddMinion": "New minion",
+      "Of": "Follows {name}",
+      "NoMaster": "Follows no crawler. Drop a crawler here to link one.",
       "Unlink": "Unlink",
       "AddPet": "New pet",
       "AddMount": "New mount",
-      "DropHint": "Drop a pet or mount actor here, or make one.",
+      "DropHint": "Drop a pet, mount or minion actor here, or make one.",
       "NewName": "{name}'s {kind}",
       "Occupants": "Occupants",
       "Accessories": "Accessories"

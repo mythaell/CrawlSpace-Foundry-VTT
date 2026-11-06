@@ -32,17 +32,4 @@
   </div>
   {{/if}}
   {{/each}}
-
-  <div class="pf-side-block">
-    <h4>{{localize "CRAWLSPACE.Section.Stats"}} {{#if statBudget}}<small class="{{#if statBudget.over}}over-budget{{/if}}" data-tooltip="{{localize 'CRAWLSPACE.Mob.StatBudgetHint'}}">{{localize "CRAWLSPACE.Mob.StatBudget" assigned=statBudget.assigned total=statBudget.total remaining=statBudget.remaining}}</small>{{else}}<small>{{localize "CRAWLSPACE.Mob.StatPoints" value=system.statPoints}}</small>{{/if}}</h4>
-    <div class="pf-side-stats">
-      {{#each stats as |stat|}}
-      <div class="pf-side-attr">
-        <a class="rollable" data-action="rollStat" data-stat="{{stat.key}}">{{stat.code}}</a>
-        <input type="number" name="system.attributes.{{stat.key}}.value" value="{{crawlNumberOrBlank stat.source.value}}" aria-label="{{stat.label}}">
-        <a class="rollable mod" data-action="rollStat" data-stat="{{stat.key}}">{{crawlSigned stat.mod}}</a>
-      </div>
-      {{/each}}
-    </div>
-  </div>
 </aside>

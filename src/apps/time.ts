@@ -1,7 +1,7 @@
 import { openGrinding } from './grinding'
 /** GM time controls and shared countdowns (partyTimers.ts); all game timers use core world time. */
 import { advanceTime } from '../time'
-import { formatTime, restSeconds, timeParts, timePartsSeconds, type TimeParts } from '../rules/time'
+import { durationSeconds, formatTime, restSeconds, timeParts, timePartsSeconds, type TimeParts } from '../rules/time'
 import { rest, advanceMarked } from './upkeep'
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
@@ -265,5 +265,47 @@ export function registerClock() {
     button.innerText = game.i18n.localize('CRAWLSPACE.Time.Title')
     button.addEventListener('click', openTime)
     html.querySelector('.directory-header')?.append(button)
+  })
+}
+
+/** Cooldown and duration text from a picked time: "1 day 2 hours 30 minutes", which durationSeconds reads back. */
+export function durationText(seconds: number) {
+  const parts = timeParts(seconds)
+  const unit = (value: number, one: string, many: string) => (value ? `${value} ${value === 1 ? one : many}` : '')
+  return [unit(parts.days, 'day', 'days'), unit(parts.hours, 'hour', 'hours'), unit(parts.minutes, 'minute', 'minutes'), unit(parts.seconds, 'second', 'seconds')]
+    .filter(Boolean)
+    .join(' ')
+}
+
+/**
+ * The clock button beside a cooldown or duration field: pick days, hours, minutes and seconds (overflow
+ * normalizes, with thirty-hour days), and the field gets the matching text. Prose such as "until the end of
+ * combat" can still be typed in the field itself.
+ */
+async function pickDuration(input: HTMLInputElement) {
+  const current = durationSeconds(input.value) ?? 0
+  const content = await foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/dialogs/time-fields.hbs', timeParts(current))
+  const answer = await foundry.applications.api.DialogV2.prompt({
+    window: { title: input.getAttribute('aria-label') || game.i18n.localize('CRAWLSPACE.Time.PickDuration') },
+    classes: ['crawlspace', 'time-panel'],
+    content,
+    rejectClose: false,
+    render: (_event: Event, dialog: any) => bindTimeFields(dialog.element),
+    ok: { label: game.i18n.localize('CRAWLSPACE.Time.Save'), callback: (_event: Event, button: any) => readTimeFields(button.form) },
+  })
+  if (answer == null || answer === false) return
+  input.value = durationText(answer)
+  input.dispatchEvent(new Event('change', { bubbles: true }))
+}
+
+/** One listener for every time-picker button, wherever a sheet renders one. */
+export function registerTimePickers() {
+  document.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement)?.closest?.('[data-time-picker]')
+    if (!button) return
+    event.preventDefault()
+    event.stopPropagation()
+    const input = button.parentElement?.querySelector('input') as HTMLInputElement | null
+    if (input && !input.disabled && !input.readOnly) pickDuration(input).catch(() => ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Time.InvalidDuration')))
   })
 }

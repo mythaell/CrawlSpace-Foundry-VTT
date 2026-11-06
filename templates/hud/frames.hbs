@@ -1,0 +1,42 @@
+<div class="crawl-frames-inner">
+  {{#if frames.length}}
+  <header class="crawl-frames-head">
+    <span>{{localize "CRAWLSPACE.Frames.Title"}}</span>
+    <a data-action="toggle" data-tooltip="{{#if collapsed}}{{localize 'CRAWLSPACE.Frames.Show'}}{{else}}{{localize 'CRAWLSPACE.Frames.Hide'}}{{/if}}"><i class="fa-solid fa-chevron-{{#if collapsed}}down{{else}}up{{/if}}"></i></a>
+  </header>
+  {{/if}}
+  {{#unless collapsed}}
+  {{#each frames as |frame|}}
+  <section class="crawl-frame" data-uuid="{{frame.uuid}}">
+    <h3><a data-action="openSheet">{{frame.name}}</a>{{#if frame.players}} <small>({{frame.players}})</small>{{/if}}</h3>
+    <div class="frame-health" data-pct="{{frame.pct}}" {{#if @root.gm}}data-health-track tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{frame.pct}}" data-tooltip="{{localize 'CRAWLSPACE.Frames.DragHealth'}}"{{else}}data-tooltip="{{localize 'CRAWLSPACE.Stat.Health'}}: {{frame.pct}}%"{{/if}} aria-label="{{frame.name}} {{localize 'CRAWLSPACE.Stat.Health'}}">
+      <div class="fill" style="width: {{frame.pct}}%; background-color: {{frame.color}}"></div>
+      <span>{{frame.pct}}%</span>
+    </div>
+    <div class="frame-mana" data-tooltip="{{localize 'CRAWLSPACE.Stat.Mana'}}: {{frame.mana.value}} / {{frame.mana.max}}">
+      <div class="fill" style="width: {{frame.mana.pct}}%"></div>
+    </div>
+    {{#if frame.effects.length}}
+    <div class="frame-effects">
+      {{#each frame.effects as |effect|}}
+      <span class="frame-effect {{effect.kind}}" data-effect-id="{{effect.id}}" data-tooltip="{{effect.tooltip}}{{#if frame.canEdit}} — {{localize 'CRAWLSPACE.Frames.RightClick'}}{{/if}}"><img src="{{effect.img}}" alt="{{effect.name}}">{{#if effect.stacks}}<b>{{effect.stacks}}</b>{{/if}}</span>
+      {{/each}}
+    </div>
+    {{/if}}
+    {{#if frame.details}}
+    <div class="frame-details">
+      <span>{{localize "CRAWLSPACE.Stat.Evade"}} {{frame.details.evade}}</span>
+      <span>{{localize "CRAWLSPACE.Stat.DR"}} {{frame.details.dr}}</span>
+      <span>{{localize "CRAWLSPACE.Crawler.Level"}} {{frame.details.level}}</span>
+      <span>{{frame.details.race}}</span>
+      <span>{{frame.details.className}}</span>
+    </div>
+    <div class="frame-controls">
+      <button type="button" data-action="award"><i class="fa-solid fa-trophy"></i> {{localize "CRAWLSPACE.Frames.Award"}}</button>
+      <button type="button" data-action="effects"><i class="fa-solid fa-person-rays"></i> {{localize "CRAWLSPACE.Frames.Effects"}}</button>
+    </div>
+    {{/if}}
+  </section>
+  {{/each}}
+  {{/unless}}
+</div>

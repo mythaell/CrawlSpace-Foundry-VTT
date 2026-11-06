@@ -59,13 +59,14 @@
       {{#if editable}}
       <button type="button" data-action="addCompanion" data-kind="pet" data-tooltip="{{localize 'CRAWLSPACE.Companion.AddPet'}}"><i class="fa-solid fa-paw"></i></button>
       <button type="button" data-action="addCompanion" data-kind="mount" data-tooltip="{{localize 'CRAWLSPACE.Companion.AddMount'}}"><i class="fa-solid fa-horse"></i></button>
+      <button type="button" data-action="addCompanion" data-kind="minion" data-tooltip="{{localize 'CRAWLSPACE.Companion.AddMinion'}}"><i class="fa-solid fa-user-shield"></i></button>
       {{/if}}
     </div>
     {{#each companions as |companion|}}
     <div class="companion-row" data-uuid="{{companion.uuid}}">
       <img src="{{companion.img}}" alt="">
       <a data-action="openCompanion"><b>{{companion.name}}</b><small>{{companion.kind}} · {{companion.health.value}}/{{companion.health.max}}</small></a>
-      {{#if @root.editable}}<button type="button" class="icon" data-action="unlinkCompanion" data-tooltip="{{localize 'CRAWLSPACE.Companion.Unlink'}}"><i class="fa-solid fa-link-slash"></i></button>{{/if}}
+      {{#if (and @root.editable (not companion.raised))}}<button type="button" class="icon" data-action="unlinkCompanion" data-tooltip="{{localize 'CRAWLSPACE.Companion.Unlink'}}"><i class="fa-solid fa-link-slash"></i></button>{{/if}}
     </div>
     {{else}}
     <p class="hint">{{localize "CRAWLSPACE.Companion.DropHint"}}</p>
@@ -78,5 +79,4 @@
   <label><span>{{localize "CRAWLSPACE.Stat.Step"}}</span><input type="text" value="{{system.step.total}}" readonly tabindex="-1"></label>
   <label data-tooltip="{{localize 'CRAWLSPACE.Stat.ActionsHint'}}"><span>{{localize "CRAWLSPACE.Stat.Actions"}}</span><input type="text" value="{{system.actions.total}}" readonly tabindex="-1"></label>
   {{#if editable}}<button type="button" class="upkeep-button" data-action="upkeep">{{localize "CRAWLSPACE.Upkeep.Button"}}</button>{{/if}}
-  {{#if isGM}}<button type="button" class="upkeep-button" data-action="awards"><i class="fa-solid fa-trophy"></i> {{localize "CRAWLSPACE.Awards.Button"}}</button>{{/if}}
 </aside>

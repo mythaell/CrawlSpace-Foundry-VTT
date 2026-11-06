@@ -308,6 +308,12 @@ const mobAttackSchema = () => {
 
 /** Mobs, bosses and the stat blocks of hostile NPCs. */
 export class MobData extends CrawlActorData {
+  /** The crawler link used to live on `companion.master` (pets) and `minion.caster` (minions). */
+  static migrateData(source: any) {
+    if (!source.master) source.master = source.companion?.master || source.minion?.caster || ''
+    return super.migrateData(source)
+  }
+
   static defineSchema() {
     const fields = f()
     return {
@@ -327,6 +333,14 @@ export class MobData extends CrawlActorData {
       healthSlotsOverride: optionalNumber({ integer: true }),
       healthPerSlotOverride: optionalNumber({ integer: true }),
       abilities: new fields.ArrayField(new fields.SchemaField({ name: text(), description: text() })),
+      /** UUID of the crawler it follows (a pet, mount, hired or raised minion); that crawler's players own it. */
+      master: new fields.StringField({ required: true, blank: true }),
+      /** Raised by a spell (minions.ts): a mob fighting for its master until it dies again or the spell ends. */
+      minion: new fields.SchemaField({
+        temporary: new fields.BooleanField(),
+        /** Name of the raising condition, for the sheet and chat. */
+        condition: text(),
+      }),
       /** Health slots lost so far. */
       slotsLost: integer(0, { min: 0 }),
       attacks: new fields.ArrayField(mobAttackSchema()),
@@ -381,23 +395,10 @@ export class MobData extends CrawlActorData {
 }
 
 /**
- * A creature raised as a crawler's minion (minions.ts PartyMinion): its own copy of the mob, fighting on the
- * crawlers' side under its caster's players, until it dies or the condition that raised it ends.
+ * A crawler's minion that isn't a raised mob: hired, summoned or otherwise its own creature. It uses the mob
+ * sheet and follows the crawler in `master`. (Raised mobs stay mobs; see minions.ts.)
  */
-export class MinionData extends MobData {
-  static defineSchema() {
-    const fields = f()
-    return {
-      ...super.defineSchema(),
-      minion: new fields.SchemaField({
-        /** UUID of the crawler whose condition raised it. */
-        caster: new fields.StringField({ required: true, blank: true }),
-        /** Name of the raising condition, for the sheet and chat. */
-        condition: text(),
-      }),
-    }
-  }
-}
+export class MinionData extends MobData {}
 
 /**
  * Pets, mounts and vehicles (mobRules.ts getMobDerived, CompanionFields.tsx). A creature sheet with 10 Health
@@ -412,8 +413,6 @@ export class CompanionData extends MobData {
       kind: new fields.StringField({ required: true, initial: 'pet', choices: ['pet', 'mount', 'vehicle'] }),
       size: text('4'),
       companion: new fields.SchemaField({
-        /** UUID of the crawler it belongs to. */
-        master: new fields.StringField({ required: true, blank: true }),
         occupants: text(),
         accessories: html(),
       }),

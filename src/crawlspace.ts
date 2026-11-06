@@ -2,7 +2,8 @@ import { CrawlRoll } from './dice/crawl-roll'
 import { openGrinding } from './apps/grinding'
 import { openAwards } from './apps/awards'
 import { registerImmunity } from './effects/immunity'
-import { openTime, registerClock } from './apps/time'
+import { openTime, registerClock, registerTimePickers } from './apps/time'
+import { registerFrames } from './apps/frames'
 import { advanceTime, settleTime, registerTime } from './time'
 import * as config from './config'
 import { CompanionData, CrawlerData, MinionData, MobData, NpcData } from './data/actors'
@@ -167,6 +168,8 @@ Hooks.once('init', () => {
   registerChatHandlers()
   CONFIG.Dice.rolls.unshift(CrawlRoll)
   registerClock()
+  registerTimePickers()
+  registerFrames()
   registerUpkeep()
 
   game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
@@ -196,13 +199,6 @@ async function createItemMacro(data: any, slot: number) {
 
 /** Actors directory gets "Build a crawler" and "Import CrawlSpace character" buttons. */
 Hooks.on('renderActorDirectory', (_app: any, html: HTMLElement) => {
-  if (!html.querySelector('.crawlspace-time')) {
-    const clock = document.createElement('button')
-    clock.className = 'crawlspace-time'
-    clock.innerText = game.i18n.localize('CRAWLSPACE.Time.Title')
-    clock.addEventListener('click', openTime)
-    html.querySelector('.header-actions')?.append(clock)
-  }
   // Every user may build a crawler; a player without actor creation sends it to the GM.
   if (!html.querySelector('.crawlspace-builder')) {
     const build = document.createElement('button')

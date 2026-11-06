@@ -155,26 +155,46 @@ export async function performUpkeep(uuids: string[], kind: string, hours = 1, sk
 export async function openUpkeep(actor?: any) {
   const gm = game.user.isGM
   if (!gm && !game.settings.get('crawlspace', 'playerUpkeep')) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Upkeep.GMRequired'))
-  const actors = actor ? [actor] : game.actors.filter((entry: any) => entry.type === 'crawler')
+  const actors = (actor ? [actor] : game.actors.filter((entry: any) => entry.type === 'crawler')).sort((a: any, b: any) => a.name.localeCompare(b.name))
   const esc = foundry.utils.escapeHTML
-  const labels = ['short', 'long', 'full', 'hourly', 'safeRoom', 'session', 'floor', 'grinding', 'assign', ...(gm ? ['level', 'awards', 'time'] : [])]
+  const labels = ['short', 'long', 'full', 'hourly', 'safeRoom', 'session', 'floor', 'grinding', 'assign', ...(gm ? ['level', 'awards'] : [])]
   const content = `<p>${game.i18n.localize(gm ? 'CRAWLSPACE.Upkeep.Hint' : 'CRAWLSPACE.Upkeep.NoTime')}</p>
-    ${actors.map((entry: any) => `<label class="upkeep-participant"><input type="checkbox" name="actor" value="${esc(entry.uuid)}" checked> ${esc(entry.name)}</label>`).join('')}
-    <div class="form-group"><label>${game.i18n.localize('CRAWLSPACE.Time.Hours')}</label><input name="hours" type="number" min="1" max="30" value="1"></div>`
+    <div class="upkeep-participants">${actors.map((entry: any) => `<label class="upkeep-participant"><input type="checkbox" name="actor" value="${esc(entry.uuid)}" checked> ${esc(entry.name)}</label>`).join('')}</div>`
   const answer = await foundry.applications.api.DialogV2.wait({
     window: { title: game.i18n.localize('CRAWLSPACE.Upkeep.Party') }, position: { width: 560 }, content, rejectClose: false,
     classes: ['crawlspace', 'upkeep-dialog'],
-    buttons: labels.map((kind) => ({ action: kind, label: game.i18n.localize(`CRAWLSPACE.Upkeep.Actions.${kind}`), callback: (_event: Event, button: any) => ({ kind, hours: Number(button.form.elements.hours.value), uuids: [...button.form.querySelectorAll('[name=actor]:checked')].map((input: any) => input.value) }) })),
+    buttons: labels.map((kind) => ({ action: kind, label: game.i18n.localize(`CRAWLSPACE.Upkeep.Actions.${kind}`), callback: (_event: Event, button: any) => ({ kind, uuids: [...button.form.querySelectorAll('[name=actor]:checked')].map((input: any) => input.value) }) })),
   })
   if (!answer) return
-  if (answer.kind === 'time') return openTime()
   const chosen = actors.filter((entry: any) => answer.uuids.includes(entry.uuid))
   if (!chosen.length) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Time.SelectActors'))
   try {
     if (answer.kind === 'awards') return openAwards(chosen)
     if (answer.kind === 'assign') { for (const entry of chosen) await assignStats(entry); return }
-    return await upkeepAction(answer.uuids, answer.kind, answer.hours)
+    // Only the actions that take hours ask for them.
+    let hours = 1
+    if (answer.kind === 'hourly' || answer.kind === 'grinding') {
+      const picked = await askHours(game.i18n.localize(`CRAWLSPACE.Upkeep.Actions.${answer.kind}`))
+      if (picked === null) return
+      hours = picked
+    }
+    return await upkeepAction(answer.uuids, answer.kind, hours)
   } catch (error: any) { ui.notifications.error(error.message) }
+}
+
+/** A small prompt for how many hours an upkeep action takes (1–30, one dungeon day). */
+async function askHours(title: string): Promise<number | null> {
+  const value = await foundry.applications.api.DialogV2.prompt({
+    window: { title }, classes: ['crawlspace'], rejectClose: false,
+    content: `<div class="form-group"><label>${game.i18n.localize('CRAWLSPACE.Upkeep.Hours')}</label><input name="hours" type="number" min="1" max="30" step="1" value="1" autofocus></div>`,
+    ok: { label: game.i18n.localize('CRAWLSPACE.Upkeep.Go'), callback: (_event: Event, button: any) => Number(button.form.elements.hours.value) },
+  })
+  if (value === null || value === undefined) return null
+  if (!Number.isSafeInteger(value) || value < 1 || value > 30) {
+    ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Upkeep.HoursError'))
+    return null
+  }
+  return value
 }
 
 export function registerUpkeep() {
@@ -182,8 +202,40 @@ export function registerUpkeep() {
     name: 'CRAWLSPACE.Upkeep.PlayerSetting', hint: 'CRAWLSPACE.Upkeep.PlayerSettingHint',
     scope: 'world', config: true, restricted: true, type: Boolean, default: false,
   })
-  Hooks.on('getSceneControlButtons', (controls: any) => {
-    if (!game.user.isGM || !controls.tokens) return
-    controls.tokens.tools.crawlspaceUpkeep = { name: 'crawlspaceUpkeep', title: 'CRAWLSPACE.Upkeep.Party', icon: 'fa-solid fa-campground', button: true, onChange: () => openUpkeep() }
+  // Party Upkeep and Timers sit in the left column under Journal, set apart from Regions by a separator.
+  // Foundry's top-level controls are canvas layers rather than buttons, so these join the rendered column.
+  Hooks.on('renderSceneControls', (_app: any, html: HTMLElement) => {
+    const menu = html.querySelector('#scene-controls-layers') ?? html.querySelector('menu')
+    const journal = menu?.querySelector('[data-control="notes"]')?.closest('li')
+    if (!menu || !journal || menu.querySelector('.crawlspace-control')) return
+    const button = (name: string, icon: string, title: string, onClick: () => unknown) => {
+      const li = document.createElement('li')
+      li.className = 'crawlspace-control'
+      const element = document.createElement('button')
+      element.type = 'button'
+      element.className = `control ui-control layer icon ${icon}`
+      element.dataset.crawlspaceControl = name
+      element.dataset.tooltip = game.i18n.localize(title)
+      element.setAttribute('aria-label', game.i18n.localize(title))
+      element.addEventListener('click', (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        onClick()
+      })
+      li.append(element)
+      return li
+    }
+    const added: HTMLElement[] = []
+    if (game.user.isGM || game.settings.get('crawlspace', 'playerUpkeep')) added.push(button('upkeep', 'fa-solid fa-campground', 'CRAWLSPACE.Upkeep.Party', () => openUpkeep()))
+    if (game.user.isGM) added.push(button('timers', 'fa-solid fa-hourglass-half', 'CRAWLSPACE.Time.Title', () => openTime()))
+    journal.after(...added)
+    const separator = document.createElement('li')
+    separator.className = 'crawlspace-control crawlspace-separator'
+    separator.setAttribute('role', 'separator')
+    const regions = menu.querySelector('[data-control="regions"]')?.closest('li')
+    const items = [...menu.children]
+    // Between the Journal group and Regions, whichever comes first.
+    if (regions && items.indexOf(regions) < items.indexOf(journal)) journal.before(separator)
+    else (added.at(-1) ?? journal).after(separator)
   })
 }
