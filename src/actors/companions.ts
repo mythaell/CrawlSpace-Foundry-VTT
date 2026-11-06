@@ -30,6 +30,24 @@ export function followersOf(crawler: any): any[] {
   return [...found.values()].sort((a, b) => ORDER[followerKind(a)] - ORDER[followerKind(b)] || a.name.localeCompare(b.name))
 }
 
+/**
+ * Where an actor sits in a crawler-first list: each crawler (by name) followed by its pets, mounts and minions,
+ * then everything else by name. Followers of a crawler that isn't in the list still sort with the crawlers.
+ */
+export function partyOrder(actor: any): { group: number; key: string; follower: boolean; kind: number } {
+  if (actor?.type === 'crawler') return { group: 0, key: actor.name.toLowerCase(), follower: false, kind: -1 }
+  const master = actor?.system?.master ? fromUuidSync(actor.system.master) : null
+  if (master?.type === 'crawler') return { group: 0, key: master.name.toLowerCase(), follower: true, kind: ORDER[followerKind(actor)] ?? 9 }
+  return { group: 1, key: String(actor?.name ?? '').toLowerCase(), follower: false, kind: -1 }
+}
+
+/** Compare two actors (or anything with a name) in crawler-first order. */
+export function comparePartyOrder(a: any, b: any, nameA = a?.name ?? '', nameB = b?.name ?? '') {
+  const x = partyOrder(a)
+  const y = partyOrder(b)
+  return x.group - y.group || x.key.localeCompare(y.key) || Number(x.follower) - Number(y.follower) || x.kind - y.kind || String(nameA).localeCompare(String(nameB))
+}
+
 /** Make a pet, mount or minion follow a crawler: it records the crawler, and the crawler's owners own it too. */
 export async function linkFollower(actor: any, crawler: any) {
   if (crawler?.type !== 'crawler' || !('master' in (actor.system ?? {}))) return
@@ -86,6 +104,8 @@ export function registerCompanions() {
   Hooks.on('createActor', refresh)
   Hooks.on('updateActor', (actor: any, changes: any) => {
     refresh(actor)
+    // The Actors sidebar regroups when something starts or stops following a crawler.
+    if (changes.system && 'master' in changes.system) ui.actors?.render()
     if (actor.type !== 'crawler' || !changes.ownership || !game.user.isActiveGM) return
     for (const follower of followersOf(actor)) {
       const missing = Object.entries(ownersOf(actor)).filter(([id, level]) => Number(follower.ownership[id] ?? -1) < level)
@@ -93,4 +113,26 @@ export function registerCompanions() {
     }
   })
   Hooks.on('deleteActor', refresh)
+}
+
+/**
+ * The Actors sidebar in crawler-first order: crawlers on top, each followed by its pets, mounts and minions
+ * (indented, even if they sit in another folder), then everything else. Folders keep their place.
+ */
+export function groupActorDirectory(root: HTMLElement) {
+  const entries = [...root.querySelectorAll<HTMLElement>('li.directory-item[data-entry-id]')]
+  const actorOf = (li: HTMLElement) => game.actors.get(li.dataset.entryId)
+  for (const list of new Set(entries.map((li) => li.parentElement).filter(Boolean)) as Set<HTMLElement>) {
+    const own = [...list.children].filter((child): child is HTMLElement => entries.includes(child as HTMLElement))
+    own.sort((a, b) => comparePartyOrder(actorOf(a), actorOf(b))).forEach((li) => list.append(li))
+  }
+  const byId = new Map(entries.map((li) => [li.dataset.entryId, li]))
+  const followers = entries.filter((li) => partyOrder(actorOf(li)).follower).sort((a, b) => comparePartyOrder(actorOf(a), actorOf(b)))
+  for (const li of entries) li.classList.toggle('crawl-follower', followers.includes(li))
+  for (const li of followers) {
+    let anchor = byId.get(fromUuidSync(actorOf(li).system.master)?.id)
+    if (!anchor) continue
+    while (anchor.nextElementSibling?.classList.contains('crawl-follower') && anchor.nextElementSibling !== li) anchor = anchor.nextElementSibling as HTMLElement
+    if (anchor !== li) anchor.after(li)
+  }
 }

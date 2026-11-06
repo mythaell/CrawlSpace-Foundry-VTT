@@ -4,12 +4,13 @@ import { openAwards } from './apps/awards'
 import { registerImmunity } from './effects/immunity'
 import { openTime, registerClock, registerTimePickers } from './apps/time'
 import { registerFrames } from './apps/frames'
+import { registerConditionDrops } from './effects/use-conditions'
 import { advanceTime, settleTime, registerTime } from './time'
 import * as config from './config'
 import { CompanionData, CrawlerData, MinionData, MobData, NpcData } from './data/actors'
 import { registerMinions } from './actors/minions'
 import { registerLight } from './actors/light'
-import { registerCompanions } from './actors/companions'
+import { groupActorDirectory, registerCompanions } from './actors/companions'
 import { openBuilder, registerBuilder } from './apps/builder'
 import { registerDatabaseRows } from './loot/database'
 import * as items from './data/items'
@@ -170,6 +171,7 @@ Hooks.once('init', () => {
   registerClock()
   registerTimePickers()
   registerFrames()
+  registerConditionDrops()
   registerUpkeep()
 
   game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
@@ -199,6 +201,7 @@ async function createItemMacro(data: any, slot: number) {
 
 /** Actors directory gets "Build a crawler" and "Import CrawlSpace character" buttons. */
 Hooks.on('renderActorDirectory', (_app: any, html: HTMLElement) => {
+  groupActorDirectory(html)
   // Every user may build a crawler; a player without actor creation sends it to the GM.
   if (!html.querySelector('.crawlspace-builder')) {
     const build = document.createElement('button')

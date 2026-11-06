@@ -2957,3 +2957,21 @@
   #crawl-frames .frame-controls { display: flex; gap: 4px; }
   #crawl-frames .frame-controls button { flex: 1; height: 22px; min-height: 22px; padding: 0 4px; font-size: 11px; line-height: 20px; }
 }
+
+@layer system {
+  .crawl-conditions h4 { margin: 0 0 4px; }
+  .crawl-conditions .condition-row { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+  .crawl-conditions .condition-row .content-link { flex: 1; display: flex; align-items: center; gap: 4px; }
+  .crawl-conditions .condition-row .content-link img { width: 20px; height: 20px; border: none; }
+  .crawl-conditions .condition-row button { flex: none; width: auto; height: 24px; line-height: 22px; padding: 0 8px; font-size: 12px; }
+}
+
+@layer system {
+  .crawl-tracker .token-initiative,
+  .crawl-tracker [data-action="rollAll"],
+  .crawl-tracker [data-action="rollNPC"] { display: none; }
+  .crawl-tracker .combatant.crawl-follower { padding-left: 22px; }
+  .crawl-tracker .combatant.crawl-follower::before { content: "\21B3"; margin-right: 2px; opacity: 0.6; }
+  #actors .directory-item.crawl-follower { padding-left: 20px; }
+  #actors .directory-item.crawl-follower::before { content: "\21B3"; align-self: center; margin-right: 2px; opacity: 0.6; }
+}

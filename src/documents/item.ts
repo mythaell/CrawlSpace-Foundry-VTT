@@ -5,6 +5,7 @@ import { itemCooldown, withCooldowns } from '../effects/cooldowns'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage, type Modifier } from '../dice/rolls'
 import { STATS, statKeyFromCode } from '../config'
 import { attackWithRow, rowForItem, withEffectBonuses } from '../actors/attacks'
+import { postConditionCard } from '../effects/use-conditions'
 
 /** Targeted tokens, or the user themself when nothing is targeted. */
 const healTargets = (actor: any): string[] => {
@@ -82,7 +83,12 @@ export class CrawlItem extends Item {
     switch (this.type) {
       case 'skill':
       case 'spell':
-        return withCooldowns(actor, [itemCooldown(this)], () => this.#useRanked(options))
+        return withCooldowns(actor, [itemCooldown(this)], async () => {
+          const result = await this.#useRanked(options)
+          // A use that went ahead (paid, rolled) offers its conditions to apply.
+          if (result) await postConditionCard(this)
+          return result
+        })
       case 'weapon':
         return this.#useWeapon(options)
       case 'consumable':

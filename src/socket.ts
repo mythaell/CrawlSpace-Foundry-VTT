@@ -1,5 +1,6 @@
 import { performUpkeep } from './apps/upkeep'
 import { createBuiltCrawler, type Draft } from './apps/builder'
+import { giveCondition, mayGive } from './effects/use-conditions'
 /**
  * GM relay. Players can't update actors or combats they don't own, so those requests travel over the system
  * socket and the active GM's client performs them. Only whitelisted methods can be called this way.
@@ -15,6 +16,7 @@ type Request =
   | { type: 'combat'; combatId: string; method: string; args: unknown[]; userId: string }
   | { type: 'buildCrawler'; draft: Draft; userId: string }
   | { type: 'builderError'; userId: string; error: string }
+  | { type: 'condition'; effectUuid: string; targetUuid: string; userId: string }
 
 async function perform(request: Request) {
   if (request.type === 'buildCrawler') {
@@ -26,6 +28,14 @@ async function perform(request: Request) {
     } catch (error: any) {
       game.socket.emit(CHANNEL, { type: 'builderError', userId: request.userId, error: error.message })
     }
+    return
+  }
+  if (request.type === 'condition') {
+    // Only the caster's owners (or a GM) may hand out a skill or spell's condition.
+    const effect = await fromUuid(request.effectUuid)
+    const target = await fromUuid(request.targetUuid)
+    if (!effect || target?.documentName !== 'Actor' || !mayGive(effect, game.users.get(request.userId))) return
+    await giveCondition(effect, target)
     return
   }
   if (request.type === 'upkeep') {
@@ -81,6 +91,11 @@ export function gmActorAction(actor: any, method: string, ...args: unknown[]) {
 export async function actorAction(actor: any, method: string, ...args: unknown[]) {
   if (actor.isOwner) return actor[method](...args)
   relay({ type: 'actor', uuid: actor.uuid, method, args })
+}
+
+/** Put a condition on an actor the user doesn't own, through the GM. */
+export function conditionAction(effect: any, target: any) {
+  relay({ type: 'condition', effectUuid: effect.uuid, targetUuid: target.uuid, userId: game.user.id })
 }
 
 /** Call a combat method as the GM. */

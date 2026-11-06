@@ -419,6 +419,14 @@
       "ClapAgainst": "Blade Clap against {attack}",
       "Clapped": "Blade Clap {total}"
     },
+    "Condition": {
+      "Title": "Conditions",
+      "ApplyTargets": "Apply to targets",
+      "DragHint": "Drag onto a token to apply",
+      "NoTargets": "Target one or more tokens first, or drag the condition onto a token.",
+      "Applied": "{name} applied to {targets}.",
+      "Missing": "That condition no longer exists."
+    },
     "Frames": {
       "Title": "Crawlers",
       "Show": "Show crawler frames",

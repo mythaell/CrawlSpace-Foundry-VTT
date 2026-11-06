@@ -1,12 +1,14 @@
 import { COMBAT_PHASES } from '../config'
 import { combatantSide, promptDeclaration, type CrawlCombat } from './combat'
 import { combatAction } from '../socket'
+import { partyOrder } from '../actors/companions'
 
 /** Core tracker plus a phase strip: the five phases, who still has to act, and phase controls. */
 export function createCombatTracker() {
   const Base = foundry.applications.sidebar.tabs.CombatTracker
   return class CrawlCombatTracker extends Base {
     static DEFAULT_OPTIONS = {
+      classes: ['crawl-tracker'],
       actions: {
         crawlPhase: CrawlCombatTracker.#onPhase,
         crawlDone: CrawlCombatTracker.#onDone,
@@ -56,10 +58,16 @@ export function createCombatTracker() {
       const turn = await super._prepareTurnContext(combat, combatant, index)
       const side = combatantSide(combatant)
       const phaseSide = COMBAT_PHASES[combat.crawl?.phase ?? 0]?.side
-      turn.css = [turn.css, `side-${side}`, combat.isDone?.(combatant.id) ? 'crawl-done' : '', phaseSide === side ? 'crawl-acting' : '']
+      turn.css = [turn.css, `side-${side}`, partyOrder(combatant.actor).follower ? 'crawl-follower' : '', combat.isDone?.(combatant.id) ? 'crawl-done' : '', phaseSide === side ? 'crawl-acting' : '']
         .filter(Boolean)
         .join(' ')
       return turn
+    }
+
+    /** Initiative isn't rolled, so its menu entries go. */
+    _getEntryContextOptions() {
+      const initiative = ['COMBATANT.ACTIONS.Clear', 'COMBATANT.ACTIONS.Reroll']
+      return super._getEntryContextOptions().filter((entry: any) => !initiative.includes(entry.label))
     }
 
     static async #onPhase(this: any, _event: Event, target: HTMLElement) {

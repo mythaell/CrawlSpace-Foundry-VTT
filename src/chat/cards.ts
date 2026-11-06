@@ -1,6 +1,7 @@
 import { undoAward } from '../apps/awards'
 import { rollDamage } from '../dice/rolls'
 import { actorAction, combatAction } from '../socket'
+import { applyCondition, mayGive } from '../effects/use-conditions'
 import { debuffByName } from '../rules/debuffs'
 import { shieldBlockAllowed, shieldBlockFor } from '../rules/shield-block'
 
@@ -29,6 +30,12 @@ async function onAction(message: any, button: HTMLElement) {
   const action = button.dataset.crawlAction
   const total = Number(message.rolls?.[0]?.total) || 0
   switch (action) {
+    case 'apply-condition': {
+      const effect = fromUuidSync(button.dataset.effectUuid ?? '')
+      if (!effect) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Condition.Missing'))
+      if (!mayGive(effect, game.user)) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Warn.NotYours'))
+      return applyCondition(effect, [...game.user.targets].map((token: any) => token.actor).filter(Boolean))
+    }
     case 'damage-tier': {
       const speaker = ChatMessage.getSpeakerActor(message.speaker)
       if (!speaker?.isOwner) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Warn.NotYours'))

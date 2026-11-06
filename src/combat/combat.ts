@@ -1,3 +1,4 @@
+import { comparePartyOrder } from '../actors/companions'
 import { bladeClapAllowed, bladeClapSkill } from '../rules/blade-clap'
 import { expireActorEvent, expireCombatConditions, settleTime } from '../time'
 import { COMBAT_PHASES } from '../config'
@@ -51,6 +52,26 @@ export function combatantSide(combatant: any): 'crawler' | 'mob' {
  * and a phase ends when every combatant on its side has finished.
  */
 export class CrawlCombat extends Combat {
+  /**
+   * No initiative in CrawlSpace: sides act by phase. The tracker lists each crawler with its followers indented
+   * under it, then the mobs. (Core calls this unbound, so it can't use `this`.)
+   */
+  _sortCombatants(a: any, b: any) {
+    return comparePartyOrder(a.actor ?? { name: a.name }, b.actor ?? { name: b.name }, a.name, b.name) || (a.id > b.id ? 1 : -1)
+  }
+
+  async rollInitiative() {
+    return this
+  }
+
+  async rollAll() {
+    return this
+  }
+
+  async rollNPC() {
+    return this
+  }
+
   /** Ending an encounter also clears conditions with an earlier-of-combat-or-time duration. */
   async _preDelete(options: any, user: any) {
     if ((await super._preDelete(options, user)) === false) return false
