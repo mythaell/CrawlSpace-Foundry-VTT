@@ -1,7 +1,8 @@
 import { blockedDamage, applyDamageResponses, safeArithmetic } from '../src/rules/core.ts'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { abilityScoreModifier, attackOutcome, doubleDice, resolveFormulaTokens } from '../src/rules/core.ts'
+import { abilityScoreModifier, attackOutcome, doubleDice, rankDie, resolveFormulaTokens, splitRankDice } from '../src/rules/core.ts'
+import { endTriggers } from '../src/effects/end-triggers.ts'
 import { debuffById } from '../src/rules/debuffs.ts'
 import { durationSeconds, durationEvent, timeParts, timePartsSeconds, restSeconds } from '../src/rules/time.ts'
 import { effectDuration } from '../src/import/convert.ts'
@@ -78,4 +79,20 @@ test('fractional rule results round down, including negative values', () => {
   assert.equal(safeArithmetic('-3/2'), -2)
   assert.equal(durationSeconds('1.9 seconds'), 1)
   assert.equal(timeParts(90.9).seconds, 30)
+})
+
+test('Rank dice come apart from the base so a Critical Hit leaves them single', () => {
+  assert.deepEqual(splitRankDice('1d6+RANK_DIE', 6), { base: '1d6', dice: `(${rankDie(6)})` })
+  assert.deepEqual(splitRankDice('RANK_DIE+2', 10), { base: '0+2', dice: `(${rankDie(10)})` })
+  assert.deepEqual(splitRankDice('2d8+2*RANK_DIE', 4), { base: '2d8', dice: `(${rankDie(4)})+(${rankDie(4)})` })
+  assert.deepEqual(splitRankDice('1d10+RANK', 3), { base: '1d10+RANK', dice: '' })
+  assert.equal(doubleDice(splitRankDice('1d6+RANK_DIE', 6).base), '2d6')
+})
+
+test('special durations read the events that end a condition', () => {
+  assert.deepEqual(endTriggers('Until you are healed'), ['healed'])
+  assert.deepEqual(endTriggers('Until the end of the next round, or you take at least 1 HP slot damage'), ['damaged'])
+  assert.deepEqual(endTriggers('Until the end of combat'), ['combatEnd'])
+  assert.deepEqual(endTriggers('Once you make a check'), ['check'])
+  assert.deepEqual(endTriggers('5 minutes'), [])
 })

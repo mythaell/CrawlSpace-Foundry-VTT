@@ -1,3 +1,5 @@
+import { registerLootTools } from './apps/loot-tools'
+import { createAuraBehavior, registerAreas } from './effects/areas'
 import { CrawlRoll } from './dice/crawl-roll'
 import { openGrinding } from './apps/grinding'
 import { openAwards } from './apps/awards'
@@ -5,6 +7,7 @@ import { registerImmunity } from './effects/immunity'
 import { openTime, registerClock, registerTimePickers } from './apps/time'
 import { registerFrames } from './apps/frames'
 import { registerConditionDrops } from './effects/use-conditions'
+import { createTokenHUD } from './effects/stacks'
 import { advanceTime, settleTime, registerTime } from './time'
 import * as config from './config'
 import { CompanionData, CrawlerData, MinionData, MobData, NpcData } from './data/actors'
@@ -106,6 +109,10 @@ Hooks.once('init', () => {
     achievement: items.AchievementData,
     trap: items.TrapData,
   })
+  // Auras and dreads: a Region behavior handing conditions to the tokens inside.
+  CONFIG.RegionBehavior.dataModels.aura = createAuraBehavior()
+  CONFIG.RegionBehavior.typeLabels.aura = 'CRAWLSPACE.Aura.Label'
+  CONFIG.RegionBehavior.typeIcons.aura = 'fa-solid fa-sun'
   Object.assign(CONFIG.Actor.trackableAttributes, {
     crawler: { bar: ['healthBar', 'mana'], value: ['evade.total', 'dr.total'] },
     mob: { bar: ['healthBar'], value: ['evade.total', 'dr.total'] },
@@ -117,6 +124,8 @@ Hooks.once('init', () => {
   CONFIG.ActiveEffect.dataModels.base = createEffectDataModel()
   Object.assign(CONFIG.ActiveEffect.changeTypes, CHANGE_TYPE_HANDLERS)
   CONFIG.ActiveEffect.expiryEvents.cleanUp = 'CRAWLSPACE.Combat.CleanUpExpiry'
+  // A condition whose time runs out is removed (core only marks it expired).
+  CONFIG.ActiveEffect.expiryAction = 'delete'
   for (const event of ['safeRoom', 'longRest', 'leaveFloor', 'healed']) CONFIG.ActiveEffect.expiryEvents[event] = `CRAWLSPACE.Time.Event.${event}`
 
   // The 27 standard debuffs replace core's status list; "dead" stays for defeated tokens.
@@ -141,6 +150,12 @@ Hooks.once('init', () => {
 
   // UI.
   CONFIG.ui.combat = createCombatTracker()
+  CONFIG.Token.hudClass = createTokenHUD()
+  // The status palette shows stacks, so it redraws when they change.
+  Hooks.on('updateActiveEffect', (effect: any) => {
+    const hud = canvas?.hud?.token
+    if (hud?.rendered && hud.actor && hud.actor === effect.parent) hud.render()
+  })
   const sheets = foundry.applications.apps.DocumentSheetConfig
   sheets.registerSheet(Actor, 'crawlspace', CrawlerSheet, { types: ['crawler'], makeDefault: true, label: 'CRAWLSPACE.Sheet.Crawler' })
   sheets.registerSheet(Actor, 'crawlspace', MobSheet, { types: ['mob', 'minion', 'companion'], makeDefault: true, label: 'CRAWLSPACE.Sheet.Mob' })
@@ -172,7 +187,9 @@ Hooks.once('init', () => {
   registerTimePickers()
   registerFrames()
   registerConditionDrops()
+  registerAreas()
   registerUpkeep()
+  registerLootTools()
 
   game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
 })

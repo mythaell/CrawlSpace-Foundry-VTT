@@ -36,6 +36,9 @@
       "background": { "htmlFields": ["description"] },
       "achievement": { "htmlFields": ["description"] },
       "trap": { "htmlFields": ["description"] }
+    },
+    "RegionBehavior": {
+      "aura": {}
     }
   },
   "packs": [

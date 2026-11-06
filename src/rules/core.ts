@@ -59,6 +59,20 @@ export function resolveFormulaTokens(formula: string, values: { floor?: number; 
 }
 
 /** Critical hits double the dice of a damage formula, never its flat modifiers. */
+/**
+ * A damage formula split into its base and its Rank dice (rollDamage.ts splitRankDamageFormula): a Critical Hit
+ * doubles the base dice, but Rank dice are added once. The base keeps any RANK token.
+ */
+export function splitRankDice(formula: string, rank: number) {
+  let count = 0
+  const base = String(formula ?? '').replace(/([+-]?)\s*(?:(\d+)\s*\*\s*)?\bRANK_DIE\b/gi, (_match, sign: string, coefficient?: string) => {
+    count += (sign === '-' ? -1 : 1) * Number(coefficient ?? 1)
+    return sign ? '' : '0'
+  })
+  const dice = count ? `${count < 0 ? '-' : ''}${Array.from({ length: Math.abs(count) }, () => `(${rankDie(rank)})`).join('+')}` : ''
+  return { base, dice }
+}
+
 export function doubleDice(formula: string) {
   return String(formula).replace(/(\d*)d(\d+)/gi, (_match, count, sides) => `${(Number(count) || 1) * 2}d${sides}`)
 }

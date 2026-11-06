@@ -8,4 +8,5 @@
     {{#if tier}}<span class="roll-mode">{{tier}}</span>{{/if}}
   </header>
   {{#if tags.length}}<p class="damage-tags">{{#each tags}}<span class="tag">{{this}}</span>{{/each}}</p>{{/if}}
+  {{#if details}}<div class="card-details">{{{details}}}</div>{{/if}}
 </div>

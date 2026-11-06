@@ -7,6 +7,7 @@
  */
 import { effectDuration } from '../import/convert'
 import { conditionAction } from '../socket'
+import { areaButton } from './areas'
 
 /** The Rank window of a rank-variant condition: its flags, else the "Ranks 5–9" line the importer wrote. */
 function rankWindow(effect: any): { min: number; max: number } | null {
@@ -61,28 +62,55 @@ export function mayGive(effect: any, user: any) {
   return !!owner?.testUserPermission?.(user, 'OWNER')
 }
 
-/** The card posted after using an item with conditions. */
-export async function postConditionCard(item: any) {
+/** The conditions an item gives, as rows to drag onto a token or apply to targets. */
+export function conditionRows(item: any) {
   const conditions = useConditions(item)
-  if (!conditions.length) return
+  if (!conditions.length) return ''
   const esc = foundry.utils.escapeHTML
   const rows = conditions
     .map(
       (effect: any) => `<div class="condition-row">
-        <a class="content-link" draggable="true" data-link data-uuid="${esc(effect.uuid)}" data-type="ActiveEffect" data-tooltip="${esc(game.i18n.localize('CRAWLSPACE.Condition.DragHint'))}"><img src="${esc(effect.img)}" alt=""> ${esc(effect.name)}</a>
-        <button type="button" data-crawl-action="apply-condition" data-effect-uuid="${esc(effect.uuid)}"><i class="fa-solid fa-crosshairs"></i> ${esc(game.i18n.localize('CRAWLSPACE.Condition.ApplyTargets'))}</button>
+        <a class="condition-link" draggable="true" data-link data-uuid="${esc(effect.uuid)}" data-type="ActiveEffect" data-tooltip="${esc(game.i18n.localize('CRAWLSPACE.Condition.DragHint'))}"><img src="${esc(effect.img)}" alt=""><span>${esc(effect.name)}</span></a>
+        <button type="button" data-crawl-action="apply-condition" data-effect-uuid="${esc(effect.uuid)}" data-tooltip="${esc(game.i18n.localize('CRAWLSPACE.Condition.ApplyTargets'))}"><i class="fa-solid fa-crosshairs"></i></button>
       </div>`,
     )
     .join('')
-  return ChatMessage.create({
-    speaker: ChatMessage.getSpeaker({ actor: item.actor }),
-    content: `<div class="crawl-card crawl-conditions"><h4>${esc(item.name)}: ${esc(game.i18n.localize('CRAWLSPACE.Condition.Title'))}</h4>${rows}</div>`,
-    flags: { crawlspace: { kind: 'conditions', itemUuid: item.uuid } },
-  })
+  return `<div class="card-conditions">${rows}</div>`
+}
+
+/**
+ * What a skill or spell's roll card shows under the roll: its description and the Rank upgrades the user has
+ * reached (not for attacks, whose card is just the roll), then its conditions.
+ */
+export async function itemCardDetails(item: any, options: { attack?: boolean } = {}) {
+  if (!item) return ''
+  const parts: string[] = []
+  if (!options.attack) {
+    const enrich = (text: string) =>
+      foundry.applications.ux.TextEditor.implementation.enrichHTML(text, { relativeTo: item, rollData: item.actor?.getRollData?.() ?? {} })
+    const description = String(item.system.description ?? '').trim()
+    if (description) parts.push(`<div class="card-description">${await enrich(description)}</div>`)
+    const rank = Math.floor(Number(item.system.rank?.total) || 0)
+    for (const step of [5, 10, 15]) {
+      const text = String(item.system.upgrades?.[`rank${step}`] ?? '').trim()
+      if (text && rank >= step)
+        parts.push(`<div class="card-upgrade"><b>${game.i18n.format('CRAWLSPACE.Effect.AtRank', { rank: step })}</b> ${await enrich(text)}</div>`)
+    }
+  }
+  parts.push(areaButton(item))
+  parts.push(conditionRows(item))
+  return parts.filter(Boolean).join('')
 }
 
 /** Dropping a condition (from a card or an item sheet) on a token applies it to that token's actor. */
 export function registerConditionDrops() {
+  // A card's condition can be dragged like any document link.
+  document.addEventListener('dragstart', (event) => {
+    const link = (event.target as HTMLElement)?.closest?.('.condition-link') as HTMLElement | null
+    if (!link?.dataset.uuid || !event.dataTransfer) return
+    event.stopPropagation()
+    event.dataTransfer.setData('text/plain', JSON.stringify({ type: 'ActiveEffect', uuid: link.dataset.uuid }))
+  }, true)
   Hooks.on('dropCanvasData', (_canvas: any, data: any) => {
     if (data?.type !== 'ActiveEffect' || !data.uuid) return
     const token = canvas.tokens.placeables

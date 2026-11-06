@@ -146,6 +146,44 @@
   {{/if}}
 
 
+  {{#if area}}
+  <fieldset class="area-editor">
+    <legend>{{localize "CRAWLSPACE.Area.Title"}} <label class="area-enabled"><input type="checkbox" data-area-enabled {{checked area.enabled}}> {{localize "CRAWLSPACE.Area.Enabled"}}</label></legend>
+    {{#each area.tiers as |tier|}}
+    <div class="area-tier{{#if tier.current}} current{{/if}}" data-area-tier="{{tier.key}}">
+      <div class="area-tier-head">
+        <span class="rank-label">{{tier.label}}</span>
+        <button type="button" class="icon" data-area-op="add" data-tooltip="{{localize 'CRAWLSPACE.Area.Add'}}"><i class="fa-solid fa-plus"></i></button>
+        {{#if tier.areas.length}}<button type="button" class="icon" data-area-op="clear" data-tooltip="{{localize 'CRAWLSPACE.Area.Clear'}}"><i class="fa-solid fa-rotate-left"></i></button>{{/if}}
+      </div>
+      {{#each tier.areas as |area|}}
+      <div class="area-row" data-area-index="{{area.index}}">
+        <select data-area-field="type">
+          {{selectOptions @root.areaTypes selected=area.type localize=true}}
+        </select>
+        <input type="number" data-area-field="distance" value="{{area.distance}}" min="1" step="any" data-tooltip="{{localize 'CRAWLSPACE.Area.Distance'}}">
+        <input type="number" data-area-field="width" value="{{area.width}}" min="1" step="any" data-tooltip="{{localize 'CRAWLSPACE.Area.Width'}}">
+        <input type="number" data-area-field="angle" value="{{area.angle}}" min="1" max="360" data-tooltip="{{localize 'CRAWLSPACE.Area.Angle'}}">
+        <input type="text" data-area-field="label" value="{{area.label}}" placeholder="{{localize 'CRAWLSPACE.Area.Label'}}">
+        <label data-tooltip="{{localize 'CRAWLSPACE.Area.AtEndHint'}}"><input type="checkbox" data-area-field="atEnd" {{checked area.atEnd}}> {{localize "CRAWLSPACE.Area.AtEnd"}}</label>
+        <select data-area-field="auraKind">
+          {{selectOptions @root.auraKinds selected=area.auraKind localize=true}}
+        </select>
+        {{#if area.auraKind}}
+        <select data-area-field="auraTargets">
+          {{selectOptions @root.auraTargets selected=area.auraTargets localize=true}}
+        </select>
+        <label><input type="checkbox" data-area-field="auraSelf" {{checked area.auraSelf}}> {{localize "CRAWLSPACE.Aura.IncludeSource"}}</label>
+        {{/if}}
+        <button type="button" class="icon" data-area-op="remove" data-tooltip="{{localize 'CRAWLSPACE.Area.Remove'}}"><i class="fa-solid fa-trash"></i></button>
+      </div>
+      {{/each}}
+    </div>
+    {{/each}}
+    <p class="hint">{{localize "CRAWLSPACE.Area.Hint"}}</p>
+  </fieldset>
+  {{/if}}
+
   <label class="wide">{{localize "CRAWLSPACE.Item.Notes"}}<input type="text" name="system.notes" value="{{systemSource.notes}}"></label>
 {{#if (eq type "spell")}}
 <fieldset><legend>{{localize "CRAWLSPACE.Item.KillingBlowStacks"}}</legend>

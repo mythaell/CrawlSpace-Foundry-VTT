@@ -76,3 +76,11 @@ test('character import floors decimals instead of removing their decimal points'
   assert.equal(actor.system.attributes.str.modOverride, -2)
   assert.equal(actor.items.find((item) => item.type === 'skill').system.rank.value, 2)
 })
+
+test('Heal stays at Rank 1; Heal Others and Heal Self do not', () => {
+  assert.equal(advancementCap('Heal', 1), 1)
+  assert.equal(advancementCap(' heal ', 9), 1)
+  assert.equal(advancementCap('Heal Others', 1), 15)
+  assert.equal(advancementCap('Heal Self', 1), 15)
+  assert.equal(advancementCap('Heal Critters', 1), 15)
+})

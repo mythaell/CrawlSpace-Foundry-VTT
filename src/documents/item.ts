@@ -1,3 +1,4 @@
+import { handEquipmentConflict, type WornItem } from '../crawlspace-shared/shared/equipmentSlots'
 import { openLootBoxes } from '../loot/boxes'
 import { buildEffect, effectDuration, stableId } from '../import/convert'
 import { BUILD_EFFECT_FIELDS } from '../data/items'
@@ -5,7 +6,7 @@ import { itemCooldown, withCooldowns } from '../effects/cooldowns'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage, type Modifier } from '../dice/rolls'
 import { STATS, statKeyFromCode } from '../config'
 import { attackWithRow, rowForItem, withEffectBonuses } from '../actors/attacks'
-import { postConditionCard } from '../effects/use-conditions'
+import { conditionRows, itemCardDetails } from '../effects/use-conditions'
 
 /** Targeted tokens, or the user themself when nothing is targeted. */
 const healTargets = (actor: any): string[] => {
@@ -85,8 +86,8 @@ export class CrawlItem extends Item {
       case 'spell':
         return withCooldowns(actor, [itemCooldown(this)], async () => {
           const result = await this.#useRanked(options)
-          // A use that went ahead (paid, rolled) offers its conditions to apply.
-          if (result) await postConditionCard(this)
+          // A Passive skill only posts its card; anything rolled (or any spell cast) counts toward advancement.
+          if (result && (this.type === 'spell' || this.system.checkType !== 'Passive')) await markForAdvancement([this])
           return result
         })
       case 'weapon':
@@ -105,6 +106,8 @@ export class CrawlItem extends Item {
     const system = this.system
     const pay = this.type === 'spell' ? () => this.payMana() : undefined
     const kind = this.type as 'skill' | 'spell'
+    // One card per use: attacks show the roll and its buttons; other skills and spells add their description.
+    const details = await itemCardDetails(this, { attack: system.isAttack })
     if (system.isAttack) {
       const attacked = await rollAttack(
         this.actor,
@@ -116,7 +119,8 @@ export class CrawlItem extends Item {
           damage: withEffectBonuses(
             this.actor,
             {
-              formula: system.damage.atRank || system.damage.formula,
+              formula: system.damage.atRank ? system.damage.baseAtRank || system.damage.atRank : system.damage.formula,
+              undoubled: system.damage.atRank ? system.damage.rankDice : '',
               types: [...system.damage.types],
               armorPiercing: system.damage.armorPiercing,
               magic: this.type === 'spell' || system.damage.magic,
@@ -126,6 +130,7 @@ export class CrawlItem extends Item {
             { names: [this.name], itemIds: [this.id], weapon: false, kind, rank: Number(system.rank?.total) || 0 },
           ),
           pay,
+          details,
         },
         options,
       )
@@ -142,14 +147,15 @@ export class CrawlItem extends Item {
       return rollDamage(
         this.actor,
         { formula: healing, types: [] },
-        { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, img: this.img, healing: true, targets: healTargets(this.actor) },
+        { label: `${this.name}: ${game.i18n.localize('CRAWLSPACE.Damage.Healing')}`, img: this.img, healing: true, targets: healTargets(this.actor), details },
       )
     }
     if (system.checkType === 'Passive') {
       if (pay && !(await pay())) return null
-      return this.toMessage()
+      return this.toMessage({ ranked: true })
     }
     return rollCheck(this.actor, {
+      details,
       label: this.name,
       kind: 'check',
       pay,
@@ -209,24 +215,37 @@ export class CrawlItem extends Item {
   }
 
   /** Post the item's description as a chat card. */
-  async toMessage() {
-    const description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.system.description ?? '', {
-      relativeTo: this,
-      rollData: this.actor?.getRollData?.() ?? {},
-    })
+  async toMessage(options: { ranked?: boolean } = {}) {
+    // A used skill or spell shows what its Rank gives (upgrades reached), its area and conditions.
+    const ranked = options.ranked && ['skill', 'spell'].includes(this.type)
+    const description = ranked
+      ? ''
+      : await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.system.description ?? '', {
+          relativeTo: this,
+          rollData: this.actor?.getRollData?.() ?? {},
+        })
     const content = await foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/chat/item.hbs', {
       item: this,
       description,
       notes: this.system.notes,
+      conditions: ranked ? await itemCardDetails(this) : options.ranked ? conditionRows(this) : '',
     })
     return ChatMessage.create({ content, speaker: ChatMessage.getSpeaker({ actor: this.actor }), flags: { crawlspace: { kind: 'item', itemUuid: this.uuid } } })
   }
 
-  /** Enforce one item per body slot and ten accessories when equipping. */
+  /** Enforce one item per body slot, ten accessories, and two hands when equipping. */
   async _preUpdate(changed: any, options: any, user: any) {
     if ((await super._preUpdate(changed, options, user)) === false) return false
     const equipping = foundry.utils.getProperty(changed, 'system.equipped') === true
-    if (!equipping || this.type !== 'equipment' || !this.actor) return
+    if (!equipping || !this.actor) return
+    // A two-handed weapon takes both hands (equipmentSlots.ts handEquipmentConflict).
+    const worn = this.actor.items.contents.map((item: any) => wornItem(item, item.id === this.id ? changed : null))
+    const conflict = handEquipmentConflict(worn, this.id)
+    if (conflict) {
+      ui.notifications.warn(conflict)
+      return false
+    }
+    if (this.type !== 'equipment') return
     const slot = foundry.utils.getProperty(changed, 'system.slot') ?? this.system.slot
     const occupied = this.actor.items.filter(
       (item: any) => item.id !== this.id && item.type === 'equipment' && item.system.equipped && item.system.slot === slot,
@@ -255,4 +274,31 @@ export class CrawlItem extends Item {
     if (current) return current.update({ 'system.changes': wanted.system.changes, 'flags.crawlspace.build': true })
     return this.createEmbeddedDocuments('ActiveEffect', [wanted])
   }
+}
+
+/** An owned item as the app's hand-slot rules see it; `changed` is a pending update to it. */
+function wornItem(item: any, changed: any): WornItem {
+  const get = (path: string) => (changed && foundry.utils.hasProperty(changed, path) ? foundry.utils.getProperty(changed, path) : foundry.utils.getProperty(item, path))
+  const twoHanded = !!get('system.twoHanded') || String(get('system.hands') ?? '').trim() === '2'
+  return {
+    id: item.id,
+    name: item.name,
+    equipped: !!get('system.equipped'),
+    properties: {
+      itemType: item.type,
+      equipment: { slot: item.type === 'equipment' && get('system.slot') === 'hands' ? 'Hands' : String(get('system.slot') ?? '') },
+      ...(item.type === 'weapon' ? { weapon: { twoHanded } } : {}),
+    },
+  }
+}
+
+/** Mark a crawler's rolled skills and spells for advancement (the upkeep checks them). */
+export async function markForAdvancement(items: any[]) {
+  const byActor = new Map<any, string[]>()
+  for (const item of items) {
+    const actor = item?.actor
+    if (!actor || actor.type !== 'crawler' || !actor.isOwner || !['skill', 'spell'].includes(item.type) || item.system.marked) continue
+    byActor.set(actor, [...(byActor.get(actor) ?? []), item.id])
+  }
+  for (const [actor, ids] of byActor) await actor.updateEmbeddedDocuments('Item', [...new Set(ids)].map((_id) => ({ _id, 'system.marked': true })))
 }

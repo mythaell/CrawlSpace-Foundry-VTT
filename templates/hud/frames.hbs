@@ -1,6 +1,7 @@
 <div class="crawl-frames-inner">
   {{#if frames.length}}
-  <header class="crawl-frames-head">
+  <header class="crawl-frames-head" data-tooltip="{{localize 'CRAWLSPACE.Frames.DragHint'}}">
+    <i class="fa-solid fa-grip-vertical"></i>
     <span>{{localize "CRAWLSPACE.Frames.Title"}}</span>
     <a data-action="toggle" data-tooltip="{{#if collapsed}}{{localize 'CRAWLSPACE.Frames.Show'}}{{else}}{{localize 'CRAWLSPACE.Frames.Hide'}}{{/if}}"><i class="fa-solid fa-chevron-{{#if collapsed}}down{{else}}up{{/if}}"></i></a>
   </header>
@@ -16,27 +17,37 @@
     <div class="frame-mana" data-tooltip="{{localize 'CRAWLSPACE.Stat.Mana'}}: {{frame.mana.value}} / {{frame.mana.max}}">
       <div class="fill" style="width: {{frame.mana.pct}}%"></div>
     </div>
-    {{#if frame.effects.length}}
-    <div class="frame-effects">
-      {{#each frame.effects as |effect|}}
-      <span class="frame-effect {{effect.kind}}" data-effect-id="{{effect.id}}" data-tooltip="{{effect.tooltip}}{{#if frame.canEdit}} — {{localize 'CRAWLSPACE.Frames.RightClick'}}{{/if}}"><img src="{{effect.img}}" alt="{{effect.name}}">{{#if effect.stacks}}<b>{{effect.stacks}}</b>{{/if}}</span>
-      {{/each}}
-    </div>
-    {{/if}}
     {{#if frame.details}}
     <div class="frame-details">
-      <span>{{localize "CRAWLSPACE.Stat.Evade"}} {{frame.details.evade}}</span>
-      <span>{{localize "CRAWLSPACE.Stat.DR"}} {{frame.details.dr}}</span>
-      <span>{{localize "CRAWLSPACE.Crawler.Level"}} {{frame.details.level}}</span>
+      <span>{{localize "CRAWLSPACE.Stat.Evade"}} <b>{{frame.details.evade}}</b></span>
+      <span>{{localize "CRAWLSPACE.Stat.DR"}} <b>{{frame.details.dr}}</b></span>
+      <span>{{localize "CRAWLSPACE.Crawler.Level"}} <b>{{frame.details.level}}</b></span>
       <span>{{frame.details.race}}</span>
       <span>{{frame.details.className}}</span>
     </div>
-    <div class="frame-controls">
-      <button type="button" data-action="award"><i class="fa-solid fa-trophy"></i> {{localize "CRAWLSPACE.Frames.Award"}}</button>
-      <button type="button" data-action="effects"><i class="fa-solid fa-person-rays"></i> {{localize "CRAWLSPACE.Frames.Effects"}}</button>
-    </div>
     {{/if}}
+    {{> crawlFrameBadges effects=frame.effects}}
+    {{#each frame.followers as |follower|}}
+    <div class="frame-follower" data-uuid="{{follower.uuid}}">
+      <div class="follower-line"><a data-action="openSheet">{{follower.name}}</a> <small>{{follower.kind}}</small></div>
+      <div class="frame-health small" data-tooltip="{{localize 'CRAWLSPACE.Stat.Health'}}: {{follower.health.value}}/{{follower.health.max}}">
+        <div class="fill" style="width: {{follower.pct}}%; background-color: {{follower.color}}"></div>
+        <span>{{follower.health.value}}/{{follower.health.max}}</span>
+      </div>
+      {{> crawlFrameBadges effects=follower.effects}}
+    </div>
+    {{/each}}
   </section>
   {{/each}}
   {{/unless}}
 </div>
+
+{{#*inline "crawlFrameBadges"}}
+{{#if effects.length}}
+<div class="frame-effects">
+  {{#each effects as |effect|}}
+  <button type="button" class="frame-effect {{effect.kind}}" data-effect-id="{{effect.id}}" data-tooltip="{{effect.tooltip}}<br><small>{{localize 'CRAWLSPACE.Frames.StackHint'}}</small>"><img src="{{effect.img}}" alt="{{effect.name}}">{{#if effect.stacks}}<b>{{effect.stacks}}</b>{{/if}}</button>
+  {{/each}}
+</div>
+{{/if}}
+{{/inline}}

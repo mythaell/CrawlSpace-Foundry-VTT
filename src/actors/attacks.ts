@@ -1,3 +1,4 @@
+import { markForAdvancement } from '../documents/item'
 import { spellKillBonus } from '../effects/killing-blows'
 /**
  * Crawler attacks: rows in `system.attacks`, plus automatic rows for equipped weapons, attack skills and
@@ -36,7 +37,11 @@ const joinFormula = (...parts: (string | undefined)[]) =>
     .replace(/\+\s*-/g, '-')
     .replace(/\+\+/g, '+')
 
-export type AttackDamage = { formula: string; types: string[]; armorPiercing?: boolean; magic?: boolean; area?: boolean; baseFormula?: string; kind?: DamageKind; killingBlowSpell?: string }
+export type AttackDamage = {
+  formula: string
+  /** Added once, not doubled on a Critical Hit: Rank dice and effect damage bonuses (undoubledDamage.ts). */
+  undoubled?: string
+  types: string[]; armorPiercing?: boolean; magic?: boolean; area?: boolean; baseFormula?: string; kind?: DamageKind; killingBlowSpell?: string }
 
 /**
  * Add what the actor's effects give an attack: Damage Modifier bonuses (with their damage types) and Armor
@@ -50,16 +55,23 @@ export function withEffectBonuses(actor: any, damage: AttackDamage, context: { n
   return {
     ...damage,
     killingBlowSpell: spell?.system.killingBlowStacking ? spell.uuid : undefined,
-    formula: joinFormula(damage.formula, killBonus ? String(killBonus) : '', ...bonuses.map((bonus) => bonus.formula)),
+    formula: joinFormula(damage.formula, killBonus ? String(killBonus) : ''),
+    undoubled: joinFormula(damage.undoubled, ...bonuses.map((bonus) => bonus.formula)),
     types: [...new Set([...damage.types, ...bonuses.flatMap((bonus) => bonus.types)])],
     armorPiercing: !!damage.armorPiercing || piercesArmor(actor, context.itemIds.filter(Boolean), names, context.weapon, context.kind),
     kind: context.kind,
   }
 }
 
+/** A skill's damage at its Rank without its Rank dice (those are added once, apart). */
+const skillBase = (skill: any) => {
+  const damage = skill?.system?.damage
+  return damage?.atRank ? damage.baseAtRank || damage.atRank : damage?.formula
+}
+
 /** A weapon's own damage is a bonus on top of its skill's damage at the current Rank. */
 export function weaponDamage(weapon: any, skill: any) {
-  return joinFormula(skill?.system?.damage?.atRank || skill?.system?.damage?.formula, weapon?.system?.damage?.formula)
+  return joinFormula(skillBase(skill), weapon?.system?.damage?.formula)
 }
 
 /** The automatic row for an item, used until the crawler edits it into a row of their own. */
@@ -112,9 +124,16 @@ export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHi
   const weapon = !source || source.type === 'weapon'
   const kind: DamageKind = source?.type === 'spell' ? 'spell' : source?.type === 'skill' ? 'skill' : undefined
   let formula = String(row.damage ?? '').trim()
+  let rankDice = ''
   if (!formula && source?.type === 'consumable') formula = source.system.damage?.formula ?? ''
-  if (!formula && source?.type === 'weapon') formula = weaponDamage(source, skill)
-  if (!formula && skill) formula = skill.system.damage?.atRank || skill.system.damage?.formula || ''
+  if (!formula && source?.type === 'weapon') {
+    formula = weaponDamage(source, skill)
+    rankDice = skill?.system?.damage?.atRank ? skill.system.damage.rankDice ?? '' : ''
+  }
+  if (!formula && skill) {
+    formula = skillBase(skill) || ''
+    rankDice = skill.system.damage?.atRank ? skill.system.damage.rankDice ?? '' : ''
+  }
   if (!formula && source) formula = source.system.damage?.formula ?? ''
   formula = joinFormula(formula, row.damageBonus)
   const sourceDamage = source?.system?.damage ?? skill?.system?.damage ?? {}
@@ -144,6 +163,7 @@ export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHi
       actor,
       {
         formula,
+        undoubled: rankDice,
         types: [...types],
         armorPiercing: !!(row.armorPiercing || sourceDamage.armorPiercing),
         magic: !!(row.magic || sourceDamage.magic || spell),
@@ -179,7 +199,12 @@ export async function attackWithRow(actor: any, row: AttackRow, options: { fast?
   const source = actor.items.get(row.sourceId)
   const skill = actor.items.get(row.skillId) ?? (['weapon', 'consumable'].includes(source?.type) ? source.weaponSkill() : null)
   const uses = [source, skill].filter((item) => item && ['skill', 'spell'].includes(item.type)).map(itemCooldown)
-  return withCooldowns(actor, uses, () => rollAttack(actor, resolveAttack(actor, row), options))
+  return withCooldowns(actor, uses, async () => {
+    const result = await rollAttack(actor, resolveAttack(actor, row), options)
+    // The skill or spell behind the attack counts as rolled, for advancement.
+    if (result) await markForAdvancement([source, skill])
+    return result
+  })
 }
 
 export async function damageWithRow(actor: any, row: AttackRow, tier: 'normal' | 'amazing' | 'critical') {

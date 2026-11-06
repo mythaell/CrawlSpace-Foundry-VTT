@@ -4,6 +4,7 @@ import { advancementModifiers } from '../rules/build-links'
 import { upkeepAction } from '../socket'
 import { openGrinding } from './grinding'
 import { openAwards } from './awards'
+import { openAutoLoot, openItemGenerator } from './loot-tools'
 import { openLootBoxes } from '../loot/boxes'
 import { advanceTime, expireActorEvent } from '../time'
 import { restSeconds } from '../rules/time'
@@ -36,6 +37,8 @@ export async function rest(actor: any, kind: RecoveryKind, hours = 1, options: {
       await actor.deleteEmbeddedDocuments('ActiveEffect', effects.map((effect: any) => effect.id))
     }
   }
+  if (kind === 'short') await expireActorEvent('shortRest', [actor])
+  if (kind === 'full') await expireActorEvent('fullRest', [actor])
   if (kind === 'long' || kind === 'full') {
     await expireActorEvent('longRest', [actor])
     await clearKillingBlows(actor, 'longRest')
@@ -152,13 +155,46 @@ export async function performUpkeep(uuids: string[], kind: string, hours = 1, sk
   }
 }
 
+/** A player's upkeep request, posted for the GMs with Approve and Decline. */
+export async function postUpkeepRequest(user: any, uuids: string[], kind: string, hours: number) {
+  if (!game.user.isGM) return
+  const actors = (await Promise.all(uuids.map((uuid) => fromUuid(uuid)))).filter((actor: any) => actor?.type === 'crawler')
+  if (!actors.length) return
+  const esc = foundry.utils.escapeHTML
+  const action = game.i18n.localize(`CRAWLSPACE.Upkeep.Actions.${kind}`)
+  const content = `<div class="crawl-card upkeep-request">
+    <h4 class="card-title"><i class="fa-solid fa-campground"></i> ${game.i18n.format('CRAWLSPACE.Upkeep.RequestTitle', { user: esc(user.name) })}</h4>
+    <p>${game.i18n.format(['hourly', 'grinding'].includes(kind) ? 'CRAWLSPACE.Upkeep.RequestHours' : 'CRAWLSPACE.Upkeep.RequestLine', { action: esc(action), hours, names: actors.map((actor: any) => esc(actor.name)).join(', ') })}</p>
+    <div class="card-buttons">
+      <button type="button" data-crawl-action="upkeep-approve"><i class="fa-solid fa-check"></i> ${game.i18n.localize('CRAWLSPACE.Upkeep.Approve')}</button>
+      <button type="button" data-crawl-action="upkeep-decline"><i class="fa-solid fa-xmark"></i> ${game.i18n.localize('CRAWLSPACE.Upkeep.Decline')}</button>
+    </div>
+  </div>`
+  await ChatMessage.create({
+    content,
+    speaker: { alias: user.name },
+    whisper: game.users.filter((entry: any) => entry.isGM).map((entry: any) => entry.id),
+    flags: { crawlspace: { kind: 'upkeepRequest', uuids: actors.map((actor: any) => actor.uuid), upkeep: kind, hours, userId: user.id } },
+  })
+}
+
+/** The GM answers a request card: approving runs the upkeep (and its time) as if the GM chose it. */
+export async function answerUpkeepRequest(message: any, approve: boolean) {
+  const flags = message.flags?.crawlspace
+  if (!game.user.isGM || flags?.kind !== 'upkeepRequest' || flags.answered) return
+  await message.update({ 'flags.crawlspace.answered': approve ? 'approved' : 'declined' })
+  if (approve) await performUpkeep(flags.uuids, flags.upkeep, flags.hours)
+  const user = game.users.get(flags.userId)
+  if (user) await ChatMessage.create({ content: `<p>${game.i18n.format(approve ? 'CRAWLSPACE.Upkeep.Approved' : 'CRAWLSPACE.Upkeep.Declined', { action: game.i18n.localize(`CRAWLSPACE.Upkeep.Actions.${flags.upkeep}`) })}</p>`, whisper: [user.id] })
+}
+
 export async function openUpkeep(actor?: any) {
   const gm = game.user.isGM
-  if (!gm && !game.settings.get('crawlspace', 'playerUpkeep')) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Upkeep.GMRequired'))
   const actors = (actor ? [actor] : game.actors.filter((entry: any) => entry.type === 'crawler')).sort((a: any, b: any) => a.name.localeCompare(b.name))
   const esc = foundry.utils.escapeHTML
-  const labels = ['short', 'long', 'full', 'hourly', 'safeRoom', 'session', 'floor', 'grinding', 'assign', ...(gm ? ['level', 'awards'] : [])]
-  const content = `<p>${game.i18n.localize(gm ? 'CRAWLSPACE.Upkeep.Hint' : 'CRAWLSPACE.Upkeep.NoTime')}</p>
+  const labels = ['short', 'long', 'full', 'hourly', 'safeRoom', 'session', 'floor', 'grinding', 'assign', ...(gm ? ['level', 'awards', 'autoLoot', 'generator'] : [])]
+  const request = !gm && !game.settings.get('crawlspace', 'playerUpkeep')
+  const content = `<p>${game.i18n.localize(gm ? 'CRAWLSPACE.Upkeep.Hint' : request ? 'CRAWLSPACE.Upkeep.RequestHint' : 'CRAWLSPACE.Upkeep.NoTime')}</p>
     <div class="upkeep-participants">${actors.map((entry: any) => `<label class="upkeep-participant"><input type="checkbox" name="actor" value="${esc(entry.uuid)}" checked> ${esc(entry.name)}</label>`).join('')}</div>`
   const answer = await foundry.applications.api.DialogV2.wait({
     window: { title: game.i18n.localize('CRAWLSPACE.Upkeep.Party') }, position: { width: 560 }, content, rejectClose: false,
@@ -166,10 +202,12 @@ export async function openUpkeep(actor?: any) {
     buttons: labels.map((kind) => ({ action: kind, label: game.i18n.localize(`CRAWLSPACE.Upkeep.Actions.${kind}`), callback: (_event: Event, button: any) => ({ kind, uuids: [...button.form.querySelectorAll('[name=actor]:checked')].map((input: any) => input.value) }) })),
   })
   if (!answer) return
+  if (answer.kind === 'generator') return openItemGenerator()
   const chosen = actors.filter((entry: any) => answer.uuids.includes(entry.uuid))
   if (!chosen.length) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Time.SelectActors'))
   try {
     if (answer.kind === 'awards') return openAwards(chosen)
+    if (answer.kind === 'autoLoot') return openAutoLoot(chosen)
     if (answer.kind === 'assign') { for (const entry of chosen) await assignStats(entry); return }
     // Only the actions that take hours ask for them.
     let hours = 1
@@ -226,7 +264,7 @@ export function registerUpkeep() {
       return li
     }
     const added: HTMLElement[] = []
-    if (game.user.isGM || game.settings.get('crawlspace', 'playerUpkeep')) added.push(button('upkeep', 'fa-solid fa-campground', 'CRAWLSPACE.Upkeep.Party', () => openUpkeep()))
+    added.push(button('upkeep', 'fa-solid fa-campground', 'CRAWLSPACE.Upkeep.Party', () => openUpkeep()))
     if (game.user.isGM) added.push(button('timers', 'fa-solid fa-hourglass-half', 'CRAWLSPACE.Time.Title', () => openTime()))
     journal.after(...added)
     const separator = document.createElement('li')

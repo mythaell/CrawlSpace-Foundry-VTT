@@ -1,4 +1,4 @@
-import { performUpkeep } from './apps/upkeep'
+import { performUpkeep, postUpkeepRequest } from './apps/upkeep'
 import { createBuiltCrawler, type Draft } from './apps/builder'
 import { giveCondition, mayGive } from './effects/use-conditions'
 /**
@@ -17,6 +17,7 @@ type Request =
   | { type: 'buildCrawler'; draft: Draft; userId: string }
   | { type: 'builderError'; userId: string; error: string }
   | { type: 'condition'; effectUuid: string; targetUuid: string; userId: string }
+  | { type: 'upkeepRequest'; uuids: string[]; kind: string; hours: number; userId: string }
 
 async function perform(request: Request) {
   if (request.type === 'buildCrawler') {
@@ -37,6 +38,12 @@ async function perform(request: Request) {
     if (!effect || target?.documentName !== 'Actor' || !mayGive(effect, game.users.get(request.userId))) return
     await giveCondition(effect, target)
     return
+  }
+  if (request.type === 'upkeepRequest') {
+    // A player's ask: the GMs see a card to approve or decline it.
+    const user = game.users.get(request.userId)
+    if (!user || !Array.isArray(request.uuids) || request.uuids.length > 100) return
+    return postUpkeepRequest(user, request.uuids, request.kind, request.hours)
   }
   if (request.type === 'upkeep') {
     const user = game.users.get(request.userId)
@@ -108,6 +115,10 @@ export async function combatAction(combat: any, method: string, ...args: unknown
 export async function upkeepAction(uuids: string[], kind: string, hours = 1) {
   const request: Request = { type: 'upkeep', uuids, kind, hours, userId: game.user.id }
   if (game.user.isGM) return perform(request)
-  if (!game.settings.get('crawlspace', 'playerUpkeep')) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Upkeep.GMRequired'))
+  // Without the "players run upkeep" setting, a player's upkeep is a request the GM approves.
+  if (!game.settings.get('crawlspace', 'playerUpkeep')) {
+    relay({ ...request, type: 'upkeepRequest' })
+    return ui.notifications.info(game.i18n.localize('CRAWLSPACE.Upkeep.Requested'))
+  }
   relay(request)
 }

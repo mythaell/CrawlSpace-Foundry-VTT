@@ -4,4 +4,5 @@
   {{#if outcome}}
   <p class="outcome {{#if success}}success{{else}}failure{{/if}}">{{outcome}}{{#if difficulty}} <small>(DC {{difficulty}})</small>{{/if}}</p>
   {{/if}}
+  {{#if details}}<div class="card-details">{{{details}}}</div>{{/if}}
 </div>

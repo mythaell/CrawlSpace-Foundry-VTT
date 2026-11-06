@@ -435,6 +435,8 @@
       "SettingHint": "Show the party's Health and Mana frames beside the scene list.",
       "DragHealth": "Drag to set Health in 10% steps (arrow keys work too)",
       "RightClick": "right-click to remove",
+      "DragHint": "Drag to move; double-click to put it back",
+      "StackHint": "Click: add a stack · Right-click: remove a stack · Shift-click: remove all",
       "Award": "Award",
       "Effects": "Effects"
     },
@@ -481,7 +483,9 @@
         "assign": "Assign Stat Points",
         "level": "Level Up",
         "awards": "Crawler Awards",
-        "time": "Time & Timers"
+        "time": "Time & Timers",
+        "autoLoot": "Auto-loot",
+        "generator": "Item Generator"
       },
       "Untrained": "Learn an untrained skill",
       "UntrainedHint": "Choose one marked Rank 0 skill to learn at Rank 1. All other untrained skills are removed, as in CrawlSpace.",
@@ -489,7 +493,16 @@
       "AdvanceModifiers": "Rolled {formula} ({sources}).",
       "Go": "Go",
       "Hours": "Hours",
-      "HoursError": "Enter 1–30 whole hours."
+      "HoursError": "Enter 1–30 whole hours.",
+      "Requested": "Your upkeep request went to the GM.",
+      "RequestHint": "Your choice goes to the GM as a request; the GM approves it before it happens.",
+      "RequestTitle": "{user} asks for upkeep",
+      "RequestLine": "{action} for {names}.",
+      "RequestHours": "{action} ({hours} h) for {names}.",
+      "Approve": "Approve",
+      "Decline": "Decline",
+      "Approved": "The GM approved your {action}.",
+      "Declined": "The GM declined your {action}."
     },
     "Import": {
       "Character": "Import CrawlSpace character",
@@ -1026,6 +1039,90 @@
         "advanceAdvantage": "Advantage on advancement checks for the linked skill.",
         "advancePenalty": "−1 per count on advancement checks for the linked skill once it is rank 5 or higher."
       }
+    },
+    "Area": {
+      "Title": "Area",
+      "Enabled": "Use area templates",
+      "Base": "Base",
+      "Add": "Add an area",
+      "Remove": "Remove this area",
+      "Clear": "Back to the published area",
+      "Distance": "Distance (ft): radius, length or cone reach",
+      "Width": "Width (ft): rectangle depth or line width",
+      "Angle": "Cone angle (degrees)",
+      "Label": "Label (Splash, Blast)",
+      "AtEnd": "At end",
+      "AtEndHint": "Placed at the far end of the first area (a fireball at the end of its line)",
+      "Hint": "The highest tier the Rank reaches is used. A circle with an aura or dread rides on the caster's token; other areas are placed from the card.",
+      "Place": "Place area",
+      "PlaceAura": "Place aura",
+      "PlaceDread": "Place dread",
+      "PlaceHint": "Click to place the area; the mouse wheel turns it, right-click skips it.",
+      "Type": {
+        "circle": "Circle",
+        "cone": "Cone",
+        "rectangle": "Rectangle",
+        "ray": "Line"
+      }
+    },
+    "Aura": {
+      "Label": "CrawlSpace Aura",
+      "IncludeSource": "Includes the caster",
+      "Kind": {
+        "none": "No aura",
+        "aura": "Aura",
+        "dread": "Dread"
+      },
+      "Targets": {
+        "allies": "Allies",
+        "enemies": "Enemies",
+        "everyone": "Everyone"
+      },
+      "FIELDS": {
+        "effects": {
+          "label": "Conditions",
+          "hint": "The conditions given to the tokens inside."
+        },
+        "kind": {
+          "label": "Kind"
+        },
+        "targets": {
+          "label": "Works on"
+        },
+        "includeSource": {
+          "label": "Includes the caster"
+        },
+        "source": {
+          "label": "Caster token",
+          "hint": "Decides allies and enemies when the area is not on a token."
+        }
+      }
+    },
+    "AutoLoot": {
+      "Title": "Auto-loot",
+      "Hint": "Each crawler ({names}) rolls the chance; a hit gives a sealed box of a weighted tier and a random type.",
+      "ChanceLabel": "Chance per crawler (%)",
+      "Weights": "Tier weights",
+      "Types": "Box types",
+      "Roll": "Roll",
+      "Chance": "{chance}% chance per crawler.",
+      "Nothing": "{name}: no box.",
+      "Got": "{name}: {box} ({contents}).",
+      "Notes": "Auto-loot."
+    },
+    "Generator": {
+      "Title": "Item Generator",
+      "Tier": "Tier",
+      "Floor": "Floor",
+      "Kind": "Item type",
+      "Subtype": "Item",
+      "Random": "Random",
+      "Generate": "Generate",
+      "Rolls": "Rolls",
+      "ToDirectory": "Items directory",
+      "Directory": "the Items directory",
+      "Create": "Create",
+      "Created": "{name} added to {where}."
     }
   }
 }

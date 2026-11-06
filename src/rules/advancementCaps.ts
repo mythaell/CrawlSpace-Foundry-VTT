@@ -8,8 +8,10 @@ export function advancementCap(
     properties?: { effects?: { type?: string; target?: string; value?: string }[] }
   }[] = [],
 ) {
-  if (!Number.isSafeInteger(Number(floor)) || Number(floor) < 7) return 15
   const normalized = name.trim().toLowerCase()
+  // The plain Heal spell stays at Rank 1 (Heal Others, Heal Self and Heal Critters advance as usual).
+  if (normalized === 'heal') return 1
+  if (!Number.isSafeInteger(Number(floor)) || Number(floor) < 7) return 15
   return abilities.some((ability) => {
     if (
       ability.properties?.effects?.some(

@@ -24,6 +24,7 @@
     </ol>
   </div>
 
+  {{#if inherent.length}}
   <h2 class="table-section-title">{{localize "CRAWLSPACE.Spell.Inherent"}}</h2>
   <div class="crawl-table inherent-table" data-filter-scope="spells">
     <div class="table-head">
@@ -62,7 +63,8 @@
           <div class="row-description">{{{spell.details}}}</div>
         </div>
       </li>
-      {{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Inherent"}}</li>{{/each}}
+      {{/each}}
     </ol>
   </div>
+  {{/if}}
 </section>

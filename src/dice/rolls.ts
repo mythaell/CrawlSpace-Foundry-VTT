@@ -1,3 +1,4 @@
+import { endConditionsOn } from '../effects/end-triggers'
 import { floorCheckDc } from '../rules/floor-checks'
 import { attackOutcome, doubleDice, outcomeLabel, resolveFormulaTokens, SUCCESS_OUTCOMES, type AttackOutcome } from '../rules/core'
 import { debuffById } from '../rules/debuffs'
@@ -23,6 +24,8 @@ export type CheckOptions = {
   pay?: () => Promise<boolean>
   /** Attacked actors: their incomingAttackMode effects change an attack's mode. */
   targets?: any[]
+  /** HTML under the title: a skill or spell's description, upgrades and conditions. */
+  details?: string
 }
 
 const MODE_FORMULA: Record<RollModeName, string> = { normal: '1d20', advantage: '2d20kh', disadvantage: '2d20kl' }
@@ -119,6 +122,19 @@ export function outcomeFor(roll: any, difficulty: number) {
 
 const messageMode = () => game.settings.get('core', 'messageMode')
 
+const joinParts = (...parts: string[]) =>
+  parts
+    .map((part) => String(part ?? '').trim())
+    .filter(Boolean)
+    .join('+')
+    .replace(/\+\s*-/g, '-')
+
+/** "Once you make a Check" and "the end of the next Action you take" conditions end once the roll is made. */
+async function afterAction(actor: any) {
+  await endConditionsOn(actor, 'check')
+  await endConditionsOn(actor, 'action')
+}
+
 /** A plain check (attribute, skill, spell): optional difficulty gives an outcome. */
 export async function rollCheck(actor: any, options: CheckOptions) {
   options.floorDifficulty = floorCheckDc(actor.system.details?.floor ?? actor.system.floor, options.sources?.some((name) => /^(STR|INT|CON|DEX|CHA)$/.test(name)) ? 'stat' : 'skill')
@@ -134,11 +150,13 @@ export async function rollCheck(actor: any, options: CheckOptions) {
     outcome: outcome ? outcomeLabel(outcome, options.kind !== 'attack') : null,
     success: outcome ? SUCCESS_OUTCOMES.includes(outcome) : null,
     difficulty: options.difficulty,
+    details: options.details ?? '',
   })
   await roll.toMessage(
     { speaker: ChatMessage.getSpeaker({ actor }), flavor, flags: { crawlspace: { kind: 'check', outcome, ...options.flags } } },
     { messageMode: messageMode() },
   )
+  await afterAction(actor)
   return { roll, outcome }
 }
 
@@ -153,6 +171,8 @@ export type AttackSource = {
   /** Run before rolling: spend mana or ammunition; false cancels. */
   pay?: () => Promise<boolean>
   ranged?: boolean
+  /** HTML under the title (an attack's conditions). */
+  details?: string
 }
 
 /** Target defense used against an attack: Evade for everyone in CrawlSpace. */
@@ -191,12 +211,14 @@ export async function rollAttack(actor: any, attack: AttackSource, options: { fa
     }
   })
   const formula = resolveFormulaTokens(attack.damage.formula, { floor })
+  const shown = joinParts(formula, resolveFormulaTokens(attack.damage.undoubled ?? '', { floor }))
   const flavor = await foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/chat/attack.hbs', {
     label: attack.label,
     subtitle: attack.subtitle,
     img: attack.img,
     mode: mode === 'normal' ? '' : game.i18n.localize(`CRAWLSPACE.Roll.Mode.${mode}`),
-    tags: damageTags(attack.damage, formula),
+    tags: damageTags(attack.damage, shown),
+    details: attack.details ?? '',
   })
   await roll.toMessage(
     {
@@ -215,6 +237,7 @@ export async function rollAttack(actor: any, attack: AttackSource, options: { fa
     },
     { messageMode: messageMode() },
   )
+  await afterAction(actor)
   return { roll, targets: rows }
 }
 
@@ -243,12 +266,17 @@ export async function rollDamage(
     healing?: boolean
     /** Targets whose Shield Block succeeded: their Block toggle starts on. */
     blocked?: string[]
+    /** HTML under the title: a healing spell's description and conditions. */
+    details?: string
   } = {},
 ) {
   const floor = damage.floor ?? (Number(actor?.system?.details?.floor ?? actor?.system?.floor) || 0)
   let formula = resolveFormulaTokens(damage.formula, { floor })
-  if (!formula) return null
-  if (options.tier === 'critical') formula = doubleDice(formula)
+  const once = resolveFormulaTokens(damage.undoubled ?? '', { floor })
+  if (!formula && !once) return null
+  // A Critical Hit doubles the dice, except Rank dice and effect bonuses, which are added once.
+  if (options.tier === 'critical' && formula) formula = doubleDice(formula)
+  formula = joinParts(formula, once)
   if (options.tier === 'amazing' && floor) formula = `${formula}+${floor}`
   const rollData = actor?.getRollData?.() ?? {}
   const roll = Roll.create(formula, rollData)
@@ -271,6 +299,7 @@ export async function rollDamage(
     tier: tierLabel,
     healing: options.healing,
     tags: options.healing ? [] : damageTags(damage),
+    details: options.details ?? '',
   })
   await roll.toMessage(
     {

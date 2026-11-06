@@ -8,4 +8,5 @@
     {{#if mode}}<span class="roll-mode">{{mode}}</span>{{/if}}
   </header>
   {{#if tags.length}}<p class="damage-tags">{{#each tags}}<span class="tag">{{this}}</span>{{/each}}</p>{{/if}}
+  {{#if details}}<div class="card-details">{{{details}}}</div>{{/if}}
 </div>

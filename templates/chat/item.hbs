@@ -3,6 +3,7 @@
     <img src="{{item.img}}" alt="">
     <h4 class="card-title">{{item.name}}</h4>
   </header>
-  <div class="card-description">{{{description}}}</div>
+  {{#if description}}<div class="card-description">{{{description}}}</div>{{/if}}
   {{#if notes}}<p class="hint">{{notes}}</p>{{/if}}
+  {{#if conditions}}<div class="card-details">{{{conditions}}}</div>{{/if}}
 </div>

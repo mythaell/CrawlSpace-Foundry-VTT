@@ -2,6 +2,7 @@ import { endMinion, isRaised } from '../actors/minions'
 import { announceImmunity } from '../effects/immunity'
 import { creditKillingBlow, spellKillBonus } from '../effects/killing-blows'
 import { expireActorEvent } from '../time'
+import { endConditionsOn } from '../effects/end-triggers'
 import { HEALTH_MAX } from '../config'
 import { applySlotDamage, dyingAfterHealthChange, type ConditionShield } from '../rules/core'
 import { debuffById } from '../rules/debuffs'
@@ -152,6 +153,7 @@ export class CrawlActor extends Actor {
       })
       const health = Math.max(0, system.health.value - result.slotsLost * 10)
       await this.update({ 'system.health.value': health, 'system.shield.slots': result.shieldStates })
+      if (result.slotsLost > 0) await endConditionsOn(this, 'damaged')
       await this.#updateConditionShields(shields, result.conditionShields)
       await this.#syncDying(before.health, health)
       if (before.health > 0 && health <= 0) await creditKillingBlow(options.killingBlowSpell)
@@ -172,6 +174,7 @@ export class CrawlActor extends Actor {
       magicDamageCap,
     })
     await this.update({ 'system.slotsLost': system.slotsLost + result.slotsLost })
+    if (result.slotsLost > 0) await endConditionsOn(this, 'damaged')
     await this.#updateConditionShields(shields, result.conditionShields)
     if (result.slotsLost >= remaining) await this.#markDefeated()
     if (remaining > 0 && result.slotsLost >= remaining) await creditKillingBlow(options.killingBlowSpell)
@@ -226,6 +229,7 @@ export class CrawlActor extends Actor {
     const before = { slotsLost: system.slotsLost }
     const slotsLost = Math.max(0, system.slotsLost - count)
     await this.update({ 'system.slotsLost': slotsLost })
+    if (system.slotsLost > slotsLost) await expireActorEvent('healed', [this])
     return this.#postHealthCard(`${this.name} healed ${system.slotsLost - slotsLost} health slots.`, before, options)
   }
 

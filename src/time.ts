@@ -3,6 +3,7 @@ import { expireKillingBlows } from './effects/killing-blows'
 import { regenAdvance, hasRegen } from './effects/specials'
 import { effectDuration } from './import/convert'
 import { cooldownLabel } from './effects/cooldowns'
+import { endConditionsOn, type EndTrigger } from './effects/end-triggers'
 
 let updates: Promise<any> = Promise.resolve()
 let advancing = false
@@ -19,13 +20,15 @@ export function timedActors(): any[] {
 /** Trigger a native expiry event only for the actors participating in it. */
 export async function expireActorEvent(event: string, actors: any[]) {
   await foundry.documents.ActiveEffect.registry.refresh(event, { actors: new Set(actors), combat: game.combat })
+  // Conditions whose duration text names the event end too (special durations).
+  for (const actor of actors) await endConditionsOn(actor, event as EndTrigger)
 }
 
 /** Standard conditions can end at combat's end OR their time limit (debuffs.ts). */
 export async function expireCombatConditions(actors: any[]) {
   for (const actor of actors) {
     const effects = actor.effects.filter((effect: any) => effect.active && /\bend of (?:the )?combat\b/i.test(effect.system.durationText))
-    if (effects.length) await actor.updateEmbeddedDocuments('ActiveEffect', effects.map((effect: any) => ({ _id: effect.id, duration: { value: 0, units: 'seconds', expiry: null, expired: true } })))
+    if (effects.length) await actor.deleteEmbeddedDocuments('ActiveEffect', effects.map((effect: any) => effect.id))
   }
 }
 

@@ -1,3 +1,5 @@
+import { answerUpkeepRequest } from '../apps/upkeep'
+import { placeArea } from '../effects/areas'
 import { undoAward } from '../apps/awards'
 import { rollDamage } from '../dice/rolls'
 import { actorAction, combatAction } from '../socket'
@@ -30,6 +32,11 @@ async function onAction(message: any, button: HTMLElement) {
   const action = button.dataset.crawlAction
   const total = Number(message.rolls?.[0]?.total) || 0
   switch (action) {
+    case 'place-area': {
+      const item = await fromUuid(button.dataset.itemUuid ?? '')
+      if (item) await placeArea(item)
+      return
+    }
     case 'apply-condition': {
       const effect = fromUuidSync(button.dataset.effectUuid ?? '')
       if (!effect) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Condition.Missing'))
@@ -84,6 +91,9 @@ async function onAction(message: any, button: HTMLElement) {
     }
     case 'undo-award':
       return undoAward(message)
+    case 'upkeep-approve':
+    case 'upkeep-decline':
+      return answerUpkeepRequest(message, action === 'upkeep-approve')
     case 'apply-debuff': {
       const debuff = debuffByName(button.dataset.debuff ?? '')
       if (!debuff) return
@@ -147,6 +157,7 @@ async function renderFooter(message: any) {
 
 export function registerChatHandlers() {
   Hooks.on('renderChatMessageHTML', (message: any, html: HTMLElement) => {
+    if (message.flags?.crawlspace?.answered) html.querySelectorAll('[data-crawl-action^="upkeep-"]').forEach((button) => button.setAttribute('disabled', ''))
     if (message.flags?.crawlspace?.undone) html.querySelector('[data-crawl-action="undo"], [data-crawl-action="undo-award"]')?.setAttribute('disabled', '')
     // One delegated listener, so buttons added below (the footer) work too.
     html.addEventListener('click', (event) => {

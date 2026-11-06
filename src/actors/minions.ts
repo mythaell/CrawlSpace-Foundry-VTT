@@ -9,11 +9,12 @@
  */
 import { raisedHealth } from '../crawlspace-shared/shared/minions'
 import { ownersOf } from './companions'
+import { endConditionsOn } from '../effects/end-triggers'
 
 const RAISE = { type: 'crawlspace.special', key: 'raiseMinion' }
 
 export const raisesMinion = (effect: any) =>
-  !effect.disabled && (effect.system?.changes ?? effect.changes ?? []).some((change: any) => change.type === RAISE.type && change.key === RAISE.key)
+  !effect.disabled && !effect.duration?.expired && (effect.system?.changes ?? effect.changes ?? []).some((change: any) => change.type === RAISE.type && change.key === RAISE.key)
 
 /** Is this actor a mob raised as a minion right now? */
 export const isRaised = (actor: any) => !!actor?.system?.minion?.temporary
@@ -116,6 +117,11 @@ export function registerMinions() {
   }
   Hooks.on('deleteActiveEffect', conditionGone)
   Hooks.on('updateActiveEffect', conditionGone)
+  // "Until you die" conditions end with death.
+  Hooks.on('createActiveEffect', (effect: any) => {
+    const actor = effect.parent
+    if (game.user.isActiveGM && actor?.documentName === 'Actor' && effect.statuses?.has(CONFIG.specialStatusEffects.DEFEATED)) endConditionsOn(actor, 'death')
+  })
   Hooks.on('updateActor', (actor: any) => {
     if (!game.user.isActiveGM || !isRaised(actor) || Number(actor.system.health?.value) > 0) return
     endMinion(actor, 'died').catch((error: any) => console.error('CrawlSpace | end minion', error))

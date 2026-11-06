@@ -1,3 +1,4 @@
+import { areaEditorContext, bindAreaEditor } from '../effects/areas'
 import { CHECK_TYPES, DAMAGE_TYPES, GEAR_SLOTS, STATS } from '../config'
 import { prepareLootBox } from '../apps/awards'
 import { boxSummary, databaseRows, rowKey } from '../loot/database'
@@ -109,6 +110,10 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       type: item.type,
       typeLabel: game.i18n.localize(`TYPES.Item.${item.type}`),
       isRanked: item.type === 'skill' || item.type === 'spell',
+      area: item.type === 'skill' || item.type === 'spell' ? areaEditorContext(item) : null,
+      areaTypes: { circle: 'CRAWLSPACE.Area.Type.circle', cone: 'CRAWLSPACE.Area.Type.cone', rectangle: 'CRAWLSPACE.Area.Type.rectangle', ray: 'CRAWLSPACE.Area.Type.ray' },
+      auraKinds: { '': 'CRAWLSPACE.Aura.Kind.none', aura: 'CRAWLSPACE.Aura.Kind.aura', dread: 'CRAWLSPACE.Aura.Kind.dread' },
+      auraTargets: { allies: 'CRAWLSPACE.Aura.Targets.allies', enemies: 'CRAWLSPACE.Aura.Targets.enemies', everyone: 'CRAWLSPACE.Aura.Targets.everyone' },
       isPhysical: PHYSICAL.includes(item.type),
       hasDamage: ['skill', 'spell', 'weapon', 'consumable', 'trap'].includes(item.type),
       damageLegend: item.type === 'weapon' ? 'CRAWLSPACE.Item.DamageBonus' : 'CRAWLSPACE.Item.Damage',
@@ -253,6 +258,7 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
   async _onRender(context: any, options: any) {
     await super._onRender(context, options)
     bindRulesEditor(this.element, (id) => this.item.effects.get(id), this.isEditable)
+    bindAreaEditor(this.element as HTMLElement, this.item, this.isEditable)
     if (this.isEditable)
       for (const zone of this.element.querySelectorAll('[data-drop-list]')) {
         zone.addEventListener('dragover', (event) => event.preventDefault())

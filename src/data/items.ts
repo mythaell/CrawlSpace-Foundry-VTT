@@ -1,6 +1,6 @@
 import { rankCap } from '../effects/rank-cap'
 import { GEAR_SLOTS } from '../config'
-import { rankDie } from '../rules/core'
+import { rankDie, splitRankDice } from '../rules/core'
 
 const f = () => foundry.data.fields
 const text = (initial = '') => new (f().StringField)({ required: true, blank: true, initial })
@@ -72,6 +72,8 @@ const rankedSchema = () => {
       rank10Damage: text(),
       rank15Damage: text(),
     }),
+    /** Area templates by Rank tier (abilityTemplates.ts); empty uses the published ones for the name. */
+    areas: new fields.ObjectField(),
   }
 }
 
@@ -96,6 +98,9 @@ function prepareRanked(model: any, kind: 'skill' | 'spell') {
           ? model.upgrades.rank5Damage
           : model.damage.formula
   model.damage.atRank = withRank(upgraded, rank)
+  const split = splitRankDice(upgraded, rank)
+  model.damage.baseAtRank = withRank(split.base, rank)
+  model.damage.rankDice = split.dice
   const heal = model.healing ?? {}
   const healing = (rank >= 15 && heal.rank15) || (rank >= 10 && heal.rank10) || (rank >= 5 && heal.rank5) || heal.formula || ''
   model.healing.atRank = withRank(String(healing).trim(), rank)
