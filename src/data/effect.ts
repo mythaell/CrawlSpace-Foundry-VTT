@@ -85,12 +85,14 @@ export function createEffectDataModel() {
      * Why an enabled effect doesn't apply: 'expired', 'unequipped' gear, a Rank not yet reached, or 'off' when
      * the owning actor switched an item's effect off for itself (the item keeps its own on/off).
      */
-    get suppression(): '' | 'expired' | 'unequipped' | 'rank' | 'off' {
+    get suppression(): '' | 'expired' | 'unequipped' | 'rank' | 'off' | 'cast' {
       const effect = this.parent
       if (effect?.duration?.expired) return 'expired'
       const item = effect?.parent?.documentName === 'Item' ? effect.parent : null
       if (!item) return ''
       if (actorTurnedOff(effect)) return 'off'
+      // A spell's own effects aren't always on: casting it puts a copy on the caster (applyCastEffects).
+      if (item.type === 'spell' && effect.transfer) return 'cast'
       if (['weapon', 'equipment', 'tattoo'].includes(item.type) && !item.system.equipped) return 'unequipped'
       if (this.requiredRank !== null && this.requiredRank !== undefined && ['skill', 'spell'].includes(item.type)) {
         const actor = item.actor

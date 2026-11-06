@@ -157,8 +157,7 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       [...this.actor.items]
         .filter((item: any) => types.includes(item.type))
         .flatMap((item: any) => item.effects.filter((e: any) => e.transfer).map((effect: any) => rows(effect, item)))
-    // A spell's own effects count as the buffs or debuffs it gives.
-    const spells = fromItems(['spell'])
+    // A spell's own effects show up as buffs or debuffs once it is cast (the copies are the actor's).
     const groups = [
       { label: 'CRAWLSPACE.Effect.FromItems', types: ['weapon', 'equipment', 'tattoo', 'consumable', 'loot', 'lootBox', 'trap'] },
       { label: 'CRAWLSPACE.Effect.FromAbilities', types: ['ability'] },
@@ -167,8 +166,8 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       { label: 'CRAWLSPACE.Effect.FromAchievements', types: ['achievement'] },
     ]
     return {
-      conditions: [...actorEffects, ...spells].filter((e: any) => e.kind === 'debuff'),
-      buffs: [...actorEffects, ...spells].filter((e: any) => e.kind !== 'debuff'),
+      conditions: actorEffects.filter((e: any) => e.kind === 'debuff'),
+      buffs: actorEffects.filter((e: any) => e.kind !== 'debuff'),
       sources: groups.map((group) => ({ label: group.label, effects: fromItems(group.types) })).filter((group) => group.effects.length),
     }
   }

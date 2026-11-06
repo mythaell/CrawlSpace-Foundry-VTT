@@ -302,8 +302,10 @@
         "expired": "Expired",
         "unequipped": "Not equipped",
         "rank": "Rank too low",
-        "off": "Off"
-      }
+        "off": "Off",
+        "cast": "When cast"
+      },
+      "OnCast": "On self when cast"
     },
     "Attack": {
       "Unarmed": "Unarmed strike",

@@ -19,9 +19,42 @@ function rankWindow(effect: any): { min: number; max: number } | null {
 
 /** The conditions this item gives when used, at its current Rank. */
 export function useConditions(item: any): any[] {
+  return rankedEffects(item, false)
+}
+
+/** A spell's own effects ("Applies to the owner") that its caster gets when casting it, at its current Rank. */
+export function castSelfEffects(item: any): any[] {
+  return item?.type === 'spell' ? rankedEffects(item, true).filter((effect: any) => !effect.disabled) : []
+}
+
+/**
+ * Casting a spell puts its self effects on the caster as buffs (or debuffs, by their Kind), timed by their
+ * duration. Recasting refreshes them: the copies from the last cast are replaced.
+ */
+export async function applyCastEffects(item: any) {
+  const actor = item?.actor
+  const effects = castSelfEffects(item)
+  if (!actor?.isOwner || !effects.length) return
+  const rank = Math.floor(Number(item.system?.rank?.total) || 0)
+  const old = actor.effects.filter((effect: any) => effect.flags?.crawlspace?.castFrom?.spell === item.name)
+  if (old.length) await actor.deleteEmbeddedDocuments('ActiveEffect', old.map((effect: any) => effect.id))
+  await actor.createEmbeddedDocuments(
+    'ActiveEffect',
+    effects.map((effect: any) => {
+      // An effect without a duration of its own lasts as long as the spell does.
+      const own = effectDuration(effect.system?.durationText)
+      const data = conditionData(own || !item.system?.duration ? effect : effect.clone({ 'system.durationText': item.system.duration }), { origin: item })
+      data.system = { ...data.system, conditionType: data.system?.conditionType || 'buff', rank, castBy: actor.name }
+      data.flags = foundry.utils.mergeObject(data.flags ?? {}, { crawlspace: { castFrom: { spell: item.name, effect: effect.id } } })
+      return data
+    }),
+  )
+}
+
+function rankedEffects(item: any, transfer: boolean): any[] {
   const rank = Math.floor(Number(item.system?.rank?.total) || 0)
   return item.effects.filter((effect: any) => {
-    if (effect.transfer) return false
+    if (!!effect.transfer !== transfer) return false
     const window = rankWindow(effect)
     if (window && ['skill', 'spell'].includes(item.type) && (rank < window.min || rank > window.max)) return false
     const required = effect.system?.requiredRank
@@ -30,13 +63,13 @@ export function useConditions(item: any): any[] {
 }
 
 /** The condition as it lands on a target: active, timed by its duration text, and from the item. */
-export function conditionData(effect: any) {
+export function conditionData(effect: any, options: { origin?: any } = {}) {
   const data = effect.toObject()
   delete data._id
   delete data.start
   const timed = effectDuration(data.system?.durationText)
   data.duration = { ...data.duration, ...(timed ? { expiry: null, ...timed } : {}), expired: false }
-  const item = effect.parent
+  const item = options.origin ?? effect.parent
   return { ...data, transfer: true, disabled: false, origin: item?.documentName === 'Item' ? item.uuid : effect.origin }
 }
 

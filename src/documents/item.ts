@@ -1,3 +1,4 @@
+import { applyCastEffects } from '../effects/use-conditions'
 import { handEquipmentConflict, type WornItem } from '../crawlspace-shared/shared/equipmentSlots'
 import { openLootBoxes } from '../loot/boxes'
 import { buildEffect, effectDuration, stableId } from '../import/convert'
@@ -88,6 +89,7 @@ export class CrawlItem extends Item {
           const result = await this.#useRanked(options)
           // A Passive skill only posts its card; anything rolled (or any spell cast) counts toward advancement.
           if (result && (this.type === 'spell' || this.system.checkType !== 'Passive')) await markForAdvancement([this])
+          if (result) await applyCastEffects(this)
           return result
         })
       case 'weapon':

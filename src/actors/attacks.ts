@@ -1,3 +1,4 @@
+import { applyCastEffects } from '../effects/use-conditions'
 import { markForAdvancement } from '../documents/item'
 import { spellKillBonus } from '../effects/killing-blows'
 /**
@@ -203,6 +204,7 @@ export async function attackWithRow(actor: any, row: AttackRow, options: { fast?
     const result = await rollAttack(actor, resolveAttack(actor, row), options)
     // The skill or spell behind the attack counts as rolled, for advancement.
     if (result) await markForAdvancement([source, skill])
+    if (result && source?.type === 'spell') await applyCastEffects(source)
     return result
   })
 }
