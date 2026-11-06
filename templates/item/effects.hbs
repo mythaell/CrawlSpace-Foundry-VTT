@@ -22,6 +22,7 @@
   {{else}}
   <p class="rules-empty">{{localize "CRAWLSPACE.Empty.ItemEffects"}}</p>
   {{/each}}
+  {{#each datalists}}<datalist id="{{id}}">{{#each names}}<option value="{{this}}"></option>{{/each}}</datalist>{{/each}}
   {{#if editable}}<button type="button" class="pf-add" data-action="createEffect"><i class="fa-solid fa-plus"></i> {{localize "CRAWLSPACE.Effect.Create"}}</button>{{/if}}
   <p class="hint">{{localize "CRAWLSPACE.Effect.ItemHint"}}</p>
 </section>

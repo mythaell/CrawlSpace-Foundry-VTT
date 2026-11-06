@@ -4,7 +4,7 @@ import { prepareLootBox } from '../apps/awards'
 import { boxSummary, databaseRows, rowKey } from '../loot/database'
 import { linkSpec, type BuildLink, type LinkKind } from '../rules/build-links'
 import { benefitTemplates, benefitTiers, createBuildEntry, detrimentTemplates, detrimentTiers, getRaceClassBuild } from '../crawlspace-shared/shared/raceClassRules'
-import { bindRulesEditor, rulesContext, ruleTypeChoices } from '../effects/rules'
+import { bindRulesEditor, rulesContext, rulesDatalists, ruleTypeChoices } from '../effects/rules'
 import { documentIds } from './ids'
 
 const { HandlebarsApplicationMixin } = foundry.applications.api
@@ -241,6 +241,7 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       case 'rules':
         context.ids = documentIds(item)
         context.ruleTypes = ruleTypeChoices()
+        context.datalists = rulesDatalists()
         context.effects = item.effects.map((effect: any) => ({
           id: effect.id,
           name: effect.name,

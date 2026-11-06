@@ -17,7 +17,7 @@
         <a data-action="stackEffect" data-delta="-1"><i class="fa-solid fa-minus"></i></a> {{effect.stacks}} <a data-action="stackEffect" data-delta="1"><i class="fa-solid fa-plus"></i></a>
       </span>
     {{/if}}
-    <span class="col duration">{{effect.duration}}</span>
+    <span class="col duration">{{#if effect.suppression}}<em class="suppression">{{effect.suppression}}</em>{{else}}{{effect.duration}}{{/if}}</span>
     <span class="item-controls">
       <a data-action="toggleEffect" data-tooltip="{{localize (ifThen effect.disabled 'CRAWLSPACE.Effect.Enable' 'CRAWLSPACE.Effect.Disable')}}"><i class="fa-solid {{#if effect.disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}"></i></a>
       <a data-action="editEffect"><i class="fa-solid fa-pen-to-square"></i></a>
@@ -38,6 +38,8 @@
   </div>
   <ol class="item-list">{{#each effects.buffs as |effect|}}{{> effectRow effect=effect}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Buffs"}}</li>{{/each}}</ol>
 
-  <div class="list-header"><span class="item-name">{{localize "CRAWLSPACE.Effect.FromItems"}}</span></div>
-  <ol class="item-list">{{#each effects.fromItems as |effect|}}{{> effectRow effect=effect}}{{else}}<li class="empty">—</li>{{/each}}</ol>
+  {{#each effects.sources as |group|}}
+  <div class="list-header"><span class="item-name">{{localize group.label}}</span></div>
+  <ol class="item-list">{{#each group.effects as |effect|}}{{> effectRow effect=effect}}{{/each}}</ol>
+  {{/each}}
 </section>

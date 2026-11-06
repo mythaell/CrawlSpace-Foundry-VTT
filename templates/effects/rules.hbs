@@ -16,6 +16,15 @@
         <span>{{field.label}}</span>
         {{#if field.options}}
         <select data-rule-field="{{field.name}}">{{#each field.options}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+        {{else if field.named}}
+        <span class="rule-named">
+          <input type="text" data-rule-field="{{field.name}}" value="{{field.value}}" list="{{field.named.list}}" data-named-types="{{field.named.types}}" placeholder="{{localize 'CRAWLSPACE.Rules.PickOrDrop'}}">
+          {{#if field.named.uuid}}<a data-rule-open="{{field.named.uuid}}" data-tooltip="{{localize 'CRAWLSPACE.Rules.OpenLinked'}}"><i class="fa-solid fa-link"></i></a>{{/if}}
+        </span>
+        {{else if field.duration}}
+        <span class="time-input"><input type="text" data-rule-field="{{field.name}}" value="{{field.value}}"><a class="time-picker" data-time-picker data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span>
+        {{else if field.damageTypes}}
+        <span class="time-input"><input type="text" data-rule-field="{{field.name}}" value="{{field.value}}"><a class="time-picker" data-rule-damage-types data-tooltip="{{localize 'CRAWLSPACE.Rules.PickDamageTypes'}}"><i class="fa-solid fa-list-check"></i></a></span>
         {{else}}
         <input type="{{#if field.isNumber}}number{{else}}text{{/if}}" data-rule-field="{{field.name}}" value="{{field.value}}">
         {{/if}}
@@ -26,6 +35,7 @@
   {{else}}
   <p class="rules-empty">{{localize "CRAWLSPACE.Rules.None"}}</p>
   {{/each}}
+  {{#each datalists}}<datalist id="{{id}}">{{#each names}}<option value="{{this}}"></option>{{/each}}</datalist>{{/each}}
   {{#if editable}}
   <div class="rule-new">
     <select data-rule-new>{{#each ruleTypes}}<option value="{{value}}">{{label}}</option>{{/each}}</select>

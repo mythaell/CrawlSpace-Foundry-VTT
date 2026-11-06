@@ -1,3 +1,4 @@
+import { actorTurnedOff, itemEffectKey } from '../data/effect'
 import { cooldownFor, cooldownLabel } from '../effects/cooldowns'
 import { CHECK_TYPES, CREATURE_SIZES, CREATURE_TYPES, DAMAGE_TYPES, GEAR_SLOTS, STATS, STAT_KEYS } from '../config'
 import { DEBUFFS } from '../rules/debuffs'
@@ -138,8 +139,11 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       uuid: effect.uuid,
       name: effect.name,
       img: effect.img,
-      disabled: effect.disabled,
-      suppressed: effect.isSuppressed,
+      // An item's effect the actor switched off shows as off here; the item itself is unchanged.
+      disabled: effect.disabled || (!!owner && actorTurnedOff(effect)),
+      suppressed: effect.isSuppressed && effect.system?.suppression !== 'off',
+      suppression:
+        effect.system?.suppression && effect.system.suppression !== 'off' ? game.i18n.localize(`CRAWLSPACE.Effect.Suppressed.${effect.system.suppression}`) : '',
       stacks: effect.system?.stacks ?? 1,
       stackable: effect.statuses.size ? DEBUFFS.find((debuff) => effect.statuses.has(debuff.id))?.stackable : !!effect.system?.maxStacks,
       kind: effect.system?.conditionType || (effect.statuses.size ? 'debuff' : ''),
@@ -149,11 +153,23 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       changes: (effect.system?.changes ?? []).length,
     })
     const actorEffects = this.actor.effects.map((effect: any) => rows(effect))
-    const itemEffects = [...this.actor.items].flatMap((item: any) => item.effects.filter((e: any) => e.transfer).map((effect: any) => rows(effect, item)))
+    const fromItems = (types: string[]) =>
+      [...this.actor.items]
+        .filter((item: any) => types.includes(item.type))
+        .flatMap((item: any) => item.effects.filter((e: any) => e.transfer).map((effect: any) => rows(effect, item)))
+    // A spell's own effects count as the buffs or debuffs it gives.
+    const spells = fromItems(['spell'])
+    const groups = [
+      { label: 'CRAWLSPACE.Effect.FromItems', types: ['weapon', 'equipment', 'tattoo', 'consumable', 'loot', 'lootBox', 'trap'] },
+      { label: 'CRAWLSPACE.Effect.FromAbilities', types: ['ability'] },
+      { label: 'CRAWLSPACE.Effect.FromSkills', types: ['skill'] },
+      { label: 'CRAWLSPACE.Effect.FromBuild', types: ['race', 'class', 'background'] },
+      { label: 'CRAWLSPACE.Effect.FromAchievements', types: ['achievement'] },
+    ]
     return {
-      conditions: actorEffects.filter((e: any) => e.kind === 'debuff'),
-      buffs: actorEffects.filter((e: any) => e.kind !== 'debuff'),
-      fromItems: itemEffects,
+      conditions: [...actorEffects, ...spells].filter((e: any) => e.kind === 'debuff'),
+      buffs: [...actorEffects, ...spells].filter((e: any) => e.kind !== 'debuff'),
+      sources: groups.map((group) => ({ label: group.label, effects: fromItems(group.types) })).filter((group) => group.effects.length),
     }
   }
 
@@ -374,7 +390,16 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   }
   static async #onToggleEffect(this: CrawlActorSheet, _event: PointerEvent, target: HTMLElement) {
     const effect = this.effectFrom(target)
-    if (effect) await effect.update({ disabled: !effect.disabled })
+    if (!effect) return
+    if (effect.parent?.documentName !== 'Item') return effect.update({ disabled: !effect.disabled })
+    // An item's effect is switched for this actor only (a flag), so the item's own setting stays as it is.
+    const key = itemEffectKey(effect)
+    const off = new Set<string>(this.actor.flags?.crawlspace?.offEffects ?? [])
+    if (effect.disabled || off.has(key)) {
+      off.delete(key)
+      if (effect.disabled) await effect.update({ disabled: false })
+    } else off.add(key)
+    await this.actor.setFlag('crawlspace', 'offEffects', [...off])
   }
   static async #onDeleteEffect(this: CrawlActorSheet, _event: PointerEvent, target: HTMLElement) {
     return this.effectFrom(target)?.delete()

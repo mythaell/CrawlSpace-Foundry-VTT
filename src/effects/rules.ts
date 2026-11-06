@@ -7,7 +7,31 @@ import { DAMAGE_TYPES, STATS, STAT_KEYS, statKeyFromCode } from '../config'
 import { DEBUFFS } from '../rules/debuffs'
 import { CUSTOM_CHANGE_TYPES } from './mapping'
 
-type Field = { name: string; label: string; kind: 'stat' | 'number' | 'text' | 'damageType' | 'debuff' | 'rollKind' | 'rollValue' | 'changeType' | 'shieldScope' }
+/**
+ * Field kinds. Besides plain text and numbers: selects (stat, damageType, debuff, rollKind, rollValue, changeType,
+ * shieldScope, special), named items (skill, spell, skillOrSpell: pick from a list, drop an Item, or open the
+ * linked one), a duration (typed, or picked with the clock), and damage types (ticked in a list).
+ */
+type Field = {
+  name: string
+  label: string
+  kind:
+    | 'stat'
+    | 'number'
+    | 'text'
+    | 'damageType'
+    | 'debuff'
+    | 'rollKind'
+    | 'rollValue'
+    | 'changeType'
+    | 'shieldScope'
+    | 'special'
+    | 'skill'
+    | 'spell'
+    | 'skillOrSpell'
+    | 'duration'
+    | 'damageTypes'
+}
 type Values = Record<string, any>
 type Change = { key: string; type: string; value: any; phase?: string; priority?: number | null }
 type RuleType = {
@@ -112,17 +136,17 @@ export const RULE_TYPES: RuleType[] = [
   traitRule('vulnerability', 'vulnerabilities', 'damageType'),
   traitRule('immunity', 'immunities', 'damageType'),
   traitRule('conditionImmunity', 'conditionImmunities', 'debuff'),
-  namedRule('skillRank', { name: 'target', label: 'CRAWLSPACE.Rules.Field.skill', kind: 'text' }),
-  namedRule('spellRank', { name: 'target', label: 'CRAWLSPACE.Rules.Field.spell', kind: 'text' }),
-  namedRule('baseSkillRank', { name: 'target', label: 'CRAWLSPACE.Rules.Field.skill', kind: 'text' }),
-  namedRule('baseSpellRank', { name: 'target', label: 'CRAWLSPACE.Rules.Field.spell', kind: 'text' }),
+  namedRule('skillRank', { name: 'target', label: 'CRAWLSPACE.Rules.Field.skill', kind: 'skill' }),
+  namedRule('spellRank', { name: 'target', label: 'CRAWLSPACE.Rules.Field.spell', kind: 'spell' }),
+  namedRule('baseSkillRank', { name: 'target', label: 'CRAWLSPACE.Rules.Field.skill', kind: 'skill' }),
+  namedRule('baseSpellRank', { name: 'target', label: 'CRAWLSPACE.Rules.Field.spell', kind: 'spell' }),
   namedRule('healthBonus', { name: 'target', label: 'CRAWLSPACE.Rules.Field.slots', kind: 'text' }),
   {
     id: 'rollMode',
     label: 'CRAWLSPACE.Rules.Type.rollMode',
     fields: [
       { name: 'kind', label: 'CRAWLSPACE.Rules.Field.rollKind', kind: 'rollKind' },
-      { name: 'target', label: 'CRAWLSPACE.Rules.Field.appliesTo', kind: 'text' },
+      { name: 'target', label: 'CRAWLSPACE.Rules.Field.appliesTo', kind: 'skillOrSpell' },
       { name: 'value', label: 'CRAWLSPACE.Rules.Field.mode', kind: 'rollValue' },
     ],
     match: (c) => c.type === CUSTOM_CHANGE_TYPES.rollMode,
@@ -136,9 +160,9 @@ export const RULE_TYPES: RuleType[] = [
     id: 'inherentSpell',
     label: 'CRAWLSPACE.Rules.Type.inherentSpell',
     fields: [
-      { name: 'target', label: 'CRAWLSPACE.Rules.Field.spell', kind: 'text' },
+      { name: 'target', label: 'CRAWLSPACE.Rules.Field.spell', kind: 'spell' },
       { name: 'value', label: 'CRAWLSPACE.Rules.Field.rank', kind: 'number' },
-      { name: 'cooldown', label: 'CRAWLSPACE.Rules.Field.cooldown', kind: 'text' },
+      { name: 'cooldown', label: 'CRAWLSPACE.Rules.Field.cooldown', kind: 'duration' },
     ],
     match: (c) => c.type === CUSTOM_CHANGE_TYPES.special && c.key === 'inherentSpell',
     read: (c) => {
@@ -196,7 +220,7 @@ export const RULE_TYPES: RuleType[] = [
     label: 'CRAWLSPACE.Rules.Type.cleanupDamage',
     fields: [
       { name: 'formula', label: 'CRAWLSPACE.Rules.Field.formula', kind: 'text' },
-      { name: 'types', label: 'CRAWLSPACE.Rules.Field.damageTypes', kind: 'text' },
+      { name: 'types', label: 'CRAWLSPACE.Rules.Field.damageTypes', kind: 'damageTypes' },
     ],
     match: (c) => c.type === CUSTOM_CHANGE_TYPES.special && c.key === 'cleanup',
     read: (c) => {
@@ -210,7 +234,7 @@ export const RULE_TYPES: RuleType[] = [
     id: 'special',
     label: 'CRAWLSPACE.Rules.Type.special',
     fields: [
-      { name: 'special', label: 'CRAWLSPACE.Rules.Field.special', kind: 'text' },
+      { name: 'special', label: 'CRAWLSPACE.Rules.Field.special', kind: 'special' },
       { name: 'target', label: 'CRAWLSPACE.Rules.Field.appliesTo', kind: 'text' },
       { name: 'value', label: 'CRAWLSPACE.Rules.Field.value', kind: 'text' },
     ],
@@ -264,6 +288,7 @@ const OPTIONS: Record<string, () => { value: string; label: string }[]> = {
     ['attackMode', 'checkMode', 'evadeMode', 'incomingAttackMode'].map((value) => ({ value, label: game.i18n.localize(`CRAWLSPACE.Rules.RollKind.${value}`) })),
   rollValue: () => ['advantage', 'disadvantage'].map((value) => ({ value, label: game.i18n.localize(`CRAWLSPACE.Roll.Mode.${value}`) })),
   shieldScope: () => ['all', 'nonMagic'].map((value) => ({ value, label: game.i18n.localize(`CRAWLSPACE.Rules.ShieldScope.${value}`) })),
+  special: () => SPECIAL_KINDS.map((value) => ({ value, label: game.i18n.localize(`CRAWLSPACE.Rules.Special.${value}`) })),
   changeType: () => Object.keys(CONFIG.ActiveEffect.changeTypes ?? { add: 1 }).map((value) => ({ value, label: value })),
 }
 
@@ -282,16 +307,52 @@ export function rulesContext(effect: any) {
         const value = values[field.name] ?? ''
         const options = OPTIONS[field.kind]?.()
         if (options && value !== '' && !options.some((option) => option.value === String(value))) options.push({ value: String(value), label: String(value) })
+        const named = NAMED_KINDS[field.kind]
         return {
           name: field.name,
           label: game.i18n.localize(field.label),
           value,
           isNumber: field.kind === 'number',
           options: options?.map((option) => ({ ...option, selected: option.value === String(value) })),
+          named: named ? { list: `crawl-names-${field.kind}`, types: named.join(','), uuid: linkedUuid(String(value), named) } : null,
+          duration: field.kind === 'duration',
+          damageTypes: field.kind === 'damageTypes',
         }
       }),
     }
   })
+}
+
+/** The item types a named field takes. */
+const NAMED_KINDS: Partial<Record<Field['kind'], string[]>> = { skill: ['skill'], spell: ['spell'], skillOrSpell: ['skill', 'spell'] }
+
+/** Skills or spells by name from the world and the Item compendia (one entry per name, world first). */
+function namedItems(types: string[]) {
+  const found = new Map<string, string>()
+  for (const item of game.items ?? []) if (types.includes(item.type) && !found.has(item.name)) found.set(item.name, item.uuid)
+  for (const pack of game.packs ?? []) {
+    if (pack.documentName !== 'Item') continue
+    for (const entry of pack.index ?? []) if (types.includes(entry.type) && !found.has(entry.name)) found.set(entry.name, entry.uuid ?? pack.getUuid?.(entry._id))
+  }
+  return found
+}
+
+/** The world or compendium item a named field points at, if there is one. */
+function linkedUuid(name: string, types: string[]) {
+  const key = name.trim().toLowerCase()
+  if (!key || key === 'all') return ''
+  for (const [entry, uuid] of namedItems(types)) if (entry.toLowerCase() === key) return uuid
+  return ''
+}
+
+/** Datalists for the named fields: every skill, spell, or both (with "All" for roll modes). */
+export function rulesDatalists() {
+  const list = (types: string[], extra: string[] = []) => [...extra, ...[...namedItems(types).keys()].sort((a, b) => a.localeCompare(b))]
+  return [
+    { id: 'crawl-names-skill', names: list(['skill']) },
+    { id: 'crawl-names-spell', names: list(['spell']) },
+    { id: 'crawl-names-skillOrSpell', names: list(['skill', 'spell'], ['All']) },
+  ]
 }
 
 export const ruleTypeChoices = () =>
@@ -338,6 +399,39 @@ export function bindRulesEditor(root: HTMLElement, effectFor: (id: string) => an
         })
       })
     }
+    for (const input of list.querySelectorAll<HTMLInputElement>('[data-named-types]')) {
+      input.addEventListener('dragover', (event) => event.preventDefault())
+      input.addEventListener('drop', async (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event)
+        const item: any = data?.type === 'Item' && data.uuid ? await fromUuid(data.uuid) : null
+        const types = (input.dataset.namedTypes ?? '').split(',')
+        if (!item || !types.includes(item.type)) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Rules.DropWrongType'))
+        input.value = item.name
+        input.dispatchEvent(new Event('change', { bubbles: true }))
+      })
+    }
+    for (const link of list.querySelectorAll<HTMLElement>('[data-rule-open]')) {
+      link.addEventListener('click', async (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        const item: any = await fromUuid(link.dataset.ruleOpen as string)
+        item?.sheet?.render(true)
+      })
+    }
+    for (const button of list.querySelectorAll<HTMLElement>('[data-rule-damage-types]')) {
+      button.addEventListener('click', async (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        const input = button.parentElement?.querySelector<HTMLInputElement>('input')
+        if (!input) return
+        const picked = await pickDamageTypes(splitTypes(input.value))
+        if (!picked) return
+        input.value = picked.join(', ')
+        input.dispatchEvent(new Event('change', { bubbles: true }))
+      })
+    }
     for (const button of list.querySelectorAll<HTMLElement>('[data-rule-action]')) {
       button.addEventListener('click', async (event) => {
         event.preventDefault()
@@ -358,6 +452,24 @@ export function bindRulesEditor(root: HTMLElement, effectFor: (id: string) => an
       })
     }
   }
+}
+
+/** Tick damage types in a list; null if cancelled. */
+async function pickDamageTypes(selected: string[]): Promise<string[] | null> {
+  const chosen = new Set(selected.map((type) => type.toLowerCase()))
+  const esc = foundry.utils.escapeHTML
+  const content = `<div class="crawl-check-grid">${DAMAGE_TYPES.map(
+    (type: string) => `<label><input type="checkbox" name="type" value="${esc(type)}" ${chosen.has(type.toLowerCase()) ? 'checked' : ''}> ${esc(type)}</label>`,
+  ).join('')}</div>`
+  const result = await foundry.applications.api.DialogV2.prompt({
+    window: { title: game.i18n.localize('CRAWLSPACE.Rules.Field.damageTypes') },
+    classes: ['crawlspace', 'crawl-pick-dialog'],
+    position: { width: 420 },
+    content,
+    rejectClose: false,
+    ok: { label: game.i18n.localize('CRAWLSPACE.Sheet.Apply'), callback: (_event: Event, button: any) => [...button.form.querySelectorAll('[name=type]:checked')].map((input: any) => input.value) },
+  })
+  return Array.isArray(result) ? result : null
 }
 
 /** Edit one change as raw JSON, like PF2e's rule element editor. */

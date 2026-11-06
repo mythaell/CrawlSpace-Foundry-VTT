@@ -87,20 +87,40 @@ export async function runAutoLoot(actors: any[], settings: AutoLootSettings) {
 export async function openAutoLoot(actors: any[]) {
   if (!game.user.isGM || !actors.length) return
   const saved = { ...DEFAULTS, ...(game.settings.get('crawlspace', 'autoLoot') ?? {}) } as AutoLootSettings
-  const content = `<p>${t('Hint', { names: actors.map((actor) => esc(actor.name)).join(', ') })}</p>
-    <div class="form-group"><label>${t('ChanceLabel')}</label><input type="number" name="chance" min="0" max="100" step="1" value="${saved.chancePercent}"></div>
-    <fieldset class="auto-loot-weights"><legend>${t('Weights')}</legend>${lootTiers
-      .map((tier) => `<label>${tier}<input type="number" name="weight-${tier}" min="0" step="1" value="${saved.weights[tier] ?? 0}"></label>`)
-      .join('')}</fieldset>
-    <fieldset class="auto-loot-types"><legend>${t('Types')}</legend>${AUTO_LOOT_TYPES.map(
-      (type) => `<label><input type="checkbox" name="type" value="${esc(type)}" ${saved.types.includes(type) ? 'checked' : ''}> ${esc(type)}</label>`,
-    ).join('')}</fieldset>`
+  const content = `<p class="hint">${t('Hint', { names: actors.map((actor) => esc(actor.name)).join(', ') })}</p>
+    <section class="auto-loot-section">
+      <h4>${t('ChanceLabel')}</h4>
+      <div class="auto-loot-chance"><input type="range" name="chanceSlider" min="0" max="100" step="1" value="${saved.chancePercent}"><input type="number" name="chance" min="0" max="100" step="1" value="${saved.chancePercent}"><span>%</span></div>
+    </section>
+    <section class="auto-loot-section">
+      <h4>${t('Weights')}</h4>
+      <div class="auto-loot-weights">${lootTiers
+        .map((tier) => `<label><span>${tier}</span><input type="number" name="weight-${tier}" min="0" step="1" value="${saved.weights[tier] ?? 0}"></label>`)
+        .join('')}</div>
+    </section>
+    <section class="auto-loot-section">
+      <h4>${t('Types')}<span class="auto-loot-all"><a data-auto-loot-all="1">${t('All')}</a> · <a data-auto-loot-all="0">${t('None')}</a></span></h4>
+      <div class="auto-loot-types">${AUTO_LOOT_TYPES.map(
+        (type) => `<label><input type="checkbox" name="type" value="${esc(type)}" ${saved.types.includes(type) ? 'checked' : ''}><span>${esc(type)}</span></label>`,
+      ).join('')}</div>
+    </section>`
   const settings = await foundry.applications.api.DialogV2.prompt({
-    window: { title: t('Title') },
     classes: ['crawlspace', 'auto-loot-dialog'],
-    position: { width: 480 },
+    position: { width: 520 },
+    window: { title: t('Title'), resizable: true },
     content,
     rejectClose: false,
+    render: (_event: Event, dialog: any) => {
+      const root = dialog.element as HTMLElement
+      const slider = root.querySelector<HTMLInputElement>('[name=chanceSlider]')
+      const number = root.querySelector<HTMLInputElement>('[name=chance]')
+      slider?.addEventListener('input', () => number && (number.value = slider.value))
+      number?.addEventListener('input', () => slider && (slider.value = number.value))
+      for (const link of root.querySelectorAll<HTMLElement>('[data-auto-loot-all]'))
+        link.addEventListener('click', () => {
+          for (const box of root.querySelectorAll<HTMLInputElement>('[name=type]')) box.checked = link.dataset.autoLootAll === '1'
+        })
+    },
     ok: {
       label: t('Roll'),
       icon: 'fa-solid fa-dice',

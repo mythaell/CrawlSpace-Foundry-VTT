@@ -96,3 +96,24 @@ test('special durations read the events that end a condition', () => {
   assert.deepEqual(endTriggers('Once you make a check'), ['check'])
   assert.deepEqual(endTriggers('5 minutes'), [])
 })
+
+test('every special duration in the picker is one the end triggers read (or is kept manual)', async () => {
+  const { SPECIAL_DURATIONS, endTriggers } = await import('../src/effects/end-triggers.ts')
+  const expected = {
+    'Until the end of combat': ['combatEnd'],
+    'Until you are healed at least 1 health slot': ['healed'],
+    'Until you take at least 1 HP slot of damage': ['damaged'],
+    'Ends once you make a check': ['check'],
+    'Until the end of the next action you take': ['action'],
+    'Until you die': ['death'],
+    'Until the end of a short rest': ['shortRest'],
+    'Until you complete a long rest': ['longRest'],
+    'Until you finish a full day of rest': ['fullRest'],
+    'Until you enter a saferoom': ['safeRoom'],
+    'Until you leave this floor': ['leaveFloor'],
+    'Until cured with a bandage': [],
+    'While the source is active': [],
+  }
+  assert.deepEqual([...SPECIAL_DURATIONS].sort(), Object.keys(expected).sort())
+  for (const [text, triggers] of Object.entries(expected)) assert.deepEqual(endTriggers(text), triggers, text)
+})

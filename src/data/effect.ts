@@ -4,6 +4,16 @@
  */
 const f = () => foundry.data.fields
 
+/** The key an actor uses to switch one of its items' effects off for itself. */
+export const itemEffectKey = (effect: any) => `${effect?.parent?.id}.${effect?.id}`
+
+/** Has the item's actor switched this effect off (flags.crawlspace.offEffects)? */
+export function actorTurnedOff(effect: any) {
+  const item = effect?.parent
+  const off = item?.actor?.flags?.crawlspace?.offEffects
+  return Array.isArray(off) && off.includes(itemEffectKey(effect))
+}
+
 export function createEffectDataModel() {
   const Base = foundry.data.ActiveEffectTypeDataModel
   return class CrawlEffectData extends Base {
@@ -68,20 +78,29 @@ export function createEffectDataModel() {
      * and a skill or spell's rank-gated effect waits for its Rank (CrawlSpace `requiredRank`).
      */
     get isSuppressed() {
+      return !!this.suppression
+    }
+
+    /**
+     * Why an enabled effect doesn't apply: 'expired', 'unequipped' gear, a Rank not yet reached, or 'off' when
+     * the owning actor switched an item's effect off for itself (the item keeps its own on/off).
+     */
+    get suppression(): '' | 'expired' | 'unequipped' | 'rank' | 'off' {
       const effect = this.parent
-      if (effect?.duration?.expired) return true
+      if (effect?.duration?.expired) return 'expired'
       const item = effect?.parent?.documentName === 'Item' ? effect.parent : null
-      if (!item) return false
-      if (['weapon', 'equipment', 'tattoo'].includes(item.type) && !item.system.equipped) return true
+      if (!item) return ''
+      if (actorTurnedOff(effect)) return 'off'
+      if (['weapon', 'equipment', 'tattoo'].includes(item.type) && !item.system.equipped) return 'unequipped'
       if (this.requiredRank !== null && this.requiredRank !== undefined && ['skill', 'spell'].includes(item.type)) {
         const actor = item.actor
         const prepass = actor?.rankPrepass?.(item.type) ?? {}
         const rank =
           item.system.rank?.override ??
           (Number(item.system.rank?.value) || 0) + (Number(prepass[item.name.trim().toLowerCase()]) || 0)
-        return rank < this.requiredRank
+        if (rank < this.requiredRank) return 'rank'
       }
-      return false
+      return ''
     }
   }
 }

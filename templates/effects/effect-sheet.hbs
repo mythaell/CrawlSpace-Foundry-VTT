@@ -15,7 +15,7 @@
       <label><span>{{localize "CRAWLSPACE.Effect.Kind"}}</span><select name="system.conditionType">{{selectOptions conditionChoices selected=systemSource.conditionType localize=true}}</select></label>
       <label><span>{{localize "CRAWLSPACE.Effect.Stacks"}}</span><input type="number" name="system.stacks" value="{{systemSource.stacks}}" min="1"></label>
       <label><span>{{localize "CRAWLSPACE.Effect.MaxStacks"}}</span><input type="number" name="system.maxStacks" value="{{crawlNumberOrBlank systemSource.maxStacks}}" placeholder="—"></label>
-      <label><span>{{localize "CRAWLSPACE.Effect.Duration"}}</span><span class="time-input"><input type="text" name="system.durationText" value="{{systemSource.durationText}}"><a class="time-picker" data-time-picker data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span></label>
+      <label><span>{{localize "CRAWLSPACE.Effect.Duration"}}</span><span class="time-input"><input type="text" name="system.durationText" value="{{systemSource.durationText}}"><a class="time-picker" data-time-picker="effect" data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span></label>
       <label><span>{{localize "CRAWLSPACE.Effect.RequiredRank"}}</span><input type="number" name="system.requiredRank" value="{{crawlNumberOrBlank systemSource.requiredRank}}" placeholder="—"></label>
       <label><span>{{localize "CRAWLSPACE.Effect.CastRank"}}</span><input type="number" name="system.rank" value="{{crawlNumberOrBlank systemSource.rank}}" placeholder="—"></label>
       {{#if onItem}}
@@ -25,12 +25,12 @@
 
     <div class="pf-main">
       {{#if shieldLeft}}<p class="hint shield-left"><i class="fa-solid fa-shield-halved"></i> {{shieldLeft}}</p>{{/if}}
+      {{> "systems/crawlspace/templates/sheets/ids.hbs" ids=ids}}
       <h3 class="pf-section">{{localize "CRAWLSPACE.Item.Description"}}</h3>
       {{#if editable}}<prose-mirror name="description" value="{{source.description}}" toggled>{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
     </div>
   </div>
 
-  {{> "systems/crawlspace/templates/sheets/ids.hbs" ids=ids}}
   <h3 class="pf-section">{{localize "CRAWLSPACE.Rules.Title"}}</h3>
-  {{> "systems/crawlspace/templates/effects/rules.hbs" effectId=effect.id rules=rules ruleTypes=ruleTypes editable=editable}}
+  {{> "systems/crawlspace/templates/effects/rules.hbs" effectId=effect.id rules=rules ruleTypes=ruleTypes editable=editable datalists=datalists}}
 </div>

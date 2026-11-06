@@ -3055,9 +3055,35 @@
 }
 
 @layer system {
-  .crawlspace.auto-loot-dialog fieldset { display: flex; flex-wrap: wrap; gap: 4px 10px; }
-  .crawlspace.auto-loot-dialog fieldset label { display: flex; align-items: center; gap: 4px; }
-  .crawlspace.auto-loot-dialog .auto-loot-weights input { width: 56px; }
+  /* Auto-loot: three short sections that scroll inside the window when it is short. */
+  .crawlspace.auto-loot-dialog { max-height: 90vh; }
+  .crawlspace.auto-loot-dialog .window-content { overflow-y: auto; }
+  .crawlspace.auto-loot-dialog .dialog-content { display: flex; flex-direction: column; gap: 10px; }
+  .crawlspace.auto-loot-dialog .hint { margin: 0; }
+  .crawlspace.auto-loot-dialog .auto-loot-section { border: 1px solid var(--crawl-border, #3a6ea5); border-radius: 6px; padding: 6px 10px 10px; }
+  .crawlspace.auto-loot-dialog .auto-loot-section h4 { display: flex; align-items: center; margin: 0 0 6px; font-size: 13px; border: none; }
+  .crawlspace.auto-loot-dialog .auto-loot-all { margin-left: auto; font-size: 12px; font-weight: normal; }
+  .crawlspace.auto-loot-dialog .auto-loot-all a { cursor: pointer; text-decoration: underline; }
+  .crawlspace.auto-loot-dialog .auto-loot-chance { display: flex; align-items: center; gap: 8px; }
+  .crawlspace.auto-loot-dialog .auto-loot-chance input[type="range"] { flex: 1; }
+  .crawlspace.auto-loot-dialog .auto-loot-chance input[type="number"] { width: 64px; flex: none; text-align: center; }
+  .crawlspace.auto-loot-dialog .auto-loot-weights { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; }
+  .crawlspace.auto-loot-dialog .auto-loot-weights label { display: flex; flex-direction: column; align-items: stretch; gap: 2px; margin: 0; font-size: 12px; }
+  .crawlspace.auto-loot-dialog .auto-loot-weights input { width: 100%; text-align: center; }
+  .crawlspace.auto-loot-dialog .auto-loot-types { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 4px 10px; }
+  .crawlspace.auto-loot-dialog .auto-loot-types label { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 6px; margin: 0; text-align: left; font-size: 13px; }
+  .crawlspace.auto-loot-dialog .auto-loot-types input { flex: none; margin: 0; }
+  /* Pickers: the rules editor's damage types. */
+  .crawlspace.crawl-pick-dialog .crawl-check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 4px 10px; }
+  .crawlspace.crawl-pick-dialog .crawl-check-grid label { display: flex; flex-direction: row; align-items: center; gap: 6px; margin: 0; }
+  .crawlspace.crawl-pick-dialog .crawl-check-grid input { flex: none; margin: 0; }
+  /* Rules editor: named fields with a link, and the duration picker's special durations. */
+  .crawlspace .rule-named { display: flex; align-items: center; gap: 4px; }
+  .crawlspace .rule-named input { flex: 1; min-width: 0; }
+  .crawlspace .rule-named a { flex: none; }
+  .crawlspace.time-panel .special-duration { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; }
+  .crawlspace.time-panel .time-fields.disabled { opacity: 0.4; pointer-events: none; }
+  .crawlspace .effect-row .suppression { opacity: 0.85; font-size: 11px; }
   .crawlspace.item-generator .window-content { display: flex; flex-direction: column; gap: 8px; }
   .crawlspace.item-generator .generator-rules { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .crawlspace.item-generator .generator-rules label { display: flex; flex-direction: column; gap: 2px; font-weight: 600; }

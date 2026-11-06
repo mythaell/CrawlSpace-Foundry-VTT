@@ -1,4 +1,5 @@
 import { openGrinding } from './grinding'
+import { SPECIAL_DURATIONS } from '../effects/end-triggers'
 /** GM time controls and shared countdowns (partyTimers.ts); all game timers use core world time. */
 import { advanceTime } from '../time'
 import { durationSeconds, formatTime, restSeconds, timeParts, timePartsSeconds, type TimeParts } from '../rules/time'
@@ -282,19 +283,42 @@ export function durationText(seconds: number) {
  * normalizes, with thirty-hour days), and the field gets the matching text. Prose such as "until the end of
  * combat" can still be typed in the field itself.
  */
-async function pickDuration(input: HTMLInputElement) {
+async function pickDuration(input: HTMLInputElement, special = false) {
   const current = durationSeconds(input.value) ?? 0
-  const content = await foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/dialogs/time-fields.hbs', timeParts(current))
+  let content = await foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/dialogs/time-fields.hbs', timeParts(current))
+  if (special) {
+    // An effect's duration may instead be one of the special durations (ending on an event, or kept manual).
+    const esc = foundry.utils.escapeHTML
+    const typed = String(input.value ?? '').trim()
+    const known = SPECIAL_DURATIONS.find((entry) => entry.toLowerCase() === typed.toLowerCase())
+    const custom = typed && !known && durationSeconds(typed) === null ? typed : ''
+    const options = [
+      `<option value="">${esc(game.i18n.localize('CRAWLSPACE.Time.Timed'))}</option>`,
+      ...SPECIAL_DURATIONS.map((entry) => `<option value="${esc(entry)}" ${entry === known ? 'selected' : ''}>${esc(entry)}</option>`),
+      ...(custom ? [`<option value="${esc(custom)}" selected>${esc(custom)}</option>`] : []),
+    ]
+    content = `<label class="special-duration"><span>${esc(game.i18n.localize('CRAWLSPACE.Time.SpecialDuration'))}</span><select name="special">${options.join('')}</select></label>${content}`
+  }
   const answer = await foundry.applications.api.DialogV2.prompt({
     window: { title: input.getAttribute('aria-label') || game.i18n.localize('CRAWLSPACE.Time.PickDuration') },
     classes: ['crawlspace', 'time-panel'],
     content,
     rejectClose: false,
-    render: (_event: Event, dialog: any) => bindTimeFields(dialog.element),
-    ok: { label: game.i18n.localize('CRAWLSPACE.Time.Save'), callback: (_event: Event, button: any) => readTimeFields(button.form) },
+    render: (_event: Event, dialog: any) => {
+      bindTimeFields(dialog.element)
+      // The time fields only count for a timed duration.
+      const select = dialog.element.querySelector('[name=special]') as HTMLSelectElement | null
+      const sync = () => dialog.element.querySelector('.time-fields')?.classList.toggle('disabled', !!select?.value)
+      select?.addEventListener('change', sync)
+      sync()
+    },
+    ok: {
+      label: game.i18n.localize('CRAWLSPACE.Time.Save'),
+      callback: (_event: Event, button: any) => button.form.elements.special?.value || readTimeFields(button.form),
+    },
   })
   if (answer == null || answer === false) return
-  input.value = durationText(answer)
+  input.value = typeof answer === 'string' ? answer : durationText(answer)
   input.dispatchEvent(new Event('change', { bubbles: true }))
 }
 
@@ -306,6 +330,7 @@ export function registerTimePickers() {
     event.preventDefault()
     event.stopPropagation()
     const input = button.parentElement?.querySelector('input') as HTMLInputElement | null
-    if (input && !input.disabled && !input.readOnly) pickDuration(input).catch(() => ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Time.InvalidDuration')))
+    const special = (button as HTMLElement).dataset.timePicker === 'effect'
+    if (input && !input.disabled && !input.readOnly) pickDuration(input, special).catch(() => ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Time.InvalidDuration')))
   })
 }

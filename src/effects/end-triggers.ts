@@ -32,6 +32,26 @@ const PATTERNS: [EndTrigger, RegExp][] = [
   ['combatEnd', /\bend of (?:the )?combat\b/i],
 ]
 
+/**
+ * The special durations offered in the duration picker (effectDurations.ts specialEffectDurations, plus one
+ * for each event above). The last two stay manual.
+ */
+export const SPECIAL_DURATIONS = [
+  'Until the end of combat',
+  'Until you are healed at least 1 health slot',
+  'Until you take at least 1 HP slot of damage',
+  'Ends once you make a check',
+  'Until the end of the next action you take',
+  'Until you die',
+  'Until the end of a short rest',
+  'Until you complete a long rest',
+  'Until you finish a full day of rest',
+  'Until you enter a saferoom',
+  'Until you leave this floor',
+  'Until cured with a bandage',
+  'While the source is active',
+] as const
+
 /** The events that end a condition with this duration text. */
 export function endTriggers(text: unknown): EndTrigger[] {
   const value = String(text ?? '')

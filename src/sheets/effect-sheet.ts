@@ -1,6 +1,6 @@
 /** The CrawlSpace effect sheet: condition fields on one side, the shared rules editor for its changes. */
 import { effectDuration } from '../import/convert'
-import { bindRulesEditor, rulesContext, ruleTypeChoices } from '../effects/rules'
+import { bindRulesEditor, rulesContext, rulesDatalists, ruleTypeChoices } from '../effects/rules'
 import { documentIds } from './ids'
 
 const { HandlebarsApplicationMixin, DocumentSheetV2 } = foundry.applications.api
@@ -41,6 +41,7 @@ export class CrawlEffectSheet extends HandlebarsApplicationMixin(DocumentSheetV2
       ids: documentIds(effect),
       rules: rulesContext(effect),
       ruleTypes: ruleTypeChoices(),
+      datalists: rulesDatalists(),
       enrichedDescription: await foundry.applications.ux.TextEditor.implementation.enrichHTML(effect.description ?? '', { relativeTo: effect }),
     })
   }

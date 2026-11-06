@@ -293,7 +293,17 @@
       "Transfer": "Applies to the owner",
       "ShieldLeft": "Shield: {remaining} of {total} slots left ({perSlot} each).",
       "ShieldBadge": "{name}: {remaining} slots ({perSlot} each)",
-      "ShieldCount": "Shield: {remaining} slots ({perSlot} each)"
+      "ShieldCount": "Shield: {remaining} slots ({perSlot} each)",
+      "FromAbilities": "From abilities",
+      "FromSkills": "From skills",
+      "FromBuild": "From race, class & background",
+      "FromAchievements": "From achievements",
+      "Suppressed": {
+        "expired": "Expired",
+        "unequipped": "Not equipped",
+        "rank": "Rank too low",
+        "off": "Off"
+      }
     },
     "Attack": {
       "Unarmed": "Unarmed strike",
@@ -663,6 +673,22 @@
       "ShieldScope": {
         "all": "All damage",
         "nonMagic": "Non-magic damage only"
+      },
+      "PickOrDrop": "Pick, type or drop one",
+      "OpenLinked": "Open the linked item",
+      "DropWrongType": "Drop a skill or spell of the right kind here.",
+      "PickDamageTypes": "Pick damage types",
+      "Special": {
+        "armorPiercing": "Armor piercing",
+        "damageBonus": "Damage bonus",
+        "magicDamageCap": "Magic damage cap",
+        "areaDamageHalf": "Half area damage",
+        "manaPerRound": "Mana per round",
+        "regenPerRound": "Regeneration per round",
+        "rankCap": "Rank cap",
+        "shield": "Shield",
+        "lightOrb": "Light orb",
+        "raiseMinion": "Raise minion"
       }
     },
     "Table": {
@@ -722,7 +748,9 @@
       "SetFloor": "Set floor-collapse timer",
       "FloorPrompt": "Set the remaining time before this floor collapses. A dungeon day lasts 30 hours.",
       "OverflowHint": "Overflow is converted automatically: 90 minutes becomes 1 hour 30 minutes; 30 hours becomes 1 day.",
-      "PickDuration": "Pick a time"
+      "PickDuration": "Pick a time",
+      "Timed": "Timed (set below)",
+      "SpecialDuration": "Special duration"
     },
     "Grinding": {
       "Title": "Grinding",
@@ -1115,14 +1143,16 @@
     "AutoLoot": {
       "Title": "Auto-loot",
       "Hint": "Each crawler ({names}) rolls the chance; a hit gives a sealed box of a weighted tier and a random type.",
-      "ChanceLabel": "Chance per crawler (%)",
+      "ChanceLabel": "Chance per crawler",
       "Weights": "Tier weights",
       "Types": "Box types",
       "Roll": "Roll",
       "Chance": "{chance}% chance per crawler.",
       "Nothing": "{name}: no box.",
       "Got": "{name}: {box} ({contents}).",
-      "Notes": "Auto-loot."
+      "Notes": "Auto-loot.",
+      "All": "All",
+      "None": "None"
     },
     "Generator": {
       "Title": "Item Generator",

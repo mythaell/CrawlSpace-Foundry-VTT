@@ -10,7 +10,7 @@
     {{#if (eq type "spell")}}
     <label>{{localize "CRAWLSPACE.Stat.Mana"}}<input type="text" name="system.mana" value="{{systemSource.mana}}"></label>
     <label>{{localize "CRAWLSPACE.Item.Range"}}<input type="text" name="system.range" value="{{systemSource.range}}"></label>
-    <label>{{localize "CRAWLSPACE.Item.Duration"}}<span class="time-input"><input type="text" name="system.duration" value="{{systemSource.duration}}"><a class="time-picker" data-time-picker data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span></label>
+    <label>{{localize "CRAWLSPACE.Item.Duration"}}<span class="time-input"><input type="text" name="system.duration" value="{{systemSource.duration}}"><a class="time-picker" data-time-picker="effect" data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span></label>
     <label>{{localize "CRAWLSPACE.Item.Usage"}}<select name="system.usage">{{selectOptions usageChoices selected=systemSource.usage localize=true}}</select></label>
     {{/if}}
     <label class="check"><input type="checkbox" name="system.isAttack" {{checked systemSource.isAttack}}> {{localize "CRAWLSPACE.Item.IsAttack"}}</label>
