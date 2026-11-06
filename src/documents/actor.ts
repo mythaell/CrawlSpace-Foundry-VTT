@@ -109,8 +109,9 @@ export class CrawlActor extends Actor {
           id: effect.id,
           effect,
           remaining: Number(shield.remaining) || (special ? statMod(special.value) : 0),
-          perSlot: Number(shield.perSlot) || (special ? statMod(special.target) : 0),
-          nonMagic: !!shield.nonMagic || special?.scope === 'nonMagic',
+          total: special ? statMod(special.value) : Number(shield.remaining) || 0,
+          perSlot: (special ? statMod(special.target) : 0) || Number(shield.perSlot) || 0,
+          nonMagic: special ? special.scope === 'nonMagic' : !!shield.nonMagic,
         }
       })
       .filter((shield: any) => shield.remaining > 0 && shield.perSlot > 0)

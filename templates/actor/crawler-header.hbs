@@ -11,7 +11,7 @@
     </label>
   </div>
 
-  <div class="health-wrapper {{#if shieldBoxes.length}}health-shield-wrapper{{/if}}">
+  <div class="health-wrapper {{#if anyShield}}health-shield-wrapper{{/if}}">
     <div class="progress-track" aria-label="{{localize 'CRAWLSPACE.Stat.Health'}}">
       {{#each healthBoxes as |box|}}
       <div class="progress-box {{#unless box.filled}}health-pressed{{/unless}}" data-action="slot" data-percentage="{{box.percentage}}"
@@ -21,11 +21,16 @@
       </div>
       {{/each}}
     </div>
-    {{#if shieldBoxes.length}}
+    {{#if anyShield}}
     <div class="progress-track shield-track" aria-label="{{localize 'CRAWLSPACE.Section.Shield'}}">
       {{#each shieldBoxes as |box|}}
       <div class="progress-box" data-action="shield" data-index="{{box.index}}" data-tooltip="{{localize 'CRAWLSPACE.Sheet.ShieldSlotHint'}}">
         <input type="text" value="{{@root.system.shield.value}}" readonly tabindex="-1">
+      </div>
+      {{/each}}
+      {{#each conditionShieldBoxes as |box|}}
+      <div class="progress-box condition-shield" data-tooltip="{{box.tooltip}}">
+        <input type="text" value="{{box.perSlot}}" readonly tabindex="-1">
       </div>
       {{/each}}
     </div>

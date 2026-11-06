@@ -19,12 +19,12 @@ export function createEffectDataModel() {
         rank: new fields.NumberField({ required: false, nullable: true, integer: true, initial: null }),
         /** On a skill or spell: only active once the parent's Rank reaches this. */
         requiredRank: new fields.NumberField({ required: false, nullable: true, integer: true, initial: null }),
-        /** Recurring damage rolled once per round in Clean Up, e.g. `1d8+F` Poison. */
+        /** Legacy: moved into a Clean Up Damage rule on load. */
         cleanup: new fields.SchemaField({
           formula: new fields.StringField({ required: true, blank: true, initial: '' }),
           types: new fields.ArrayField(new fields.StringField({ blank: false })),
         }),
-        /** Temporary shield slots; the condition ends when they run out. */
+        /** Shield slots left on an applied condition (its Condition Shield rule sets how many it starts with). */
         shield: new fields.SchemaField({
           remaining: new fields.NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
           perSlot: new fields.NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
@@ -34,6 +34,33 @@ export function createEffectDataModel() {
         castBy: new fields.StringField({ required: true, blank: true, initial: '' }),
         durationText: new fields.StringField({ required: true, blank: true, initial: '' }),
       }
+    }
+
+    /**
+     * Clean Up damage and shield slots used to be fields of their own; they are rules now. An old effect's
+     * values move into its changes when it loads (world, actors and compendia alike).
+     */
+    static migrateData(source: any) {
+      const legacy = Number(source?.shield?.perSlot) > 0 || !!source?.cleanup?.formula
+      if (source && legacy && !Array.isArray(source.changes)) source.changes = []
+      const changes: any[] = Array.isArray(source?.changes) ? source.changes : null
+      if (changes) {
+        const has = (key: string) => changes.some((change) => change?.type === 'crawlspace.special' && change.key === key)
+        const special = (key: string, value: Record<string, unknown>) => ({ key, type: 'crawlspace.special', value: JSON.stringify(value), phase: 'initial', priority: null })
+        const cleanup = source.cleanup
+        if (cleanup?.formula && !has('cleanup')) {
+          changes.push(special('cleanup', { value: String(cleanup.formula), damageTypes: Array.isArray(cleanup.types) ? cleanup.types : [] }))
+          source.cleanup = { formula: '', types: [] }
+        }
+        const shield = source.shield
+        if (Number(shield?.perSlot) > 0 && !has('shield')) {
+          changes.push(special('shield', { target: String(shield.perSlot), value: String(shield.remaining ?? 0), scope: shield.nonMagic ? 'nonMagic' : 'all' }))
+          // The rule now says how many slots it starts with; remaining stays as the running count (it must
+          // match the stored value, or a later write of the same number would be a no-op on the server).
+          source.shield = { remaining: Number(shield.remaining) || 0, perSlot: 0, nonMagic: false }
+        }
+      }
+      return super.migrateData(source)
     }
 
     /**

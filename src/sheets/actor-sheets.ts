@@ -533,6 +533,14 @@ export class CrawlerSheet extends CrawlActorSheet {
         // Left to right: 10% … 100%, like CrawlSpace's health bar.
         context.healthBoxes = [...system.health.slots].reverse()
         context.shieldBoxes = system.shield.slots.map((on: boolean, index: number) => ({ on, index })).filter((slot: any) => slot.on)
+        // Condition Shield rules (e.g. Hot Stuff Aura): one box per slot left, beside the magical shield.
+        context.conditionShieldBoxes = (this.actor.conditionShields?.() ?? []).flatMap((shield: any) =>
+          Array.from({ length: shield.remaining }, () => ({
+            perSlot: shield.perSlot,
+            tooltip: game.i18n.format('CRAWLSPACE.Effect.ShieldBadge', { name: shield.effect.name, remaining: shield.remaining, perSlot: shield.perSlot }),
+          })),
+        )
+        context.anyShield = context.shieldBoxes.length + context.conditionShieldBoxes.length > 0
         context.pendingStatPoints = pendingStatPoints(system.details.level, system.upkeep.allocatedThroughLevel)
         break
       case 'tabs': {

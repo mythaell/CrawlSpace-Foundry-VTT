@@ -37,7 +37,7 @@ export class CrawlEffectSheet extends HandlebarsApplicationMixin(DocumentSheetV2
       systemSource: effect._source.system ?? {},
       onItem: effect.parent?.documentName === 'Item',
       conditionChoices: { '': 'CRAWLSPACE.Effect.Plain', buff: 'CRAWLSPACE.Effect.Buff', debuff: 'CRAWLSPACE.Effect.Debuff' },
-      cleanupTypes: (system.cleanup?.types ?? []).join(', '),
+      shieldLeft: shieldLeft(effect),
       ids: documentIds(effect),
       rules: rulesContext(effect),
       ruleTypes: ruleTypeChoices(),
@@ -52,11 +52,6 @@ export class CrawlEffectSheet extends HandlebarsApplicationMixin(DocumentSheetV2
 
   _processFormData(event: any, form: any, formData: any) {
     const data = super._processFormData(event, form, formData)
-    const types = data.system?.cleanup?.typesText
-    if (typeof types === 'string') {
-      data.system.cleanup.types = types.split(',').map((type: string) => type.trim()).filter(Boolean)
-      delete data.system.cleanup.typesText
-    }
     const durationText = data.system?.durationText
     if (durationText !== undefined && durationText !== this.effect.system.durationText) {
       data.duration = { value: null, units: 'seconds', expiry: null, ...effectDuration(durationText), expired: false }
@@ -73,4 +68,11 @@ export class CrawlEffectSheet extends HandlebarsApplicationMixin(DocumentSheetV2
     game.clipboard.copyPlainText(target.dataset.value ?? '')
     ui.notifications.info(game.i18n.format('CRAWLSPACE.Ids.Copied', { value: target.dataset.value }))
   }
+}
+
+/** On an applied condition with a Condition Shield rule: how many slots are left. */
+function shieldLeft(effect: any) {
+  const actor = effect.parent?.documentName === 'Actor' ? effect.parent : null
+  const shield = actor?.conditionShields?.().find((entry: any) => entry.id === effect.id)
+  return shield ? game.i18n.format('CRAWLSPACE.Effect.ShieldLeft', { remaining: shield.remaining, total: shield.total, perSlot: shield.perSlot }) : ''
 }

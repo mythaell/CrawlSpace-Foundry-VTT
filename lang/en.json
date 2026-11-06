@@ -290,7 +290,10 @@
       "RequiredRank": "Required Rank",
       "ShieldSlots": "Shield slots",
       "Stacks": "Stacks",
-      "Transfer": "Applies to the owner"
+      "Transfer": "Applies to the owner",
+      "ShieldLeft": "Shield: {remaining} of {total} slots left ({perSlot} each).",
+      "ShieldBadge": "{name}: {remaining} slots ({perSlot} each)",
+      "ShieldCount": "Shield: {remaining} slots ({perSlot} each)"
     },
     "Attack": {
       "Unarmed": "Unarmed strike",
@@ -613,7 +616,12 @@
         "changeType": "Change type",
         "brightFeet": "Bright (ft)",
         "dimFeet": "Dim (ft)",
-        "rangeFeet": "Range (ft)"
+        "rangeFeet": "Range (ft)",
+        "shieldSlots": "Slots",
+        "perSlot": "Damage per slot",
+        "blocks": "Blocks",
+        "formula": "Formula",
+        "damageTypes": "Damage types"
       },
       "RollKind": {
         "attackMode": "Attack rolls",
@@ -648,7 +656,13 @@
         "lightOrb": "Light",
         "raiseMinion": "Raise as Minion",
         "special": "Special",
-        "custom": "Custom"
+        "custom": "Custom",
+        "conditionShield": "Condition Shield",
+        "cleanupDamage": "Clean Up Damage"
+      },
+      "ShieldScope": {
+        "all": "All damage",
+        "nonMagic": "Non-magic damage only"
       }
     },
     "Table": {

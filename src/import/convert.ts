@@ -232,7 +232,15 @@ export function buffToEffect(data: Record<string, any>, img = ICONS.buff) {
     const raise = special('raiseMinion', { target: '', value: '' })
     if (raise) changes.push(raise as any)
   }
-  const shieldSlots = int(data.shield?.slots, 0)
+  // Clean Up damage and shield slots are rules (Clean Up Damage, Condition Shield).
+  if (str(data.cleanupFormula)) {
+    const cleanup = special('cleanup', { value: str(data.cleanupFormula), damageTypes: types(data.cleanupDamageTypes) } as any)
+    if (cleanup) changes.push(cleanup as any)
+  }
+  if (data.shield && str(data.shield.healthPerSlot) && str(data.shield.slots)) {
+    const shield = special('shield', { target: str(data.shield.healthPerSlot), value: str(data.shield.slots), scope: data.shield.scope === 'nonMagic' ? 'nonMagic' : 'all' } as any)
+    if (shield) changes.push(shield as any)
+  }
   return {
     name: str(data.name) || 'Condition',
     img: standard ? `systems/crawlspace/assets/debuffs/${standard.id}.png` : str(properties.icon) || img,
@@ -246,8 +254,6 @@ export function buffToEffect(data: Record<string, any>, img = ICONS.buff) {
       conditionType: data.conditionType === 'debuff' || standard ? 'debuff' : 'buff',
       stacks: Math.max(1, int(data.stacks, 1)),
       maxStacks: nullableInt(data.maxStacks),
-      cleanup: { formula: str(data.cleanupFormula), types: types(data.cleanupDamageTypes) },
-      shield: { remaining: shieldSlots, perSlot: int(data.shield?.healthPerSlot, 0), nonMagic: data.shield?.scope === 'nonMagic' },
       durationText: str(data.duration),
     },
     ...(effectDuration(data.duration) ? { duration: effectDuration(data.duration) } : {}),

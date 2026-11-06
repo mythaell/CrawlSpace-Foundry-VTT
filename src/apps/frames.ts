@@ -36,7 +36,7 @@ function defaultPosition() {
 }
 
 /** A condition badge. */
-function badge(effect: any) {
+function badge(effect: any, shields: any[] = []) {
   const debuff = effect.system?.conditionType === 'debuff' || (effect.statuses?.size > 0 && effect.system?.conditionType !== 'buff')
   const stacks = Math.max(1, Number(effect.system?.stacks) || 1)
   // Permanent conditions have Infinity remaining: no time to show.
@@ -48,11 +48,16 @@ function badge(effect: any) {
     name: effect.name,
     kind: debuff ? 'debuff' : 'buff',
     stacks: isStackable(effect) && stacks > 1 ? stacks : 0,
-    tooltip: [effect.name, remaining].filter(Boolean).join(' · '),
+    tooltip: [effect.name, remaining, shieldText(shields.find((shield) => shield.id === effect.id))].filter(Boolean).join(' · '),
   }
 }
 
-const conditionsOf = (actor: any) => actor.effects.contents.filter((effect: any) => effect.active && !effect.flags?.crawlspace?.build).map(badge)
+const shieldText = (shield: any) => (shield ? game.i18n.format('CRAWLSPACE.Effect.ShieldCount', { remaining: shield.remaining, perSlot: shield.perSlot }) : '')
+
+const conditionsOf = (actor: any) => {
+  const shields = actor.conditionShields?.() ?? []
+  return actor.effects.contents.filter((effect: any) => effect.active && !effect.flags?.crawlspace?.build).map((effect: any) => badge(effect, shields))
+}
 
 class CrawlerFrames extends HandlebarsApplicationMixin(ApplicationV2) {
   static DEFAULT_OPTIONS: any = {

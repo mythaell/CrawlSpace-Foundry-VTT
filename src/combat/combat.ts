@@ -340,10 +340,12 @@ export class CrawlCombat extends Combat {
       const floor = Number(actor.system.details?.floor ?? actor.system.floor) || 0
       for (const effect of actor.effects) {
         if (!effect.active) continue
+        // The condition's Clean Up Damage rule, else the standard debuff's.
+        const rule = (actor.system.specials ?? []).find((special: any) => special.type === 'cleanup' && special.effectId === effect.id && special.value)
         const standard = [...effect.statuses].map((id: string) => debuffById(id)).find((debuff) => debuff?.cleanup)
-        const formula = effect.system?.cleanup?.formula || standard?.cleanup?.formula
+        const formula = rule?.value || effect.system?.cleanup?.formula || standard?.cleanup?.formula
         if (!formula) continue
-        const types = effect.system?.cleanup?.types?.length ? effect.system.cleanup.types : (standard?.cleanup?.types ?? [])
+        const types = rule ? (rule.damageTypes ?? []) : effect.system?.cleanup?.types?.length ? effect.system.cleanup.types : (standard?.cleanup?.types ?? [])
         const stacks = Math.max(1, Number(effect.system?.stacks) || 1)
         const resolved = resolveFormulaTokens(formula, { floor })
         await rollDamage(

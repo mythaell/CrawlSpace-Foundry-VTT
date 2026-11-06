@@ -7,7 +7,7 @@ import { DAMAGE_TYPES, STATS, STAT_KEYS, statKeyFromCode } from '../config'
 import { DEBUFFS } from '../rules/debuffs'
 import { CUSTOM_CHANGE_TYPES } from './mapping'
 
-type Field = { name: string; label: string; kind: 'stat' | 'number' | 'text' | 'damageType' | 'debuff' | 'rollKind' | 'rollValue' | 'changeType' }
+type Field = { name: string; label: string; kind: 'stat' | 'number' | 'text' | 'damageType' | 'debuff' | 'rollKind' | 'rollValue' | 'changeType' | 'shieldScope' }
 type Values = Record<string, any>
 type Change = { key: string; type: string; value: any; phase?: string; priority?: number | null }
 type RuleType = {
@@ -28,6 +28,10 @@ const json = (value: unknown) => {
     return {}
   }
 }
+const splitTypes = (value: unknown) =>
+  (Array.isArray(value) ? value : String(value ?? '').split(','))
+    .map((type) => String(type).trim())
+    .filter(Boolean)
 const statCode = (key: string) => STATS[(statKeyFromCode(key) ?? 'str') as keyof typeof STATS].code
 const F = {
   stat: { name: 'stat', label: 'CRAWLSPACE.Rules.Field.stat', kind: 'stat' } as Field,
@@ -169,6 +173,40 @@ export const RULE_TYPES: RuleType[] = [
     write: () => make('raiseMinion', CUSTOM_CHANGE_TYPES.special, JSON.stringify({ target: '', value: '' })),
   },
   {
+    // Temporary shield slots (conditionShields.ts): each absorbs a whole slot's worth of damage, and the
+    // condition ends when they are used up. Slots and size take a number or a stat (CON, CHA).
+    id: 'conditionShield',
+    label: 'CRAWLSPACE.Rules.Type.conditionShield',
+    fields: [
+      { name: 'slots', label: 'CRAWLSPACE.Rules.Field.shieldSlots', kind: 'text' },
+      { name: 'perSlot', label: 'CRAWLSPACE.Rules.Field.perSlot', kind: 'text' },
+      { name: 'scope', label: 'CRAWLSPACE.Rules.Field.blocks', kind: 'shieldScope' },
+    ],
+    match: (c) => c.type === CUSTOM_CHANGE_TYPES.special && c.key === 'shield',
+    read: (c) => {
+      const data = json(c.value)
+      return { slots: data.value ?? '', perSlot: data.target ?? '', scope: data.scope === 'nonMagic' ? 'nonMagic' : 'all' }
+    },
+    write: (v) =>
+      make('shield', CUSTOM_CHANGE_TYPES.special, JSON.stringify({ target: String(v.perSlot ?? '').trim(), value: String(v.slots ?? '').trim(), scope: v.scope === 'nonMagic' ? 'nonMagic' : 'all' })),
+  },
+  {
+    // Recurring damage rolled each round in Clean Up, times the condition's stacks.
+    id: 'cleanupDamage',
+    label: 'CRAWLSPACE.Rules.Type.cleanupDamage',
+    fields: [
+      { name: 'formula', label: 'CRAWLSPACE.Rules.Field.formula', kind: 'text' },
+      { name: 'types', label: 'CRAWLSPACE.Rules.Field.damageTypes', kind: 'text' },
+    ],
+    match: (c) => c.type === CUSTOM_CHANGE_TYPES.special && c.key === 'cleanup',
+    read: (c) => {
+      const data = json(c.value)
+      return { formula: data.value ?? '', types: (Array.isArray(data.damageTypes) ? data.damageTypes : []).join(', ') }
+    },
+    write: (v) =>
+      make('cleanup', CUSTOM_CHANGE_TYPES.special, JSON.stringify({ value: String(v.formula ?? '').trim(), damageTypes: splitTypes(v.types) })),
+  },
+  {
     id: 'special',
     label: 'CRAWLSPACE.Rules.Type.special',
     fields: [
@@ -208,6 +246,8 @@ function defaults(rule: RuleType): Values {
       field.kind === 'stat' ? 'STR' : field.kind === 'number' ? 1 : field.kind === 'damageType' ? DAMAGE_TYPES[0] : field.kind === 'debuff' ? DEBUFFS[0]?.name : field.kind === 'rollKind' ? 'checkMode' : field.kind === 'rollValue' ? 'advantage' : field.kind === 'changeType' ? 'add' : ''
   }
   if (rule.id === 'special') values.special = 'damageBonus'
+  if (rule.id === 'conditionShield') Object.assign(values, { slots: '1', perSlot: '10', scope: 'all' })
+  if (rule.id === 'cleanupDamage') Object.assign(values, { formula: '1d6+F', types: '' })
   return values
 }
 
@@ -223,6 +263,7 @@ const OPTIONS: Record<string, () => { value: string; label: string }[]> = {
   rollKind: () =>
     ['attackMode', 'checkMode', 'evadeMode', 'incomingAttackMode'].map((value) => ({ value, label: game.i18n.localize(`CRAWLSPACE.Rules.RollKind.${value}`) })),
   rollValue: () => ['advantage', 'disadvantage'].map((value) => ({ value, label: game.i18n.localize(`CRAWLSPACE.Roll.Mode.${value}`) })),
+  shieldScope: () => ['all', 'nonMagic'].map((value) => ({ value, label: game.i18n.localize(`CRAWLSPACE.Rules.ShieldScope.${value}`) })),
   changeType: () => Object.keys(CONFIG.ActiveEffect.changeTypes ?? { add: 1 }).map((value) => ({ value, label: value })),
 }
 
