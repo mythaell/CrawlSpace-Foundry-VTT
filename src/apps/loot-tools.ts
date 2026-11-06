@@ -13,6 +13,7 @@ import { consumableFamily } from '../crawlspace-shared/shared/lootPotions'
 import { consumableSpellKind } from '../crawlspace-shared/shared/lootSpells'
 import { finalizeLootItem, type InventoryItem } from '../crawlspace-shared/shared/inventoryItems'
 import { boxSummary, contextFor, foundryItemData } from '../loot/database'
+import { crawlerLootTypes, normalizeAutoLoot, type AutoLootSettings as Settings } from '../rules/auto-loot'
 
 const t = (key: string, data?: Record<string, unknown>) => (data ? game.i18n.format(`CRAWLSPACE.AutoLoot.${key}`, data) : game.i18n.localize(`CRAWLSPACE.AutoLoot.${key}`))
 const esc = (value: unknown) => foundry.utils.escapeHTML(String(value ?? ''))
@@ -20,12 +21,8 @@ const esc = (value: unknown) => foundry.utils.escapeHTML(String(value ?? ''))
 /** Box types a random box can take: Earth needs Silver, and Custom, Boss, Quest and the like are the GM's. */
 export const AUTO_LOOT_TYPES = lootTypes.filter((type) => !['Earth', 'Custom', 'Benefactor', 'Boss', 'Bounty', 'Quest'].includes(type))
 
-export type AutoLootSettings = { chancePercent: number; weights: Record<LootTier, number>; types: LootType[] }
-const DEFAULTS: AutoLootSettings = {
-  chancePercent: 10,
-  weights: { Bronze: 60, Silver: 25, Gold: 10, Platinum: 4, Legendary: 1, Celestial: 0 },
-  types: [...AUTO_LOOT_TYPES],
-}
+export type AutoLootSettings = Settings<LootTier, LootType>
+const savedSettings = () => normalizeAutoLoot<LootTier, LootType>(game.settings.get('crawlspace', 'autoLoot'), AUTO_LOOT_TYPES, lootTiers)
 
 /** A weighted tier (autoLoot.ts pickAutoLootTier). */
 export function pickTier(weights: Record<LootTier, number>, rng = Math.random): LootTier | undefined {
@@ -65,13 +62,14 @@ export async function runAutoLoot(actors: any[], settings: AutoLootSettings) {
   const lines: string[] = []
   for (const actor of actors) {
     const roll = Math.floor(Math.random() * 100)
-    if (roll >= settings.chancePercent || !settings.types.length) {
+    const types = crawlerLootTypes(settings, actor.id, AUTO_LOOT_TYPES)
+    if (roll >= settings.chancePercent || !types.length) {
       lines.push(t('Nothing', { name: esc(actor.name) }))
       continue
     }
     const tier = pickTier(settings.weights)
     if (!tier) continue
-    const type = settings.types[Math.floor(Math.random() * settings.types.length)]
+    const type = types[Math.floor(Math.random() * types.length)]
     const box = await autoLootBox(actor, tier, type)
     await actor.createEmbeddedDocuments('Item', [box])
     lines.push(t('Got', { name: esc(actor.name), box: esc(box.name), contents: esc(boxSummary(box.system.loot).join(', ') || game.i18n.localize('CRAWLSPACE.Loot.Empty')) }))
@@ -83,10 +81,27 @@ export async function runAutoLoot(actors: any[], settings: AutoLootSettings) {
   })
 }
 
-/** Ask the chance, tier weights and box types (remembered), then roll for the crawlers. */
+/**
+ * Ask the chance, tier weights and box types (remembered), then roll for the crawlers. Box types are a table
+ * (PartySettingsDialog.tsx Box Type Access): a column for all crawlers, then one per crawler for the extra types
+ * only they can get. A column header ticks or unticks the whole column.
+ */
 export async function openAutoLoot(actors: any[]) {
   if (!game.user.isGM || !actors.length) return
-  const saved = { ...DEFAULTS, ...(game.settings.get('crawlspace', 'autoLoot') ?? {}) } as AutoLootSettings
+  const saved = savedSettings()
+  const total = lootTiers.reduce((sum, tier) => sum + (saved.weights[tier] || 0), 0)
+  const share = (weight: number, sum: number) => (sum > 0 ? `${Math.floor((weight / sum) * 100)}%` : '0%')
+  const head = actors.map((actor) => `<th scope="col"><button type="button" data-loot-column="${esc(actor.id)}" data-tooltip="${esc(t('ColumnHint', { name: actor.name }))}">${esc(actor.name)}</button></th>`).join('')
+  const rows = AUTO_LOOT_TYPES.map((type) => {
+    const forAll = saved.allTypes.includes(type)
+    const cells = actors
+      .map((actor) => {
+        const own = saved.crawlerTypes[actor.id] ?? []
+        return `<td><input type="checkbox" data-loot-crawler="${esc(actor.id)}" value="${esc(type)}" ${forAll || own.includes(type) ? 'checked' : ''} ${forAll ? 'disabled' : ''} data-own="${own.includes(type) ? '1' : ''}"></td>`
+      })
+      .join('')
+    return `<tr><th scope="row">${esc(type)}</th><td><input type="checkbox" data-loot-all value="${esc(type)}" ${forAll ? 'checked' : ''}></td>${cells}</tr>`
+  }).join('')
   const content = `<p class="hint">${t('Hint', { names: actors.map((actor) => esc(actor.name)).join(', ') })}</p>
     <section class="auto-loot-section">
       <h4>${t('ChanceLabel')}</h4>
@@ -95,49 +110,85 @@ export async function openAutoLoot(actors: any[]) {
     <section class="auto-loot-section">
       <h4>${t('Weights')}</h4>
       <div class="auto-loot-weights">${lootTiers
-        .map((tier) => `<label><span>${tier}</span><input type="number" name="weight-${tier}" min="0" step="1" value="${saved.weights[tier] ?? 0}"></label>`)
+        .map((tier) => `<label><span>${tier}</span><input type="number" name="weight-${tier}" min="0" step="1" value="${saved.weights[tier] ?? 0}"><small data-tier-share="${tier}">${share(saved.weights[tier] || 0, total)}</small></label>`)
         .join('')}</div>
     </section>
     <section class="auto-loot-section">
-      <h4>${t('Types')}<span class="auto-loot-all"><a data-auto-loot-all="1">${t('All')}</a> · <a data-auto-loot-all="0">${t('None')}</a></span></h4>
-      <div class="auto-loot-types">${AUTO_LOOT_TYPES.map(
-        (type) => `<label><input type="checkbox" name="type" value="${esc(type)}" ${saved.types.includes(type) ? 'checked' : ''}><span>${esc(type)}</span></label>`,
-      ).join('')}</div>
+      <h4>${t('Types')}</h4>
+      <p class="hint">${t('TypesHint')}</p>
+      <div class="auto-loot-table"><table>
+        <thead><tr><th scope="col">${t('BoxType')}</th><th scope="col"><button type="button" data-loot-column="all" data-tooltip="${esc(t('ColumnAllHint'))}">${t('AllCrawlers')}</button></th>${head}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
     </section>`
   const settings = await foundry.applications.api.DialogV2.prompt({
     classes: ['crawlspace', 'auto-loot-dialog'],
-    position: { width: 520 },
+    position: { width: Math.min(window.innerWidth - 40, 420 + actors.length * 110) },
     window: { title: t('Title'), resizable: true },
     content,
     rejectClose: false,
-    render: (_event: Event, dialog: any) => {
-      const root = dialog.element as HTMLElement
-      const slider = root.querySelector<HTMLInputElement>('[name=chanceSlider]')
-      const number = root.querySelector<HTMLInputElement>('[name=chance]')
-      slider?.addEventListener('input', () => number && (number.value = slider.value))
-      number?.addEventListener('input', () => slider && (slider.value = number.value))
-      for (const link of root.querySelectorAll<HTMLElement>('[data-auto-loot-all]'))
-        link.addEventListener('click', () => {
-          for (const box of root.querySelectorAll<HTMLInputElement>('[name=type]')) box.checked = link.dataset.autoLootAll === '1'
-        })
-    },
+    render: (_event: Event, dialog: any) => bindAutoLoot(dialog.element as HTMLElement),
     ok: {
       label: t('Roll'),
       icon: 'fa-solid fa-dice',
       callback: (_event: Event, button: any) => {
-        const form = button.form
-        const number = (name: string) => Math.max(0, Math.floor(Number(form.elements[name]?.value) || 0))
-        return {
-          chancePercent: Math.min(100, number('chance')),
-          weights: Object.fromEntries(lootTiers.map((tier) => [tier, number(`weight-${tier}`)])) as Record<LootTier, number>,
-          types: [...form.querySelectorAll('[name=type]:checked')].map((input: any) => input.value as LootType),
-        }
+        const form = button.form as HTMLFormElement
+        const number = (name: string) => Math.max(0, Math.floor(Number((form.elements as any)[name]?.value) || 0))
+        const ticked = (selector: string) => [...form.querySelectorAll<HTMLInputElement>(selector)].map((input) => input.value as LootType)
+        const allTypes = ticked('[data-loot-all]:checked')
+        // Other crawlers' own types stay as they were; these crawlers' are what's ticked beyond the shared ones.
+        const crawlerTypes = { ...saved.crawlerTypes }
+        for (const actor of actors) crawlerTypes[actor.id] = ticked(`[data-loot-crawler="${actor.id}"]:checked`).filter((type) => !allTypes.includes(type))
+        return normalizeAutoLoot<LootTier, LootType>(
+          { chancePercent: Math.min(100, number('chance')), weights: Object.fromEntries(lootTiers.map((tier) => [tier, number(`weight-${tier}`)])), allTypes, crawlerTypes },
+          AUTO_LOOT_TYPES,
+          lootTiers,
+        )
       },
     },
   })
   if (!settings) return
   await game.settings.set('crawlspace', 'autoLoot', settings)
   await runAutoLoot(actors, settings)
+}
+
+/** The Auto-loot dialog's live parts: the chance slider, tier shares, and the box type table. */
+function bindAutoLoot(root: HTMLElement) {
+  const slider = root.querySelector<HTMLInputElement>('[name=chanceSlider]')
+  const number = root.querySelector<HTMLInputElement>('[name=chance]')
+  slider?.addEventListener('input', () => number && (number.value = slider.value))
+  number?.addEventListener('input', () => slider && (slider.value = number.value))
+  const shares = () => {
+    const weight = (tier: string) => Math.max(0, Number(root.querySelector<HTMLInputElement>(`[name="weight-${tier}"]`)?.value) || 0)
+    const total = lootTiers.reduce((sum, tier) => sum + weight(tier), 0)
+    for (const tier of lootTiers) {
+      const output = root.querySelector(`[data-tier-share="${tier}"]`)
+      if (output) output.textContent = total > 0 ? `${Math.floor((weight(tier) / total) * 100)}%` : '0%'
+    }
+  }
+  for (const input of root.querySelectorAll<HTMLInputElement>('[name^="weight-"]')) input.addEventListener('input', shares)
+  // A type ticked for everyone shows ticked (and locked) for each crawler; unticking it gives back their own choice.
+  const syncRow = (all: HTMLInputElement) => {
+    for (const cell of all.closest('tr')?.querySelectorAll<HTMLInputElement>('[data-loot-crawler]') ?? []) {
+      cell.disabled = all.checked
+      cell.checked = all.checked || cell.dataset.own === '1'
+    }
+  }
+  for (const all of root.querySelectorAll<HTMLInputElement>('[data-loot-all]')) all.addEventListener('change', () => syncRow(all))
+  for (const cell of root.querySelectorAll<HTMLInputElement>('[data-loot-crawler]')) cell.addEventListener('change', () => (cell.dataset.own = cell.checked ? '1' : ''))
+  for (const button of root.querySelectorAll<HTMLElement>('[data-loot-column]')) {
+    button.addEventListener('click', (event) => {
+      event.preventDefault()
+      const column = button.dataset.lootColumn
+      const boxes = [...root.querySelectorAll<HTMLInputElement>(column === 'all' ? '[data-loot-all]' : `[data-loot-crawler="${column}"]:not(:disabled)`)]
+      const on = !boxes.every((box) => box.checked)
+      for (const box of boxes) {
+        box.checked = on
+        if (column === 'all') syncRow(box)
+        else box.dataset.own = on ? '1' : ''
+      }
+    })
+  }
 }
 
 /* -------------------------------------------- */
@@ -268,7 +319,7 @@ export function openItemGenerator() {
 }
 
 export function registerLootTools() {
-  game.settings.register('crawlspace', 'autoLoot', { scope: 'world', config: false, type: Object, default: DEFAULTS })
+  game.settings.register('crawlspace', 'autoLoot', { scope: 'world', config: false, type: Object, default: {} })
   // The generator also sits at the foot of the Items directory.
   Hooks.on('renderItemDirectory', (_app: any, html: HTMLElement) => {
     if (!game.user.isGM || html.querySelector('[data-crawl-generator]')) return

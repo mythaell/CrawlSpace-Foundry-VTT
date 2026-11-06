@@ -152,7 +152,8 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       itemId: owner?.id ?? '',
       changes: (effect.system?.changes ?? []).length,
     })
-    const actorEffects = this.actor.effects.map((effect: any) => rows(effect))
+    const all = this.actor.effects.map((effect: any) => ({ ...rows(effect), cooldown: !!effect.flags?.crawlspace?.cooldownKey }))
+    const actorEffects = all.filter((effect: any) => !effect.cooldown)
     const fromItems = (types: string[]) =>
       [...this.actor.items]
         .filter((item: any) => types.includes(item.type))
@@ -168,6 +169,7 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     return {
       conditions: actorEffects.filter((e: any) => e.kind === 'debuff'),
       buffs: actorEffects.filter((e: any) => e.kind !== 'debuff'),
+      cooldowns: all.filter((effect: any) => effect.cooldown),
       sources: groups.map((group) => ({ label: group.label, effects: fromItems(group.types) })).filter((group) => group.effects.length),
     }
   }

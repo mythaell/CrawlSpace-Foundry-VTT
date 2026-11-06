@@ -6,6 +6,7 @@ import { openAwards } from './apps/awards'
 import { registerImmunity } from './effects/immunity'
 import { openTime, registerClock, registerTimePickers } from './apps/time'
 import { registerFrames } from './apps/frames'
+import { registerCooldownIcons } from './effects/cooldowns'
 import { registerConditionDrops } from './effects/use-conditions'
 import { createTokenHUD } from './effects/stacks'
 import { advanceTime, settleTime, registerTime } from './time'
@@ -186,6 +187,7 @@ Hooks.once('init', () => {
   registerClock()
   registerTimePickers()
   registerFrames()
+  registerCooldownIcons()
   registerConditionDrops()
   registerAreas()
   registerUpkeep()

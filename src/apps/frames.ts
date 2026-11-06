@@ -56,7 +56,8 @@ const shieldText = (shield: any) => (shield ? game.i18n.format('CRAWLSPACE.Effec
 
 const conditionsOf = (actor: any) => {
   const shields = actor.conditionShields?.() ?? []
-  return actor.effects.contents.filter((effect: any) => effect.active && !effect.flags?.crawlspace?.build).map((effect: any) => badge(effect, shields))
+  // Cooldowns aren't conditions: they stay on the sheet's Cooldowns list.
+  return actor.effects.contents.filter((effect: any) => effect.active && !effect.flags?.crawlspace?.build && !effect.flags?.crawlspace?.cooldownKey).map((effect: any) => badge(effect, shields))
 }
 
 class CrawlerFrames extends HandlebarsApplicationMixin(ApplicationV2) {

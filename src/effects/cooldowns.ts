@@ -44,6 +44,8 @@ export async function withCooldowns(actor: any, uses: CooldownUse[], action: () 
         name: game.i18n.format('CRAWLSPACE.Time.CooldownName', { name: use.name }),
         img: use.img || 'icons/svg/clockwork.svg',
         transfer: false,
+        // Cooldowns are bookkeeping, not conditions: no icon on the token.
+        showIcon: CONST.ACTIVE_EFFECT_SHOW_ICON.NEVER,
         duration: seconds === null ? { value: null, units: 'seconds', expiry } : { value: seconds, units: 'seconds' },
         system: { changes: [], durationText: use.duration },
         flags: { crawlspace: { cooldownKey: use.key, cooldownEnd: seconds === null ? null : game.time.worldTime + seconds } },
@@ -53,6 +55,22 @@ export async function withCooldowns(actor: any, uses: CooldownUse[], action: () 
   } finally {
     for (const use of entries) pending.delete(`${actor.uuid}:${use.key}`)
   }
+}
+
+/** Is this effect a skill, spell or granted spell's cooldown? */
+export const isCooldown = (effect: any) => !!effect?.flags?.crawlspace?.cooldownKey
+
+/** Cooldowns made before they hid their token icon: the active GM hides it once on load. */
+export function registerCooldownIcons() {
+  Hooks.once('ready', async () => {
+    if (!game.user.isActiveGM) return
+    const NONE = CONST.ACTIVE_EFFECT_SHOW_ICON.NEVER
+    const actors = [...game.actors, ...game.scenes.contents.flatMap((scene: any) => scene.tokens.contents.filter((token: any) => !token.actorLink && token.actor).map((token: any) => token.actor))]
+    for (const actor of actors) {
+      const updates = actor.effects.filter((effect: any) => isCooldown(effect) && effect.showIcon !== NONE).map((effect: any) => ({ _id: effect.id, showIcon: NONE }))
+      if (updates.length) await actor.updateEmbeddedDocuments('ActiveEffect', updates)
+    }
+  })
 }
 
 /** Cooldown identity for an embedded skill or spell. */

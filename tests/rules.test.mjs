@@ -117,3 +117,18 @@ test('every special duration in the picker is one the end triggers read (or is k
   assert.deepEqual([...SPECIAL_DURATIONS].sort(), Object.keys(expected).sort())
   for (const [text, triggers] of Object.entries(expected)) assert.deepEqual(endTriggers(text), triggers, text)
 })
+
+test('auto-loot box types: every crawler gets the shared ones plus their own; old saves keep their types', async () => {
+  const { crawlerLootTypes, normalizeAutoLoot } = await import('../src/rules/auto-loot.ts')
+  const types = ['Adventurer', 'Apparel', 'Goblin', 'Pet', 'Weapon']
+  const tiers = ['Bronze', 'Silver']
+  const settings = normalizeAutoLoot({ allTypes: ['Weapon', 'Apparel'], crawlerTypes: { a1: ['Goblin', 'Weapon', 'Nonsense'] } }, types, tiers)
+  assert.deepEqual(crawlerLootTypes(settings, 'a1', types), ['Apparel', 'Goblin', 'Weapon'])
+  assert.deepEqual(crawlerLootTypes(settings, 'b2', types), ['Apparel', 'Weapon'])
+  assert.deepEqual(settings.weights, { Bronze: 60, Silver: 25 })
+  const old = normalizeAutoLoot({ chancePercent: 30, types: ['Pet'] }, types, tiers)
+  assert.deepEqual(old.allTypes, ['Pet'])
+  assert.equal(old.chancePercent, 30)
+  assert.deepEqual(old.crawlerTypes, {})
+  assert.deepEqual(normalizeAutoLoot({}, types, tiers).allTypes, types)
+})

@@ -305,7 +305,8 @@
         "off": "Off",
         "cast": "When cast"
       },
-      "OnCast": "On self when cast"
+      "OnCast": "On self when cast",
+      "Cooldowns": "Cooldowns"
     },
     "Attack": {
       "Unarmed": "Unarmed strike",
@@ -1147,14 +1148,19 @@
       "Hint": "Each crawler ({names}) rolls the chance; a hit gives a sealed box of a weighted tier and a random type.",
       "ChanceLabel": "Chance per crawler",
       "Weights": "Tier weights",
-      "Types": "Box types",
+      "Types": "Box type access",
       "Roll": "Roll",
       "Chance": "{chance}% chance per crawler.",
       "Nothing": "{name}: no box.",
       "Got": "{name}: {box} ({contents}).",
       "Notes": "Auto-loot.",
       "All": "All",
-      "None": "None"
+      "None": "None",
+      "TypesHint": "Types ticked for all crawlers can go to anyone; a crawler column adds types only that crawler can get. Click a column header to tick or untick it.",
+      "BoxType": "Box type",
+      "AllCrawlers": "All crawlers",
+      "ColumnAllHint": "Tick or untick every box type for all crawlers",
+      "ColumnHint": "Tick or untick every box type for {name}"
     },
     "Generator": {
       "Title": "Item Generator",

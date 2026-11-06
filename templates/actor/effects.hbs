@@ -38,6 +38,11 @@
   </div>
   <ol class="item-list">{{#each effects.buffs as |effect|}}{{> effectRow effect=effect}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Buffs"}}</li>{{/each}}</ol>
 
+  {{#if effects.cooldowns.length}}
+  <div class="list-header"><span class="item-name">{{localize "CRAWLSPACE.Effect.Cooldowns"}}</span></div>
+  <ol class="item-list">{{#each effects.cooldowns as |effect|}}{{> effectRow effect=effect}}{{/each}}</ol>
+  {{/if}}
+
   {{#each effects.sources as |group|}}
   <div class="list-header"><span class="item-name">{{localize group.label}}</span></div>
   <ol class="item-list">{{#each group.effects as |effect|}}{{> effectRow effect=effect}}{{/each}}</ol>

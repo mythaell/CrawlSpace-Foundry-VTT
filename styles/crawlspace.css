@@ -3070,6 +3070,15 @@
   .crawlspace.auto-loot-dialog .auto-loot-weights { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; }
   .crawlspace.auto-loot-dialog .auto-loot-weights label { display: flex; flex-direction: column; align-items: stretch; gap: 2px; margin: 0; font-size: 12px; }
   .crawlspace.auto-loot-dialog .auto-loot-weights input { width: 100%; text-align: center; }
+  .crawlspace.auto-loot-dialog .auto-loot-weights small { text-align: center; opacity: 0.75; }
+  .crawlspace.auto-loot-dialog .auto-loot-table { overflow-x: auto; }
+  .crawlspace.auto-loot-dialog .auto-loot-table table { width: 100%; border-collapse: collapse; margin: 0; }
+  .crawlspace.auto-loot-dialog .auto-loot-table th, .crawlspace.auto-loot-dialog .auto-loot-table td { padding: 2px 6px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+  .crawlspace.auto-loot-dialog .auto-loot-table tbody th { text-align: left; font-weight: normal; white-space: nowrap; }
+  .crawlspace.auto-loot-dialog .auto-loot-table thead th { position: sticky; top: 0; background: var(--crawl-panel, #10325a); }
+  .crawlspace.auto-loot-dialog .auto-loot-table thead button { width: auto; min-height: 0; padding: 2px 8px; font-size: 12px; line-height: 1.4; white-space: nowrap; }
+  .crawlspace.auto-loot-dialog .auto-loot-table input { margin: 0; }
+  .crawlspace.auto-loot-dialog .auto-loot-table input:disabled { opacity: 0.55; }
   .crawlspace.auto-loot-dialog .auto-loot-types { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 4px 10px; }
   .crawlspace.auto-loot-dialog .auto-loot-types label { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 6px; margin: 0; text-align: left; font-size: 13px; }
   .crawlspace.auto-loot-dialog .auto-loot-types input { flex: none; margin: 0; }
