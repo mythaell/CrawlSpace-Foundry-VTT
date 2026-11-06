@@ -246,22 +246,64 @@ export class AbilityData extends foundry.abstract.TypeDataModel {
   }
 }
 
+/** A benefit or detriment bought with build points (raceClassRules.ts createBuildEntry). */
 const benefitSchema = () =>
-  new (f().SchemaField)({ name: text(), tier: text(), description: text() })
+  new (f().SchemaField)({ templateId: text(), name: text(), tier: text(), count: integer(1, { min: 0 }), target: text(), description: text() })
+
+/** Bonus ranks in a skill or spell: `ref` is its CrawlSpace record ("game-40"), `uuid` a Foundry item dropped on the build. */
+const rankBonusSchema = () =>
+  new (f().SchemaField)({
+    name: text(),
+    ref: text(),
+    uuid: text(),
+    ranks: integer(1, { min: 0 }),
+    training: new (f().StringField)({ required: true, initial: 'standard', choices: ['standard', 'passive', 'unusual', 'unusualPassive'] }),
+    notes: text(),
+  })
+
+/**
+ * The race and class point-buy build (RaceClassEditor.tsx, raceClassRules.ts). Stat, skill, spell and DR bonuses
+ * become the item's "Build" ActiveEffect; benefits and detriments are described for the GM.
+ */
+const buildSchema = () => {
+  const fields = f()
+  return {
+    statBonuses: new fields.SchemaField(Object.fromEntries(['str', 'int', 'con', 'dex', 'cha'].map((stat) => [stat, integer(0)]))),
+    drBonus: integer(0),
+    skillBonuses: new fields.ArrayField(rankBonusSchema()),
+    spellBonuses: new fields.ArrayField(rankBonusSchema()),
+    benefits: new fields.ArrayField(benefitSchema()),
+    detriments: new fields.ArrayField(benefitSchema()),
+    skillDetriments: new fields.ArrayField(
+      new fields.SchemaField({ name: text(), ref: text(), uuid: text(), currentRank: optionalNumber(), penalty: integer(0, { min: 0 }), notes: text() }),
+    ),
+    statSkillDetriments: new fields.ArrayField(
+      new fields.SchemaField({
+        stat: new fields.StringField({ required: true, initial: 'str', choices: ['str', 'int', 'con', 'dex', 'cha'] }),
+        penalty: integer(1, { min: 0 }),
+        notes: text(),
+      }),
+    ),
+    tags: text(),
+  }
+}
+
+/** Fields whose change rebuilds the "Build" effect. */
+export const BUILD_EFFECT_FIELDS = ['statBonuses', 'drBonus', 'skillBonuses', 'spellBonuses']
 
 export class RaceData extends foundry.abstract.TypeDataModel {
   [key: string]: any
   static defineSchema() {
-    const fields = f()
     return {
       ...common(),
-      origin: text(),
+      ...buildSchema(),
+      origin: new (f().StringField)({ required: true, blank: true, initial: 'Earth' }),
       size: text(),
       sizeName: text(),
-      drBonus: integer(0),
-      benefits: new fields.ArrayField(benefitSchema()),
-      detriments: new fields.ArrayField(benefitSchema()),
-      tags: text(),
+      /** Earth races: the skill their Hobby Potion grants 3 ranks in. */
+      hobbySkill: text(),
+      /** Alien races: how representing the race can earn popularity. */
+      popularity: text(),
     }
   }
 }
@@ -269,13 +311,12 @@ export class RaceData extends foundry.abstract.TypeDataModel {
 export class ClassData extends foundry.abstract.TypeDataModel {
   [key: string]: any
   static defineSchema() {
-    const fields = f()
     return {
       ...common(),
-      drBonus: integer(0),
-      benefits: new fields.ArrayField(benefitSchema()),
-      detriments: new fields.ArrayField(benefitSchema()),
-      tags: text(),
+      ...buildSchema(),
+      earthClass: new (f().BooleanField)(),
+      classTypes: text(),
+      prerequisites: text(),
     }
   }
 }
@@ -287,6 +328,10 @@ export class BackgroundData extends foundry.abstract.TypeDataModel {
     return {
       ...common(),
       stage: new fields.StringField({ required: true, initial: 'childhood', choices: ['childhood', 'adolescence', 'career', 'hobby'] }),
+      /** Human or animal crawlers (the builder's species). */
+      species: new fields.StringField({ required: true, initial: 'human', choices: ['human', 'animal'] }),
+      /** The three skills a crawler picks two of in the character builder. */
+      skills: new fields.ArrayField(new fields.StringField({ required: true, blank: true }), { initial: ['', '', ''] }),
     }
   }
 }

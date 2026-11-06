@@ -67,6 +67,13 @@
 
   {{#if (eq type "background")}}
     <label>{{localize "CRAWLSPACE.Item.Stage"}}<select name="system.stage">{{selectOptions stageChoices selected=systemSource.stage localize=true}}</select></label>
+    <label>{{localize "CRAWLSPACE.Builder.Species"}}<select name="system.species">{{selectOptions speciesChoices selected=systemSource.species localize=true}}</select></label>
+    <fieldset class="wide background-skills">
+      <legend>{{localize "CRAWLSPACE.Build.BackgroundSkills"}}</legend>
+      <p class="hint">{{localize "CRAWLSPACE.Build.BackgroundSkillsHint"}}</p>
+      {{#each backgroundSkills as |skill|}}<input type="text" name="system.skills.{{skill.index}}" value="{{skill.value}}" list="crawl-skill-names" placeholder="{{localize 'TYPES.Item.skill'}}">{{/each}}
+      <datalist id="crawl-skill-names">{{#each skillNames}}<option value="{{this}}"></option>{{/each}}</datalist>
+    </fieldset>
   {{/if}}
 
   {{#if (eq type "achievement")}}
@@ -78,13 +85,24 @@
     <label>{{localize "CRAWLSPACE.Item.TrapType"}}<input type="text" name="system.trapType" value="{{systemSource.trapType}}"></label>
   {{/if}}
 
-  {{#if hasBenefits}}
-    {{#if (eq type "race")}}
-    <label>{{localize "CRAWLSPACE.Item.Origin"}}<input type="text" name="system.origin" value="{{systemSource.origin}}"></label>
+  {{#if (eq type "race")}}
+    <label>{{localize "CRAWLSPACE.Item.Origin"}}<select name="system.origin">{{selectOptions originChoices selected=systemSource.origin localize=true}}</select></label>
     <label>{{localize "CRAWLSPACE.Crawler.Size"}}<input type="text" name="system.size" value="{{systemSource.size}}"></label>
+    {{#if (eq systemSource.origin "Alien")}}
+    <label class="wide">{{localize "CRAWLSPACE.Build.Popularity"}}<textarea name="system.popularity">{{systemSource.popularity}}</textarea></label>
+    <p class="wide hint">{{localize "CRAWLSPACE.Build.AlienHint"}}</p>
+    {{else}}
+    <label>{{localize "CRAWLSPACE.Build.HobbySkill"}}<input type="text" name="system.hobbySkill" value="{{systemSource.hobbySkill}}"></label>
+    <p class="wide hint">{{localize "CRAWLSPACE.Build.EarthHint"}}</p>
     {{/if}}
-    <label>{{localize "CRAWLSPACE.Item.DrBonus"}}<input type="number" name="system.drBonus" value="{{systemSource.drBonus}}"></label>
-    <label>{{localize "CRAWLSPACE.Item.Tags"}}<input type="text" name="system.tags" value="{{systemSource.tags}}"></label>
+  {{/if}}
+  {{#if (eq type "class")}}
+    <label>{{localize "CRAWLSPACE.Build.ClassTypes"}}<input type="text" name="system.classTypes" value="{{systemSource.classTypes}}" placeholder="Bard, Fighter, Rogue…"></label>
+    <label class="check"><input type="checkbox" name="system.earthClass" {{checked systemSource.earthClass}}> {{localize "CRAWLSPACE.Build.EarthClassHint"}}</label>
+    <label class="wide">{{localize "CRAWLSPACE.Build.Prerequisites"}}<textarea name="system.prerequisites">{{systemSource.prerequisites}}</textarea></label>
+  {{/if}}
+  {{#if hasBenefits}}
+    <label class="wide">{{localize "CRAWLSPACE.Item.Tags"}}<input type="text" name="system.tags" value="{{systemSource.tags}}"></label>
   {{/if}}
 
   </div>
@@ -127,21 +145,6 @@
   </fieldset>
   {{/if}}
 
-  {{#if hasBenefits}}
-  {{#each benefitLists as |list|}}
-  <fieldset class="benefits">
-    <legend>{{list.label}} {{#if @root.editable}}<a data-action="addBenefit" data-list="{{list.key}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</legend>
-    {{#each list.entries as |entry|}}
-    <div class="benefit-row">
-      <input type="text" name="system.{{list.key}}.{{@index}}.name" value="{{entry.name}}" placeholder="{{localize 'CRAWLSPACE.Item.Name'}}">
-      <input type="text" name="system.{{list.key}}.{{@index}}.tier" value="{{entry.tier}}" placeholder="{{localize 'CRAWLSPACE.Item.Tier'}}">
-      {{#if @root.editable}}<a data-action="deleteBenefit" data-list="{{list.key}}" data-index="{{@index}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
-      <textarea name="system.{{list.key}}.{{@index}}.description">{{entry.description}}</textarea>
-    </div>
-    {{/each}}
-  </fieldset>
-  {{/each}}
-  {{/if}}
 
   <label class="wide">{{localize "CRAWLSPACE.Item.Notes"}}<input type="text" name="system.notes" value="{{systemSource.notes}}"></label>
 {{#if (eq type "spell")}}

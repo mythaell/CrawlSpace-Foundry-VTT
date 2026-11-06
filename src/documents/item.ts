@@ -1,5 +1,6 @@
 import { openLootBoxes } from '../loot/boxes'
-import { effectDuration } from '../import/convert'
+import { buildEffect, effectDuration, stableId } from '../import/convert'
+import { BUILD_EFFECT_FIELDS } from '../data/items'
 import { itemCooldown, withCooldowns } from '../effects/cooldowns'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage, type Modifier } from '../dice/rolls'
 import { STATS, statKeyFromCode } from '../config'
@@ -229,5 +230,23 @@ export class CrawlItem extends Item {
       ui.notifications.warn(game.i18n.format('CRAWLSPACE.Warn.SlotFull', { slot, limit }))
       return false
     }
+  }
+
+  _onUpdate(changed: any, options: any, userId: string) {
+    super._onUpdate(changed, options, userId)
+    if (userId !== game.user.id || !['race', 'class'].includes(this.type)) return
+    if (BUILD_EFFECT_FIELDS.some((key) => changed.system && key in changed.system)) this.syncBuildEffect()
+  }
+
+  /** Rebuild the race or class's "Build" effect from its stat, skill, spell and DR bonuses. */
+  async syncBuildEffect() {
+    const source = this._source.system
+    const wanted = buildEffect(this.name, this.img, source)
+    // Items imported before builds were tracked carry the same effect without the flag, under the id the importer gave it.
+    const legacyId = stableId(`${this.name}-effect-0-${this.name}`)
+    const current = this.effects.find((effect: any) => effect.getFlag('crawlspace', 'build')) ?? this.effects.get(legacyId)
+    if (!wanted) return current?.delete()
+    if (current) return current.update({ 'system.changes': wanted.system.changes, 'flags.crawlspace.build': true })
+    return this.createEmbeddedDocuments('ActiveEffect', [wanted])
   }
 }

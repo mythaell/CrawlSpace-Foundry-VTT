@@ -12,10 +12,24 @@
       "book": "",
       "pages": ""
     },
+    "statBonuses": {
+      "str": 0,
+      "int": 0,
+      "con": 0,
+      "dex": 0,
+      "cha": 0
+    },
     "drBonus": 0,
+    "skillBonuses": [],
+    "spellBonuses": [],
     "benefits": [],
     "detriments": [],
-    "tags": ""
+    "skillDetriments": [],
+    "statSkillDetriments": [],
+    "tags": "",
+    "earthClass": false,
+    "classTypes": "",
+    "prerequisites": ""
   },
   "effects": [],
   "flags": {

@@ -1,5 +1,5 @@
 import { cooldownFor, cooldownLabel } from '../effects/cooldowns'
-import { CHECK_TYPES, DAMAGE_TYPES, GEAR_SLOTS, STATS, STAT_KEYS } from '../config'
+import { CHECK_TYPES, CREATURE_SIZES, CREATURE_TYPES, DAMAGE_TYPES, GEAR_SLOTS, STATS, STAT_KEYS } from '../config'
 import { DEBUFFS } from '../rules/debuffs'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage } from '../dice/rolls'
 import { levelUp, openUpkeep } from '../apps/upkeep'
@@ -75,12 +75,35 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       toggleExpand: CrawlActorSheet.#onToggleExpand,
       setFilter: CrawlActorSheet.#onSetFilter,
       openPack: CrawlActorSheet.#onOpenPack,
+      editTraits: CrawlActorSheet.#onEditTraits,
     },
   }
 
   get actor() {
     return this.document
   }
+
+  /** Edit Immunities / Vulnerabilities / Resistances as damage-type checkboxes. */
+  static async #onEditTraits(this: CrawlActorSheet, _event: PointerEvent, target: HTMLElement) {
+    const key = target.dataset.trait as (typeof TRAIT_SECTIONS)[number]
+    const selected = new Set<string>(this.actor._source.system.traits[key] ?? [])
+    const boxes = ['All', ...DAMAGE_TYPES]
+      .map((type) => `<label class="check"><input type="checkbox" name="types" value="${type}" ${selected.has(type) ? 'checked' : ''}> ${type}</label>`)
+      .join('')
+    const result = await foundry.applications.api.DialogV2.prompt({
+      window: { title: game.i18n.localize(`CRAWLSPACE.Sheet.${key}`) },
+      content: `<div class="crawl-trait-grid">${boxes}</div>`,
+      ok: {
+        label: game.i18n.localize('CRAWLSPACE.Sheet.Apply'),
+        callback: (_event: Event, button: any) =>
+          [...button.form.querySelectorAll('input[name="types"]:checked')].map((input: any) => input.value),
+      },
+      rejectClose: false,
+    })
+    if (!result) return
+    await this.actor.update({ [`system.traits.${key}`]: result })
+  }
+
 
   /** Rows the user has opened (name click), kept across re-renders. */
   protected expanded = new Set<string>()
@@ -434,7 +457,6 @@ export class CrawlerSheet extends CrawlActorSheet {
       awards: CrawlerSheet.#onAwards,
       levelUp: CrawlerSheet.#onLevelUp,
       openEffects: CrawlerSheet.#onOpenEffects,
-      editTraits: CrawlerSheet.#onEditTraits,
       addClub: CrawlerSheet.#onAddClub,
       removeClub: CrawlerSheet.#onRemoveClub,
       attackRoll: CrawlerSheet.#onAttackRoll,
@@ -858,27 +880,6 @@ export class CrawlerSheet extends CrawlActorSheet {
     await this.actor.update({ 'system.shield.slots': Array.from({ length: Math.clamp(count, 0, 20) }, () => true) })
   }
 
-  /** Edit Immunities / Vulnerabilities / Resistances as damage-type checkboxes. */
-  static async #onEditTraits(this: CrawlerSheet, _event: PointerEvent, target: HTMLElement) {
-    const key = target.dataset.trait as (typeof TRAIT_SECTIONS)[number]
-    const selected = new Set<string>(this.actor._source.system.traits[key] ?? [])
-    const boxes = ['All', ...DAMAGE_TYPES]
-      .map((type) => `<label class="check"><input type="checkbox" name="types" value="${type}" ${selected.has(type) ? 'checked' : ''}> ${type}</label>`)
-      .join('')
-    const result = await foundry.applications.api.DialogV2.prompt({
-      window: { title: game.i18n.localize(`CRAWLSPACE.Sheet.${key}`) },
-      content: `<div class="crawl-trait-grid">${boxes}</div>`,
-      ok: {
-        label: game.i18n.localize('CRAWLSPACE.Sheet.Apply'),
-        callback: (_event: Event, button: any) =>
-          [...button.form.querySelectorAll('input[name="types"]:checked')].map((input: any) => input.value),
-      },
-      rejectClose: false,
-    })
-    if (!result) return
-    await this.actor.update({ [`system.traits.${key}`]: result })
-  }
-
   /** Clicking a health slot sets health to that slot (CrawlSpace's slot click); clicking the top filled slot empties it. */
   static async #onHealthSlot(this: CrawlerSheet, _event: PointerEvent, target: HTMLElement) {
     const percentage = Number(target.dataset.percentage)
@@ -941,6 +942,19 @@ export class CrawlerSheet extends CrawlActorSheet {
   }
 }
 
+/**
+ * A mob's stat budget (mobRules.ts getMobDerived): level × 3 points, or the boss tier's points per level, spread over
+ * its five stats. Published stat blocks that only give modifiers have no budget to show.
+ */
+export function mobStatBudget(actor: any) {
+  const attributes = actor._source.system.attributes ?? {}
+  const values = Object.values(attributes).map((attribute: any) => attribute?.value)
+  if (actor.type === 'companion' || values.every((value) => value === null || value === undefined)) return null
+  const total = Number(actor.system.statPoints) || 0
+  const assigned = values.reduce((sum: number, value: any) => sum + Math.max(0, Math.floor(Number(value) || 0)), 0)
+  return { total, assigned, remaining: total - assigned, over: assigned > total }
+}
+
 export class MobSheet extends CrawlActorSheet {
   static DEFAULT_OPTIONS: any = {
     classes: ['mob', 'pf-actor'],
@@ -991,6 +1005,7 @@ export class MobSheet extends CrawlActorSheet {
       case 'sidebar':
         context.slots = Array.from({ length: system.health.max }, (_, index) => ({ index, filled: index < system.health.value }))
         context.traitSections = TRAIT_SECTIONS.map((key) => ({ key, label: game.i18n.localize(`CRAWLSPACE.Sheet.${key}`), values: [...(system.traits?.[key] ?? [])].sort() }))
+        context.statBudget = mobStatBudget(actor)
         break
       case 'header':
         context.kindChoices =
@@ -1006,6 +1021,9 @@ export class MobSheet extends CrawlActorSheet {
           context.companion = { master: master?.name ?? '', vehicle: system.kind !== 'pet' }
         }
         context.tagList = String(system.tags ?? '').split(',').map((tag) => tag.trim()).filter(Boolean)
+        context.sizeChoices = Object.fromEntries(CREATURE_SIZES.map((size) => [size.value, `${size.value} · ${size.name}`]))
+        if (system.size && !(system.size in context.sizeChoices)) context.sizeChoices[system.size] = system.size
+        context.creatureTypes = CREATURE_TYPES
         if (actor.type === 'minion')
           context.minion = { caster: fromUuidSync(system.minion.caster)?.name ?? game.i18n.localize('CRAWLSPACE.Minion.NoCaster'), condition: system.minion.condition }
         break

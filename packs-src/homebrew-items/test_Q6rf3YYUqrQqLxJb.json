@@ -12,31 +12,75 @@
       "book": "",
       "pages": ""
     },
+    "statBonuses": {
+      "str": 2,
+      "int": 0,
+      "con": 1,
+      "dex": 0,
+      "cha": 0
+    },
     "drBonus": 3,
+    "skillBonuses": [
+      {
+        "name": "Alchemy",
+        "ref": "game-40",
+        "uuid": "",
+        "ranks": 3,
+        "training": "passive",
+        "notes": ""
+      }
+    ],
+    "spellBonuses": [
+      {
+        "name": "Heal",
+        "ref": "game-133",
+        "uuid": "",
+        "ranks": 1,
+        "training": "passive",
+        "notes": ""
+      }
+    ],
     "benefits": [
       {
+        "templateId": "skillCap",
         "name": "Skill Rank 20",
         "tier": "minor",
+        "count": 1,
+        "target": "",
         "description": "A specific Skill can reach Rank 20."
       },
       {
+        "templateId": "combatHealing",
         "name": "Healing from attacks",
         "tier": "moderate",
+        "count": 1,
+        "target": "",
         "description": "Heal one Health Bar slot after damaging/killing with a specified attack; maximum five per combat."
       },
       {
+        "templateId": "flight",
         "name": "Unlimited flight",
         "tier": "epic",
+        "count": 1,
+        "target": "",
         "description": "Fly without limitations."
       },
       {
+        "templateId": "limitedNoncombat",
         "name": "Situational non-combat Advantage",
         "tier": "extreme",
+        "count": 1,
+        "target": "",
         "description": "Advantage on all Skills in a limited non-combat situation."
       }
     ],
     "detriments": [],
-    "tags": ""
+    "skillDetriments": [],
+    "statSkillDetriments": [],
+    "tags": "",
+    "earthClass": false,
+    "classTypes": "",
+    "prerequisites": ""
   },
   "effects": [
     {
@@ -49,15 +93,15 @@
       "system": {
         "changes": [
           {
-            "key": "system.attributes.con.value",
-            "type": "add",
-            "value": 1,
-            "phase": "initial"
-          },
-          {
             "key": "system.attributes.str.value",
             "type": "add",
             "value": 2,
+            "phase": "initial"
+          },
+          {
+            "key": "system.attributes.con.value",
+            "type": "add",
+            "value": 1,
             "phase": "initial"
           },
           {
@@ -80,6 +124,11 @@
           }
         ],
         "requiredRank": null
+      },
+      "flags": {
+        "crawlspace": {
+          "build": true
+        }
       },
       "_key": "!items.effects!Q6rf3YYUqrQqLxJb.5tJLXjelDbsjThP6"
     }

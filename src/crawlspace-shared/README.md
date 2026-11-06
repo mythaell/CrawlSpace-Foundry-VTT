@@ -14,3 +14,6 @@ When updating from CrawlSpace, copy the files again and reapply these changes.
 The character builder modules (`characterBuilder*.ts`, `characterSheet*.ts` and what they import) came over unchanged,
 except `shared/characterSheetModel.ts`, whose two type imports from React components now point at `./actions` and a
 local `RichTextValue` type.
+
+The race and class build rules (`shared/raceClassRules.ts`, `shared/raceClassGrants.ts`, and `shared/adventureModels.ts`
+for its row helper) came over unchanged.

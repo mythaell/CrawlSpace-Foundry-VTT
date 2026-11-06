@@ -1,0 +1,96 @@
+{{#*inline "crawlRankList"}}{{#with list as |list|}}
+  <fieldset class="build-list" data-drop-list="{{list.key}}">
+    <legend>{{list.label}}
+      {{#if @root.editable}}<a data-action="addBuildRow" data-list="{{list.key}}" data-tooltip="{{localize 'CRAWLSPACE.Build.AddCustom'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}
+    </legend>
+    <p class="hint">{{list.hint}}</p>
+    {{#each list.entries as |entry|}}
+    <div class="build-row" data-index="{{entry.index}}">
+      <span class="build-name">
+        {{#if entry.link}}<a class="content-link" draggable="true" data-link data-uuid="{{entry.link}}" data-tooltip="{{localize 'CRAWLSPACE.Build.Open'}}"><i class="fa-solid fa-link"></i></a>{{/if}}
+        <input type="text" name="system.{{list.key}}.{{entry.index}}.name" value="{{entry.name}}" placeholder="{{list.nameLabel}}" list="crawl-{{list.type}}-names">
+      </span>
+      {{#if list.penalty}}
+      <label class="small">{{localize "CRAWLSPACE.Build.CurrentRank"}}<input type="number" min="0" name="system.{{list.key}}.{{entry.index}}.currentRank" value="{{crawlNumberOrBlank entry.currentRank}}"></label>
+      <label class="small">{{localize "CRAWLSPACE.Build.Penalty"}}<input type="number" min="0" name="system.{{list.key}}.{{entry.index}}.penalty" value="{{entry.penalty}}"></label>
+      {{else}}
+      <label class="small">{{localize "CRAWLSPACE.Build.Ranks"}}<input type="number" min="0" name="system.{{list.key}}.{{entry.index}}.ranks" value="{{entry.ranks}}"></label>
+      <label>{{localize "CRAWLSPACE.Build.TrainingLabel"}}<select name="system.{{list.key}}.{{entry.index}}.training">{{selectOptions list.trainingChoices selected=entry.training localize=true}}</select></label>
+      {{/if}}
+      {{#if @root.editable}}<a class="build-delete" data-action="deleteBuildRow" data-list="{{list.key}}" data-index="{{entry.index}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
+      <input class="build-notes" type="text" name="system.{{list.key}}.{{entry.index}}.notes" value="{{entry.notes}}" placeholder="{{localize 'CRAWLSPACE.Build.Notes'}}">
+    </div>
+    {{else}}
+    <p class="build-empty">{{list.empty}}</p>
+    {{/each}}
+  </fieldset>
+{{/with}}{{/inline}}
+<section class="tab build {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  <datalist id="crawl-skill-names">{{#each skillNames}}<option value="{{this}}"></option>{{/each}}</datalist>
+  <datalist id="crawl-spell-names">{{#each spellNames}}<option value="{{this}}"></option>{{/each}}</datalist>
+  <div class="build-budget {{#if build.over}}over{{/if}}" role="group" aria-label="{{localize 'CRAWLSPACE.Build.Points'}}">
+    <span>{{localize "CRAWLSPACE.Build.Base"}} <b>{{build.base}}</b></span>
+    <span>{{localize "CRAWLSPACE.Build.Detriments"}} <b>+{{build.extra}}</b> / 5</span>
+    <span>{{localize "CRAWLSPACE.Build.Spent"}} <b>{{build.spent}}</b></span>
+    <span class="remaining">{{localize "CRAWLSPACE.Build.Remaining"}} <b>{{build.remaining}}</b></span>
+    {{#if build.isClass}}<span>{{localize "CRAWLSPACE.Build.PassiveRanks"}} <b>{{build.passiveRanks}}</b> / 5</span>{{/if}}
+  </div>
+  {{#if build.capped}}<p class="hint">{{localize "CRAWLSPACE.Build.Capped" earned=build.earned}}</p>{{/if}}
+  {{#if build.issues.length}}<ul class="build-issues">{{#each build.issues}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
+  <p class="hint">{{localize "CRAWLSPACE.Build.PoolHint"}}</p>
+
+  <fieldset class="build-stats">
+    <legend>{{localize "CRAWLSPACE.Build.StatAdjustments"}}</legend>
+    <p class="hint">{{localize "CRAWLSPACE.Build.StatHint"}}</p>
+    <div class="build-stat-grid">
+      {{#each statRows as |stat|}}
+      <label>{{stat.label}}<input type="number" step="1" name="system.statBonuses.{{stat.key}}" value="{{stat.value}}"></label>
+      {{/each}}
+      <label>{{localize "CRAWLSPACE.Item.DrBonus"}}<input type="number" min="0" max="3" step="1" name="system.drBonus" value="{{systemSource.drBonus}}"></label>
+    </div>
+  </fieldset>
+
+  {{#each rankLists as |list|}}{{> crawlRankList list=list}}{{/each}}
+
+  {{#each entryLists as |list|}}
+  <fieldset class="build-list">
+    <legend>{{list.label}}</legend>
+    {{#if list.hint}}<p class="hint">{{list.hint}}</p>{{/if}}
+    {{#if @root.editable}}
+    <div class="build-template">
+      <select data-template-for="{{list.key}}" aria-label="{{list.templateLabel}}">
+        {{#each list.groups as |group|}}<optgroup label="{{group.label}}">{{#each group.options}}<option value="{{this.id}}">{{this.name}}</option>{{/each}}</optgroup>{{/each}}
+      </select>
+      <button type="button" data-action="addBuildRow" data-list="{{list.key}}"><i class="fa-solid fa-plus"></i> {{list.addLabel}}</button>
+    </div>
+    {{/if}}
+    {{#each list.entries as |entry|}}
+    <div class="build-row benefit" data-index="{{entry.index}}">
+      <span class="build-name"><input type="text" name="system.{{list.key}}.{{entry.index}}.name" value="{{entry.name}}" placeholder="{{localize 'CRAWLSPACE.Item.Name'}}"></span>
+      <label>{{list.tierLabel}}<select name="system.{{list.key}}.{{entry.index}}.tier">{{selectOptions list.tierChoices selected=entry.tier blank=""}}</select></label>
+      <label class="small">{{localize "CRAWLSPACE.Build.Count"}}<input type="number" min="0" name="system.{{list.key}}.{{entry.index}}.count" value="{{entry.count}}"></label>
+      {{#if @root.editable}}<a class="build-delete" data-action="deleteBuildRow" data-list="{{list.key}}" data-index="{{entry.index}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
+      <input class="build-notes" type="text" name="system.{{list.key}}.{{entry.index}}.target" value="{{entry.target}}" placeholder="{{localize 'CRAWLSPACE.Build.Target'}}">
+      <textarea class="build-notes" name="system.{{list.key}}.{{entry.index}}.description" placeholder="{{localize 'CRAWLSPACE.Build.Details'}}">{{entry.description}}</textarea>
+    </div>
+    {{else}}
+    <p class="build-empty">—</p>
+    {{/each}}
+    {{#if list.skillPenalties}}{{> crawlRankList list=list.skillPenalties}}{{/if}}
+    {{#if list.isDetriments}}
+    <div class="build-subhead">{{localize "CRAWLSPACE.Build.AllSkillPenalties"}}
+      {{#if @root.editable}}<a data-action="addBuildRow" data-list="statSkillDetriments"><i class="fa-solid fa-plus"></i></a>{{/if}}
+    </div>
+    <p class="hint">{{localize "CRAWLSPACE.Build.AllSkillHint"}}</p>
+    {{#each list.statPenalties as |entry|}}
+    <div class="build-row" data-index="{{entry.index}}">
+      <label>{{localize "CRAWLSPACE.Build.AllSkillsUnder"}}<select name="system.statSkillDetriments.{{entry.index}}.stat">{{selectOptions @root.statChoicesLower selected=entry.stat}}</select></label>
+      <label class="small">{{localize "CRAWLSPACE.Build.Penalty"}}<input type="number" min="0" name="system.statSkillDetriments.{{entry.index}}.penalty" value="{{entry.penalty}}"></label>
+      {{#if @root.editable}}<a class="build-delete" data-action="deleteBuildRow" data-list="statSkillDetriments" data-index="{{entry.index}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
+      <input class="build-notes" type="text" name="system.statSkillDetriments.{{entry.index}}.notes" value="{{entry.notes}}" placeholder="{{localize 'CRAWLSPACE.Build.Notes'}}">
+    </div>
+    {{/each}}
+    {{/if}}
+  </fieldset>
+  {{/each}}
+</section>

@@ -2628,3 +2628,106 @@
   .crawlspace.character-builder .builder-count { flex: 1; opacity: 0.8; }
   .crawlspace.character-builder .form-footer button { flex: 0 0 auto; width: auto; }
 }
+
+/* ---------- Race and class builds ---------- */
+@layer system {
+  .crawlspace .tab.build .build-budget {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--crawl-border);
+    border-radius: 6px;
+    background: var(--crawl-accent-soft);
+  }
+  .crawlspace .tab.build .build-budget.over .remaining {
+    color: var(--crawl-bad);
+  }
+  .crawlspace .tab.build .build-issues {
+    margin: 0.4rem 0;
+    padding-left: 1.2rem;
+    color: var(--crawl-bad);
+  }
+  .crawlspace .tab.build .hint {
+    margin: 0.3rem 0;
+    color: var(--crawl-muted);
+    font-size: var(--font-size-12, 0.8rem);
+  }
+  .crawlspace .tab.build .build-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.35rem;
+  }
+  .crawlspace .tab.build .build-stat-grid label,
+  .crawlspace .tab.build .build-row label {
+    display: flex;
+    flex-direction: column;
+    font-size: var(--font-size-12, 0.8rem);
+    color: var(--crawl-muted);
+  }
+  .crawlspace .tab.build .build-row {
+    display: grid;
+    grid-template-columns: 1fr 5rem 10rem auto;
+    gap: 0.35rem;
+    align-items: end;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--crawl-border);
+  }
+  .crawlspace .tab.build .build-row:last-child {
+    border-bottom: none;
+  }
+  .crawlspace .tab.build .build-row.benefit {
+    grid-template-columns: 1fr 10rem 5rem auto;
+  }
+  .crawlspace .tab.build .build-name {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .crawlspace .tab.build .build-notes {
+    grid-column: 1 / -1;
+  }
+  .crawlspace .tab.build textarea.build-notes {
+    min-height: 2.6rem;
+  }
+  .crawlspace .tab.build .build-delete {
+    align-self: center;
+  }
+  .crawlspace .tab.build .build-template {
+    display: flex;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+  }
+  .crawlspace .tab.build .build-template select {
+    flex: 1;
+  }
+  .crawlspace .tab.build .build-template button {
+    flex: 0 0 auto;
+    width: auto;
+  }
+  .crawlspace .tab.build .build-empty {
+    color: var(--crawl-muted);
+    font-style: italic;
+  }
+  .crawlspace .tab.build .build-subhead {
+    margin-top: 0.6rem;
+    font-weight: bold;
+  }
+  .crawlspace .tab.build [data-drop-list].drag-over {
+    outline: 2px dashed var(--crawl-accent);
+  }
+  .crawlspace .background-skills input {
+    margin-bottom: 0.25rem;
+  }
+}
+
+@layer system {
+  .crawlspace .pf-side small.over-budget {
+    color: var(--crawl-bad);
+    font-weight: bold;
+  }
+  .crawlspace .pf-side .pf-side-edit {
+    font-size: 0.8em;
+    opacity: 0.7;
+  }
+}

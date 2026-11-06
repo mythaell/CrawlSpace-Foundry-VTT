@@ -28,11 +28,12 @@
     <label><span>{{localize "CRAWLSPACE.Mob.BossTier"}}</span><select name="system.bossTier">{{selectOptions bossTierChoices selected=systemSource.bossTier}}</select></label>
     {{/if}}
     {{#unless companion}}<label><span>{{localize "CRAWLSPACE.Crawler.Floor"}}</span><input type="number" name="system.floor" value="{{systemSource.floor}}" min="0"></label>{{/unless}}
-    <label><span>{{localize "CRAWLSPACE.Crawler.Size"}}</span><input type="text" name="system.size" value="{{systemSource.size}}"{{#if companion}} placeholder="1–8"{{/if}}></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.Size"}}</span><select name="system.size">{{selectOptions sizeChoices selected=systemSource.size blank=""}}</select></label>
     {{#if companion.vehicle}}
     <label><span>{{localize "CRAWLSPACE.Companion.Occupants"}}</span><input type="text" name="system.companion.occupants" value="{{systemSource.companion.occupants}}"></label>
     {{else}}
-    <label><span>{{localize "CRAWLSPACE.Mob.Type"}}</span><input type="text" name="system.type" value="{{systemSource.type}}"></label>
+    <label><span>{{localize "CRAWLSPACE.Mob.Type"}}</span><input type="text" name="system.type" value="{{systemSource.type}}" list="crawl-creature-types-{{document.id}}"></label>
+    <datalist id="crawl-creature-types-{{document.id}}">{{#each creatureTypes}}<option value="{{this}}"></option>{{/each}}</datalist>
     {{/if}}
     <label class="wide"><span>{{localize "CRAWLSPACE.Mob.Tags"}}</span><input type="text" name="system.tags" value="{{systemSource.tags}}"></label>
   </div>

@@ -6,6 +6,7 @@ import { normalizeGrinding } from '../rules/grinding.ts'
  */
 import { effectPropertiesToActiveEffects, type CrawlEffectProperty } from '../effects/mapping.ts'
 import { debuffByName } from '../rules/debuffs.ts'
+import { raceClassGrant } from '../crawlspace-shared/shared/raceClassGrants.ts'
 import { durationSeconds, durationEvent } from '../rules/time.ts'
 
 export type ContentRow = { id: number; content_type: string; name: string; data: Record<string, any> }
@@ -344,7 +345,8 @@ export function inventoryToItem(entry: Record<string, any>, contentType = '') {
 /*  Races and classes                                                  */
 /* ------------------------------------------------------------------ */
 
-function raceClassEffects(name: string, img: string, data: Record<string, any>): CrawlEffectProperty[] {
+/** Stat, skill, spell and DR bonuses of a race or class build, as effect properties. Takes CrawlSpace data or a build item's system. */
+export function raceClassEffects(data: Record<string, any>): CrawlEffectProperty[] {
   const effects: CrawlEffectProperty[] = []
   for (const [stat, value] of Object.entries(data.statBonuses ?? {}))
     if (int(value)) effects.push({ type: 'baseStatBonus', target: stat.toUpperCase(), value: String(int(value)) })
@@ -356,8 +358,76 @@ function raceClassEffects(name: string, img: string, data: Record<string, any>):
   return effects
 }
 
+/** A race or class's "Build" effect: the one the build tab keeps in step with its bonuses. */
+export function buildEffect(name: string, img: string, data: Record<string, any>) {
+  const effect = effectPropertiesToActiveEffects(raceClassEffects(data), { name, img }).effects[0]
+  return effect ? { ...effect, flags: { crawlspace: { build: true } } } : null
+}
+
 const benefitList = (value: unknown) =>
-  list(value).map((entry) => ({ name: str(entry.name), tier: str(entry.tier), description: str(entry.description) }))
+  list(value).map((entry) => ({
+    templateId: str(entry.templateId),
+    name: str(entry.name),
+    tier: str(entry.tier),
+    count: Math.max(0, int(entry.count, 1)),
+    target: str(entry.target),
+    description: str(entry.description),
+  }))
+
+const TRAINING = ['standard', 'passive', 'unusual', 'unusualPassive']
+const STAT_KEYS_LOWER = ['str', 'int', 'con', 'dex', 'cha']
+
+/** CrawlSpace's race/class build record → the build fields on a race or class item. */
+export function raceClassBuild(data: Record<string, any>) {
+  // Older records name grants like "Shield Crash Skill (4 Points)" or "DR Buff (6 Points)", and some put them in
+  // benefits; CrawlSpace reads them through raceClassGrant (raceClassImport.ts raceClassAbilities), and so do we.
+  const grants: Record<'skillBonuses' | 'spellBonuses', any[]> = { skillBonuses: [], spellBonuses: [] }
+  let drBonus = int(data.drBonus)
+  const addGrant = (row: any, fallback?: 'skill' | 'spell') => {
+    const entry = typeof row === 'string' ? {} : (row ?? {})
+    const rawName = typeof row === 'string' ? row : str(entry.name ?? entry.skill ?? entry.spell ?? entry.text)
+    const parsed = raceClassGrant(rawName, entry.ranks ?? entry.rank ?? entry.value ?? entry.bonus, entry.points, fallback, String(entry.training).startsWith('unusual'))
+    if (!parsed) return
+    if (parsed.kind === 'dr') {
+      if (!drBonus) drBonus = parsed.amount
+      return
+    }
+    const target = parsed.kind === 'skill' ? 'skillBonuses' : 'spellBonuses'
+    const allowed = target === 'skillBonuses' ? TRAINING : ['standard', 'passive']
+    for (const name of parsed.names)
+      if (!grants[target].some((existing) => existing.name.toLowerCase() === name.toLowerCase()))
+        grants[target].push({
+          name,
+          ref: parsed.names.length === 1 ? str(entry.ref) : '',
+          uuid: '',
+          ranks: Math.max(0, Math.floor(parsed.amount)),
+          training: allowed.includes(entry.training) ? entry.training : 'standard',
+          notes: str(entry.notes),
+        })
+  }
+  for (const key of ['skillBonuses', 'spellBonuses'] as const) for (const row of list(data[key])) addGrant(row, key === 'skillBonuses' ? 'skill' : 'spell')
+  for (const row of list(data.benefits)) if (!(row?.properties?.effects?.length || row?.effects?.length)) addGrant(row)
+  return {
+    statBonuses: Object.fromEntries(STAT_KEYS_LOWER.map((stat) => [stat, int(data.statBonuses?.[stat])])),
+    drBonus,
+    skillBonuses: grants.skillBonuses,
+    spellBonuses: grants.spellBonuses,
+    benefits: benefitList(data.benefits),
+    detriments: benefitList(data.detriments),
+    skillDetriments: list(data.skillDetriments).map((entry) => ({
+      name: str(entry.name),
+      ref: str(entry.ref),
+      uuid: '',
+      currentRank: nullableInt(entry.currentRank),
+      penalty: Math.max(0, int(entry.penalty)),
+      notes: str(entry.notes),
+    })),
+    statSkillDetriments: list(data.statSkillDetriments)
+      .filter((entry) => STAT_KEYS_LOWER.includes(entry?.stat))
+      .map((entry) => ({ stat: entry.stat, penalty: Math.max(0, int(entry.penalty, 1)), notes: str(entry.notes) })),
+    tags: str(data.tags),
+  }
+}
 
 /* ------------------------------------------------------------------ */
 /*  Mobs and NPCs                                                      */
@@ -668,18 +738,12 @@ export function convertRow(row: ContentRow, database: 'game' | 'homebrew'): Conv
     case 'race':
     case 'class': {
       const img = ICONS[row.content_type]
-      const extra = [data.prerequisites ? `<p><strong>Prerequisites:</strong> ${escapeHtml(str(data.prerequisites))}</p>` : '', data.classTypes ? `<p><strong>Class type:</strong> ${escapeHtml(str(data.classTypes))}</p>` : '']
-      const system: Record<string, any> = {
-        description: toHtml(data.description) + extra.join(''),
-        notes: str(data.notes),
-        source,
-        drBonus: int(data.drBonus),
-        benefits: benefitList(data.benefits),
-        detriments: benefitList(data.detriments),
-        tags: str(data.tags),
-      }
-      if (row.content_type === 'race') Object.assign(system, { origin: str(data.origin), size: str(data.size), sizeName: str(data.sizeName) })
-      const effects = effectsFor(name, img, raceClassEffects(name, img, data))
+      const system: Record<string, any> = { description: toHtml(data.description), notes: str(data.notes), source, ...raceClassBuild(data) }
+      if (row.content_type === 'race')
+        Object.assign(system, { origin: str(data.origin), size: str(data.size), sizeName: str(data.sizeName), hobbySkill: str(data.hobbySkill), popularity: str(data.popularity) })
+      else Object.assign(system, { earthClass: !!data.earthClass, classTypes: str(data.classTypes), prerequisites: str(data.prerequisites) })
+      const effect = buildEffect(name, img, system)
+      const effects = effect ? [{ _id: stableId(`${name}-effect-0-${effect.name}`), ...effect }] : []
       return { documentName: 'Item', pack, data: { _id, name, type: row.content_type, img, system, effects, flags } }
     }
     case 'background_childhood':
@@ -690,7 +754,7 @@ export function convertRow(row: ContentRow, database: 'game' | 'homebrew'): Conv
       return {
         documentName: 'Item',
         pack,
-        data: { _id, name, type: 'background', img: ICONS.background, system: { description: toHtml(data.description ?? data.details ?? data.notes), notes: '', source, stage }, flags },
+        data: { _id, name, type: 'background', img: ICONS.background, system: { description: toHtml(data.description ?? data.details ?? data.notes), notes: '', source, stage, species: data.species === 'animal' ? 'animal' : 'human', skills: list(data.skills).map(str).slice(0, 3) }, flags },
       }
     }
     case 'achievement':

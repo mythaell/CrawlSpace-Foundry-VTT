@@ -26,18 +26,45 @@ export const rowKey = (row: { source: string; id: number }) => `${row.source}-${
 
 let cache: { at: number; rows: DatabaseRow[] } | null = null
 
+/** A stable number for an item that has no CrawlSpace record, so it can stand in for a database id. */
+const hashId = (text: string) => {
+  let hash = 0
+  for (const char of text) hash = (Math.imul(hash, 31) + char.charCodeAt(0)) | 0
+  return Math.abs(hash)
+}
+
+/** Forget cached rows, e.g. after a GM edits a background. */
+export const clearDatabaseRows = () => {
+  cache = null
+}
+
 /** Every item with a CrawlSpace record, from Item compendia and the world. Cached for a minute. */
 export async function databaseRows(): Promise<DatabaseRow[]> {
   if (cache && Date.now() - cache.at < 60_000) return cache.rows
   const rows: DatabaseRow[] = []
   const add = (entry: any, uuid: string) => {
     const flags = entry.flags?.crawlspace
+    // Backgrounds are edited on their item sheet, so their skills come from the item, even ones made in Foundry.
+    if (entry.type === 'background') {
+      const system = entry.system ?? {}
+      const stage = ['childhood', 'adolescence', 'career', 'hobby'].includes(system.stage) ? system.stage : 'childhood'
+      const match = /^(game|homebrew)-(\d+)$/.exec(String(flags?.sourceId ?? ''))
+      rows.push({
+        id: match ? Number(match[2]) : hashId(uuid),
+        source: match?.[1] ?? 'world',
+        content_type: `background_${stage}`,
+        name: entry.name,
+        data: { ...(flags?.data ?? {}), stage, species: system.species ?? flags?.data?.species ?? 'human', skills: system.skills ?? flags?.data?.skills ?? [], skillLinks: [] },
+        uuid,
+      } as DatabaseRow)
+      return
+    }
     const match = /^(game|homebrew)-(\d+)$/.exec(String(flags?.sourceId ?? ''))
     if (!match || !flags?.data || !flags.contentType) return
     rows.push({ id: Number(match[2]), source: match[1], content_type: flags.contentType, name: entry.name, data: flags.data, uuid } as DatabaseRow)
   }
   for (const pack of game.packs.filter((pack: any) => pack.documentName === 'Item')) {
-    const index = await pack.getIndex({ fields: ['type', 'flags.crawlspace'] })
+    const index = await pack.getIndex({ fields: ['type', 'flags.crawlspace', 'system.stage', 'system.species', 'system.skills'] })
     for (const entry of index) add(entry, entry.uuid ?? `Compendium.${pack.collection}.Item.${entry._id}`)
   }
   // World copies win over compendium ones with the same record, as a GM's edits should.
@@ -95,4 +122,9 @@ export function foundryItemData(entry: InventoryItem & { foundry?: any; contentL
 export function boxSummary(contents: { gold?: number; items?: InventoryItem[] }) {
   const items = (contents.items ?? []).map((item) => `${item.name} ×${item.quantity ?? 1}`)
   return [contents.gold ? `${contents.gold} ${game.i18n.localize('CRAWLSPACE.Crawler.Gold')}` : '', ...items].filter(Boolean)
+}
+
+/** Item edits anywhere (world or compendium) make the cached rows stale. */
+export function registerDatabaseRows() {
+  for (const hook of ['createItem', 'updateItem', 'deleteItem']) Hooks.on(hook, clearDatabaseRows)
 }

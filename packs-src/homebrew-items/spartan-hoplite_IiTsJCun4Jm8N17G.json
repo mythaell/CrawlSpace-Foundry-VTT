@@ -4,7 +4,7 @@
   "type": "class",
   "img": "icons/svg/combat.svg",
   "system": {
-    "description": "<p>Constitution-based Paladin class built around shield-based defense and holding the line.</p><p>TypeA Constitution-based Paladin classStat BonusCon +3, Str +2Stat PenaltyDex -2, Int -1The Spartan Hoplite deals mostly with discipline, shield-based defense, and refusing to move when every reasonable instinct says otherwise. A Hoplite is strongest when protecting their allies and anchoring a battle line — elite at turning narrow corridors into very educational stabbing funnels. Their power comes from conviction and training.<br>Class Benefits:<br>Radiant Tip spell — imbue the tip of your weapon with Radiant damage<br>Aegis Flash spell — a flash of light erupts from your shield, disorienting nearby enemies<br>Shieldbash skill — slams a target with your shield, sending them backwards<br>Spear Brace skill — root yourself in place, using your spear to brace for impact<br>+3 to Shield-based skills<br>+3 to Spear-based skills</p><p><strong>Class type:</strong> Fighter, Paladin</p>",
+    "description": "<p>Constitution-based Paladin class built around shield-based defense and holding the line.</p><p>TypeA Constitution-based Paladin classStat BonusCon +3, Str +2Stat PenaltyDex -2, Int -1The Spartan Hoplite deals mostly with discipline, shield-based defense, and refusing to move when every reasonable instinct says otherwise. A Hoplite is strongest when protecting their allies and anchoring a battle line — elite at turning narrow corridors into very educational stabbing funnels. Their power comes from conviction and training.<br>Class Benefits:<br>Radiant Tip spell — imbue the tip of your weapon with Radiant damage<br>Aegis Flash spell — a flash of light erupts from your shield, disorienting nearby enemies<br>Shieldbash skill — slams a target with your shield, sending them backwards<br>Spear Brace skill — root yourself in place, using your spear to brace for impact<br>+3 to Shield-based skills<br>+3 to Spear-based skills</p>",
     "notes": "+3 Constitution (3 Points)\n+3 Strength (3 Points)\nBenefit requires tier review: Hoplite Formation Buff: Once per day, give your allies in your party +1 DR if they are standing adjacent to you (3 Points)\nBenefit requires tier review: Can gain access to any Weapon Training Guild (2)\nDetriment requires tier review: 2 Dexterity (+1 Build Point)\nrank20: None\nbonusBox: Silver Earth Box",
     "source": {
       "database": "homebrew",
@@ -12,27 +12,92 @@
       "book": "",
       "pages": ""
     },
+    "statBonuses": {
+      "str": 0,
+      "int": 0,
+      "con": 0,
+      "dex": 0,
+      "cha": 0
+    },
     "drBonus": 3,
+    "skillBonuses": [
+      {
+        "name": "Shield Crash",
+        "ref": "",
+        "uuid": "",
+        "ranks": 2,
+        "training": "standard",
+        "notes": ""
+      },
+      {
+        "name": "Shield Block",
+        "ref": "",
+        "uuid": "",
+        "ranks": 2,
+        "training": "standard",
+        "notes": ""
+      },
+      {
+        "name": "Polearm",
+        "ref": "",
+        "uuid": "",
+        "ranks": 1,
+        "training": "standard",
+        "notes": ""
+      }
+    ],
+    "spellBonuses": [
+      {
+        "name": "Radiant Tip",
+        "ref": "",
+        "uuid": "",
+        "ranks": 2,
+        "training": "standard",
+        "notes": ""
+      },
+      {
+        "name": "Aegis Flash",
+        "ref": "",
+        "uuid": "",
+        "ranks": 2,
+        "training": "standard",
+        "notes": ""
+      }
+    ],
     "benefits": [
       {
+        "templateId": "",
         "name": "Hoplite Formation Buff",
         "tier": "",
+        "count": 1,
+        "target": "",
         "description": "Once per day, give your allies in your party +1 DR if they are standing adjacent to you (3 Points)"
       },
       {
+        "templateId": "",
         "name": "Can gain access to any Weapon Training Guild (2)",
         "tier": "",
+        "count": 1,
+        "target": "",
         "description": ""
       }
     ],
     "detriments": [
       {
+        "templateId": "",
         "name": "2 Dexterity (+1 Build Point)",
         "tier": "",
+        "count": 1,
+        "target": "",
         "description": ""
       }
     ],
-    "tags": ""
+    "skillDetriments": [],
+    "statSkillDetriments": [],
+    "tags": "",
+    "earthClass": true,
+    "classTypes": "Fighter, Paladin",
+    "prerequisites": ""
   },
   "effects": [
     {
@@ -45,33 +110,33 @@
       "system": {
         "changes": [
           {
-            "key": "Radiant Tip and Aegis Flash Spells (4 Points)",
+            "key": "Shield Crash",
             "type": "crawlspace.baseSkillRank",
             "value": 2,
             "phase": "initial"
           },
           {
-            "key": "Shield Crash Skill (4 Points)",
+            "key": "Shield Block",
             "type": "crawlspace.baseSkillRank",
             "value": 2,
             "phase": "initial"
           },
           {
-            "key": "Shield Block Skill (4 Points)",
-            "type": "crawlspace.baseSkillRank",
-            "value": 2,
-            "phase": "initial"
-          },
-          {
-            "key": "Polearm Skill (2 Points)",
+            "key": "Polearm",
             "type": "crawlspace.baseSkillRank",
             "value": 1,
             "phase": "initial"
           },
           {
-            "key": "DR Buff (6 Points)",
-            "type": "crawlspace.baseSkillRank",
-            "value": 3,
+            "key": "Radiant Tip",
+            "type": "crawlspace.baseSpellRank",
+            "value": 2,
+            "phase": "initial"
+          },
+          {
+            "key": "Aegis Flash",
+            "type": "crawlspace.baseSpellRank",
+            "value": 2,
             "phase": "initial"
           },
           {
@@ -82,6 +147,11 @@
           }
         ],
         "requiredRank": null
+      },
+      "flags": {
+        "crawlspace": {
+          "build": true
+        }
       },
       "_key": "!items.effects!IiTsJCun4Jm8N17G.156vjt5orNLN3Bnm"
     }

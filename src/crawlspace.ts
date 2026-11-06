@@ -10,6 +10,7 @@ import { registerMinions } from './actors/minions'
 import { registerLight } from './actors/light'
 import { registerCompanions } from './actors/companions'
 import { openBuilder, registerBuilder } from './apps/builder'
+import { registerDatabaseRows } from './loot/database'
 import * as items from './data/items'
 import { createEffectDataModel } from './data/effect'
 import { CHANGE_TYPE_HANDLERS } from './effects/change-types'
@@ -162,6 +163,7 @@ Hooks.once('init', () => {
   registerLight()
   registerCompanions()
   registerBuilder()
+  registerDatabaseRows()
   registerChatHandlers()
   CONFIG.Dice.rolls.unshift(CrawlRoll)
   registerClock()

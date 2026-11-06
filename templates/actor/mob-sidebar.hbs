@@ -25,13 +25,16 @@
   </div>
 
   {{#each traitSections as |section|}}
-  {{#if section.values.length}}
-  <div class="pf-side-block"><h4>{{section.label}}</h4><div class="pf-tags">{{#each section.values}}<span class="pf-tag">{{this}}</span>{{/each}}</div></div>
+  {{#if (or section.values.length @root.editable)}}
+  <div class="pf-side-block">
+    <h4>{{section.label}}{{#if @root.editable}} <a class="pf-side-edit" data-action="editTraits" data-trait="{{section.key}}" data-tooltip="{{localize 'CRAWLSPACE.Sheet.Edit'}}"><i class="fa-solid fa-pen"></i></a>{{/if}}</h4>
+    {{#if section.values.length}}<div class="pf-tags">{{#each section.values}}<span class="pf-tag">{{this}}</span>{{/each}}</div>{{/if}}
+  </div>
   {{/if}}
   {{/each}}
 
   <div class="pf-side-block">
-    <h4>{{localize "CRAWLSPACE.Section.Stats"}} <small>{{localize "CRAWLSPACE.Mob.StatPoints" value=system.statPoints}}</small></h4>
+    <h4>{{localize "CRAWLSPACE.Section.Stats"}} {{#if statBudget}}<small class="{{#if statBudget.over}}over-budget{{/if}}" data-tooltip="{{localize 'CRAWLSPACE.Mob.StatBudgetHint'}}">{{localize "CRAWLSPACE.Mob.StatBudget" assigned=statBudget.assigned total=statBudget.total remaining=statBudget.remaining}}</small>{{else}}<small>{{localize "CRAWLSPACE.Mob.StatPoints" value=system.statPoints}}</small>{{/if}}</h4>
     <div class="pf-side-stats">
       {{#each stats as |stat|}}
       <div class="pf-side-attr">

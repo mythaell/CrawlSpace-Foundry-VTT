@@ -39,7 +39,8 @@
       "actions": "Actions",
       "main": "Main",
       "notes": "Notes",
-      "rules": "Rules"
+      "rules": "Rules",
+      "build": "Build"
     },
     "Sheet": {
       "Crawler": "CrawlSpace Crawler",
@@ -237,7 +238,8 @@
       "Upgrade10": "Rank 10",
       "Upgrade15": "Rank 15",
       "KillingBlowStacking": "Killing-blow stacking",
-      "KillingBlowStacks": "Killing-blow stacks"
+      "KillingBlowStacks": "Killing-blow stacks",
+      "Skills": "Skills"
     },
     "Usage": {
       "learned": "Learned",
@@ -333,7 +335,9 @@
       "NewAttack": "New Attack",
       "AddAbility": "Add Ability",
       "NewAbility": "New Ability",
-      "AreaFeet": "Area (ft)"
+      "AreaFeet": "Area (ft)",
+      "StatBudget": "{assigned} of {total} points · {remaining} left",
+      "StatBudgetHint": "Mobs get 3 stat points per level; bosses get their tier's points per level."
     },
     "Npc": {
       "Job": "Job",
@@ -898,6 +902,73 @@
       "StatRolled": "Rolled",
       "SentToGM": "Your crawler has gone to the GM to be created.",
       "NoUser": "That user is no longer in this world."
+    },
+    "Build": {
+      "Points": "Build points",
+      "Base": "Base",
+      "Detriments": "Detriments",
+      "Spent": "Spent",
+      "Remaining": "Points left",
+      "PassiveRanks": "Passive ranks",
+      "Capped": "Detriments total {earned} points; only 5 can raise this build's budget.",
+      "PoolHint": "Races get 25 points and classes 30, plus up to 5 from detriments. Unspent points are lost. A build with rule checks can still be saved for the GM to review.",
+      "StatAdjustments": "Stat adjustments",
+      "StatHint": "Each +1 costs a point; every 2 points of stat penalties earn 1 back. DR costs 2 points per +1, up to +3. Stat, skill, spell and DR bonuses go on this item's Build effect automatically.",
+      "AddCustom": "Add a row by hand",
+      "Open": "Open the linked item",
+      "CurrentRank": "Current rank",
+      "Penalty": "Penalty",
+      "Ranks": "Ranks",
+      "Training": {
+        "standard": "Standard (2/rank)",
+        "passive": "Passive (2/rank)",
+        "unusual": "Unusual / Racial (4/rank)",
+        "unusualPassive": "Unusual Passive (4/rank)"
+      },
+      "TrainingLabel": "Training",
+      "Notes": "Notes / choices",
+      "Count": "Count",
+      "Target": "Target / condition",
+      "Details": "Details",
+      "AllSkillPenalties": "All-skills penalties",
+      "AllSkillHint": "Each −1 to every skill under a stat earns 1 point.",
+      "AllSkillsUnder": "All skills under",
+      "List": {
+        "skillBonuses": "Skill bonuses",
+        "spellBonuses": "Spell bonuses",
+        "skillDetriments": "Skill penalties",
+        "benefits": "Benefits",
+        "detriments": "Detriments"
+      },
+      "Hint": {
+        "skillBonuses": "Standard and passive ranks cost 2 points each; unusual or racial skill ranks cost 4. Drop skills here to link them.",
+        "spellBonuses": "Each rank costs 2 points. A class can grant at most 5 passive ranks across its skills and spells. Drop spells here to link them.",
+        "skillDetriments": "A penalty must apply to an existing skill and can't exceed its current rank. Every 2 points of penalties earn 1 point. Drop skills here to link them.",
+        "benefits": "Pick a template, then describe the target and conditions. Agree custom tiers with the GM. Cosmetic traits are free.",
+        "detriments": "A build gains at most 5 extra points from detriments."
+      },
+      "DropSkill": "Drop a skill here, or add one by hand.",
+      "DropSpell": "Drop a spell here, or add one by hand.",
+      "BenefitTemplate": "Benefit template",
+      "DetrimentTemplate": "Detriment template",
+      "AddBenefit": "Add benefit",
+      "AddDetriment": "Add detriment",
+      "PointCost": "Point cost",
+      "PointsEarned": "Points earned",
+      "WrongDrop": "Only a {type} can go in this list.",
+      "AlreadyListed": "{name} is already in this list.",
+      "Earth": "Earth race",
+      "Alien": "Alien race",
+      "EarthClass": "Earth class",
+      "EarthClassHint": "Earth class (Earth races only)",
+      "Popularity": "Alien popularity opportunities",
+      "AlienHint": "Alien races can earn popularity and can't choose Earth classes.",
+      "HobbySkill": "Hobby Potion skill",
+      "EarthHint": "Earth races can choose Earth classes and get a Silver Earth Box with a Hobby Potion granting 3 skill ranks.",
+      "ClassTypes": "Class types",
+      "Prerequisites": "Prerequisites and class restrictions",
+      "BackgroundSkills": "Skills",
+      "BackgroundSkillsHint": "Crawlers taking this background pick two of these skills in the character builder."
     }
   }
 }

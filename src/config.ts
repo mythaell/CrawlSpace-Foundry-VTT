@@ -64,6 +64,19 @@ export const BOSS_TIERS = {
   Floor: { statsPerLevel: 10, healthSlots: 40 },
 } as const
 
+/** mobRules.ts creatureSizes and creatureTypes. */
+export const CREATURE_SIZES = [
+  { value: '1', name: 'Tiny' },
+  { value: '2', name: 'Small' },
+  { value: '3', name: 'Petite' },
+  { value: '4', name: 'Medium' },
+  { value: '5', name: 'Large' },
+  { value: '6', name: 'Huge' },
+  { value: '7', name: 'Colossal' },
+  { value: '8', name: 'Gargantuan' },
+] as const
+export const CREATURE_TYPES = ['Beastly', 'Undead', 'Humanoid', 'Ooze', 'Trapezoidal', 'Patchwork', 'Celestial', 'Deity'] as const
+
 export const LOOT_TIERS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Legendary', 'Celestial'] as const
 
 /** Health runs 0–110 in steps of 10: 110 is full, 10 is 0% HP (Dying), 0 is dead. */
