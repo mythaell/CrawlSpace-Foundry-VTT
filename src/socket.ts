@@ -1,4 +1,5 @@
 import { performUpkeep } from './apps/upkeep'
+import { createBuiltCrawler, type Draft } from './apps/builder'
 /**
  * GM relay. Players can't update actors or combats they don't own, so those requests travel over the system
  * socket and the active GM's client performs them. Only whitelisted methods can be called this way.
@@ -12,8 +13,21 @@ type Request =
   | { type: 'upkeep'; uuids: string[]; kind: string; hours: number; userId: string }
   | { type: 'actor'; uuid: string; method: string; args: unknown[] }
   | { type: 'combat'; combatId: string; method: string; args: unknown[]; userId: string }
+  | { type: 'buildCrawler'; draft: Draft; userId: string }
+  | { type: 'builderError'; userId: string; error: string }
 
 async function perform(request: Request) {
+  if (request.type === 'buildCrawler') {
+    // The builder checks every choice again here; a refusal goes back to the player.
+    try {
+      // GMs build on their own client; a relayed request naming a GM would skip the roll check.
+      if (game.users.get(request.userId)?.isGM !== false) return
+      await createBuiltCrawler(request.draft, request.userId)
+    } catch (error: any) {
+      game.socket.emit(CHANNEL, { type: 'builderError', userId: request.userId, error: error.message })
+    }
+    return
+  }
   if (request.type === 'upkeep') {
     const user = game.users.get(request.userId)
     if (!user || !Array.isArray(request.uuids) || request.uuids.length > 100) return
@@ -41,6 +55,10 @@ let queue = Promise.resolve()
 
 export function registerSocket() {
   game.socket.on(CHANNEL, (request: Request) => {
+    if (request.type === 'builderError') {
+      if (request.userId === game.user.id) ui.notifications.error(request.error)
+      return
+    }
     if (game.user.isActiveGM) queue = queue.then(() => perform(request)).catch((error) => { console.error('CrawlSpace | socket', error); ui.notifications.error(error.message) })
   })
 }

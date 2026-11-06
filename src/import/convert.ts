@@ -616,8 +616,12 @@ function preparedLoot(value: any) {
   return { tier: str(value.tier) || 'Bronze', type: str(value.type) || 'Custom', floor: int(value.floor, 1), gold: Math.max(0, int(value.gold)), items: value.items }
 }
 
-/** Content the loot generator draws from or awards (lootContext.ts, CrawlerAwardsPopup.tsx). */
-const LOOT_SOURCE_TYPES = new Set([
+/** Content the loot generator and character builder read as CrawlSpace records (lootContext.ts, characterBuilder.ts). */
+const SOURCE_DATA_TYPES = new Set([
+  'background_childhood',
+  'background_adolescence',
+  'background_career',
+  'background_hobby',
   'skill',
   'spell',
   'achievement',
@@ -644,8 +648,8 @@ export function convertRow(row: ContentRow, database: 'game' | 'homebrew'): Conv
   if (!pack) return null
   const source = sourceOf(row, database)
   const flags: Record<string, any> = { crawlspace: { sourceId: `${database}-${row.id}`, contentType: row.content_type } }
-  // The loot generator and awards read the original CrawlSpace record, as the app reads its database.
-  if (LOOT_SOURCE_TYPES.has(row.content_type)) flags.crawlspace.data = data
+  // The loot generator, awards and character builder read the original CrawlSpace record, as the app reads its database.
+  if (SOURCE_DATA_TYPES.has(row.content_type)) flags.crawlspace.data = data
 
   switch (row.content_type) {
     case 'skill':
@@ -842,6 +846,10 @@ export function characterToActor(input: Record<string, any>) {
     }
   for (const achievement of list(data.achievements))
     add({ name: str(achievement.name || achievement.value) || 'Achievement', type: 'achievement', img: ICONS.achievement, system: { description: toHtml(achievement.description ?? achievement.details ?? ''), reward: str(achievement.reward) } })
+  // Backgrounds by stage (characterBuilder.ts writes `background.childhood` etc. as names).
+  for (const stage of ['childhood', 'adolescence', 'career', 'hobby'])
+    if (str(data.background?.[stage]).trim())
+      add({ name: str(data.background[stage]).trim(), type: 'background', img: ICONS.background, system: { description: '', notes: '', stage } })
 
   // Conditions: internal/external buffs and custom debuffs keep their active state; standard debuffs become statuses.
   const effects: any[] = []
@@ -929,6 +937,8 @@ export function characterToActor(input: Record<string, any>) {
       sheetActions,
       personalSpace: { tier: str(data.personalSpace?.tier), size: str(data.personalSpace?.size) },
       upkeep: { allocatedThroughLevel: int(data.upkeep?.allocatedThroughLevel, 1), lastSafeRoomLevel: int(data.upkeep?.lastSafeRoomLevel, 0), pendingStatPoints: 0 },
+      // CrawlSpace pins by name; Foundry by item id.
+      hotlist: { items: [...new Set(list(data.hotlist).map((pinned) => items.find((item) => item.name === str(pinned))?._id).filter(Boolean))] },
     },
     flags: { crawlspace: { grinding: normalizeGrinding({
       ...data.upkeep?.grinding,

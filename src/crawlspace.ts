@@ -9,6 +9,7 @@ import { CompanionData, CrawlerData, MinionData, MobData, NpcData } from './data
 import { registerMinions } from './actors/minions'
 import { registerLight } from './actors/light'
 import { registerCompanions } from './actors/companions'
+import { openBuilder, registerBuilder } from './apps/builder'
 import * as items from './data/items'
 import { createEffectDataModel } from './data/effect'
 import { CHANGE_TYPE_HANDLERS } from './effects/change-types'
@@ -160,12 +161,13 @@ Hooks.once('init', () => {
   registerMinions()
   registerLight()
   registerCompanions()
+  registerBuilder()
   registerChatHandlers()
   CONFIG.Dice.rolls.unshift(CrawlRoll)
   registerClock()
   registerUpkeep()
 
-  game.crawlspace = { config, openGrinding, openAwards, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
+  game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
 })
 
 Hooks.once('ready', () => {
@@ -190,7 +192,7 @@ async function createItemMacro(data: any, slot: number) {
   game.user.assignHotbarMacro(macro, slot)
 }
 
-/** Actors directory gets an "Import CrawlSpace character" button. */
+/** Actors directory gets "Build a crawler" and "Import CrawlSpace character" buttons. */
 Hooks.on('renderActorDirectory', (_app: any, html: HTMLElement) => {
   if (!html.querySelector('.crawlspace-time')) {
     const clock = document.createElement('button')
@@ -198,6 +200,15 @@ Hooks.on('renderActorDirectory', (_app: any, html: HTMLElement) => {
     clock.innerText = game.i18n.localize('CRAWLSPACE.Time.Title')
     clock.addEventListener('click', openTime)
     html.querySelector('.header-actions')?.append(clock)
+  }
+  // Every user may build a crawler; a player without actor creation sends it to the GM.
+  if (!html.querySelector('.crawlspace-builder')) {
+    const build = document.createElement('button')
+    build.type = 'button'
+    build.className = 'crawlspace-builder'
+    build.innerHTML = `<i class="fa-solid fa-user-plus"></i> ${game.i18n.localize('CRAWLSPACE.Builder.Button')}`
+    build.addEventListener('click', () => openBuilder())
+    html.querySelector('.header-actions')?.append(build)
   }
   if (!game.user.can('ACTOR_CREATE') || html.querySelector('.crawlspace-import')) return
   const button = document.createElement('button')

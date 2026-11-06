@@ -1,0 +1,167 @@
+{{!-- Character builder. Context: CharacterBuilder._prepareContext. --}}
+<div class="builder-layout">
+  <nav class="builder-steps" aria-label="{{localize 'CRAWLSPACE.Builder.Steps'}}">
+    {{#each steps as |entry|}}
+    <button type="button" data-action="step" data-step="{{entry.index}}" {{#if entry.current}}aria-current="step"{{/if}} {{disabled (or @root.busy @root.loadError)}}>{{entry.number}}. {{entry.label}}</button>
+    {{/each}}
+  </nav>
+
+  <div class="builder-body">
+    {{#if loadError}}
+    <p class="builder-error" role="alert">{{loadError}}</p>
+    {{else}}
+
+    {{#if (eq step 0)}}
+    <div class="builder-grid">
+      <label>{{localize "CRAWLSPACE.Builder.Name"}}<input type="text" name="name" value="{{draft.name}}" maxlength="100"></label>
+      <label>{{localize "CRAWLSPACE.Builder.Number"}}<input type="text" name="crawlerNumber" value="{{draft.crawlerNumber}}" inputmode="numeric"><small>{{localize "CRAWLSPACE.Builder.NumberHint"}}</small></label>
+      <label>{{localize "CRAWLSPACE.Builder.Species"}}
+        <select name="species">
+          <option value="human" {{#if (eq draft.species "human")}}selected{{/if}}>{{localize "CRAWLSPACE.Builder.Human"}}</option>
+          <option value="animal" {{#if isAnimal}}selected{{/if}}>{{localize "CRAWLSPACE.Builder.Animal"}}</option>
+        </select>
+      </label>
+      {{#if isAnimal}}
+      <label>{{localize "CRAWLSPACE.Builder.AnimalSpecies"}}<input type="text" name="animal" value="{{draft.animal}}" placeholder="{{localize 'CRAWLSPACE.Builder.AnimalPlaceholder'}}"></label>
+      <label>{{localize "CRAWLSPACE.Builder.AnimalSize"}}
+        <select name="size">
+          <option value="2" {{#if (eq draft.size "2")}}selected{{/if}}>{{localize "CRAWLSPACE.Builder.Size2"}}</option>
+          <option value="3" {{#if (eq draft.size "3")}}selected{{/if}}>{{localize "CRAWLSPACE.Builder.Size3"}}</option>
+          <option value="4" {{#if (eq draft.size "4")}}selected{{/if}}>{{localize "CRAWLSPACE.Builder.Size4"}}</option>
+        </select>
+      </label>
+      {{/if}}
+    </div>
+    <p class="hint">{{localize "CRAWLSPACE.Builder.BackgroundHint"}}</p>
+    {{#each stages as |stage|}}
+    <fieldset class="builder-stage">
+      <legend>{{stage.label}} · {{localize "CRAWLSPACE.Builder.RankN" rank=stage.rank}}</legend>
+      <div class="builder-choice">
+        <select name="background.{{stage.stage}}" aria-label="{{stage.label}}">
+          <option value="">{{localize "CRAWLSPACE.Builder.ChooseBackground"}}</option>
+          {{#each stage.options}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+        <button type="button" data-action="rollBackground" data-stage="{{stage.stage}}"><i class="fa-solid fa-dice"></i> {{localize "CRAWLSPACE.Builder.RollBackground"}}</button>
+      </div>
+      {{#if stage.skills.length}}
+      <div class="builder-skills">
+        {{#each stage.skills as |skill|}}
+        <label><input type="checkbox" name="skill.{{stage.stage}}.{{skill.index}}" {{checked skill.checked}} {{disabled skill.disabled}}> {{skill.name}}{{#if skill.taken}} <small>({{localize "CRAWLSPACE.Builder.Taken"}})</small>{{/if}}</label>
+        {{/each}}
+      </div>
+      {{/if}}
+    </fieldset>
+    {{/each}}
+    {{/if}}
+
+    {{#if (eq step 1)}}
+    <p>{{localize "CRAWLSPACE.Builder.CombatIntro" attack=baseAttack}}</p>
+    <label class="builder-wide">{{localize "CRAWLSPACE.Builder.CombatOption"}}
+      <select name="combat">
+        <option value="">{{localize "CRAWLSPACE.Builder.ChooseOption"}}</option>
+        {{#each combatGroups as |group|}}
+        <optgroup label="{{group.label}}">{{#each group.options}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</optgroup>
+        {{/each}}
+      </select>
+    </label>
+    {{#if combat.effect}}<p>{{localize "CRAWLSPACE.Builder.EffectHint" effect=combat.effect}}</p>{{/if}}
+    {{#if (eq combat.kind "spell")}}<p>{{localize "CRAWLSPACE.Builder.SpellHint"}}</p>{{/if}}
+    <p class="hint">{{localize "CRAWLSPACE.Builder.MatchHint"}}</p>
+    {{/if}}
+
+    {{#if (eq step 2)}}
+    <label class="builder-wide">{{localize "CRAWLSPACE.Builder.StatMethod"}}
+      <select name="statMode">
+        <option value="array" {{#if (eq draft.statMode "array")}}selected{{/if}}>{{localize "CRAWLSPACE.Builder.MethodArray"}}</option>
+        <option value="roll" {{#if (eq draft.statMode "roll")}}selected{{/if}}>{{localize "CRAWLSPACE.Builder.MethodRoll"}}</option>
+      </select>
+    </label>
+    {{#if (eq draft.statMode "roll")}}
+    <button type="button" data-action="rollStats" {{disabled busy}}><i class="fa-solid fa-dice"></i> {{localize "CRAWLSPACE.Builder.RollAll"}}</button>
+    {{/if}}
+    <div class="builder-stats">
+      {{#each stats as |stat|}}
+      <div class="builder-stat">
+        <label>{{stat.name}} ({{stat.code}})
+          {{#if (eq @root.draft.statMode "array")}}
+          <select name="stat.{{stat.index}}">{{#each stat.choices}}<option value="{{this}}" {{#if (eq this stat.value)}}selected{{/if}}>{{this}}</option>{{/each}}</select>
+          {{else}}
+          <output>{{#if stat.value}}{{stat.value}}{{else}}—{{/if}}</output>
+          {{/if}}
+        </label>
+        {{#if (eq @root.draft.statMode "roll")}}<button type="button" data-action="rollStats" data-index="{{stat.index}}" {{disabled @root.busy}}>{{#if stat.value}}{{localize "CRAWLSPACE.Builder.Reroll"}}{{else}}{{localize "CRAWLSPACE.Builder.Roll"}}{{/if}} {{stat.code}}</button>{{/if}}
+      </div>
+      {{/each}}
+    </div>
+    <p class="hint">{{localize "CRAWLSPACE.Builder.StatHint"}}</p>
+    {{/if}}
+
+    {{#if (eq step 3)}}
+    <label class="builder-toggle"><input type="checkbox" name="storyLater" {{checked draft.storyLater}}> {{localize "CRAWLSPACE.Builder.StoryLater"}}</label>
+    {{#unless draft.storyLater}}
+    {{#each stories as |story|}}
+    <fieldset class="builder-stage">
+      <legend>{{story.label}}</legend>
+      <div class="builder-choice">
+        <select name="storyPick.{{story.key}}">
+          <option value="">{{localize "CRAWLSPACE.Builder.WriteOwn"}}</option>
+          {{#each story.options}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{value}}</option>{{/each}}
+        </select>
+        <button type="button" data-action="rollStory" data-key="{{story.key}}" {{disabled (not story.options.length)}}><i class="fa-solid fa-dice"></i> {{localize "CRAWLSPACE.Builder.RollStory"}}</button>
+      </div>
+      <textarea name="story.{{story.key}}" rows="3">{{story.text}}</textarea>
+    </fieldset>
+    {{/each}}
+    {{/unless}}
+    {{/if}}
+
+    {{#if (eq step 4)}}
+    <label class="builder-toggle"><input type="checkbox" name="gearLater" {{checked draft.gearLater}}> {{localize "CRAWLSPACE.Builder.GearLater"}}</label>
+    {{#unless draft.gearLater}}
+    <label class="builder-wide">{{localize "CRAWLSPACE.Builder.Clothing"}}<input type="text" name="clothing" value="{{draft.clothing}}"></label>
+    {{#if (eq combat.kind "weapon")}}<p>{{localize "CRAWLSPACE.Builder.WeaponAdded" name=combat.name}}</p>{{/if}}
+    <label class="builder-wide">{{localize "CRAWLSPACE.Builder.Useful"}}<input type="text" name="usefulItem" value="{{draft.usefulItem}}"></label>
+    <label class="builder-wide">{{localize "CRAWLSPACE.Builder.Weird"}}<input type="text" name="weirdItem" value="{{draft.weirdItem}}"></label>
+    <p class="hint">{{localize "CRAWLSPACE.Builder.GearHint"}}</p>
+    {{/unless}}
+    {{/if}}
+
+    {{#if (eq step 5)}}
+    {{#if recap.issue}}
+    <p class="builder-error" role="alert">{{recap.issue}}</p>
+    {{else}}
+    <div class="builder-recap">
+      <h3>{{recap.sheet.character.name}} · {{localize "CRAWLSPACE.Builder.CrawlerN" number=recap.sheet.character.crawlerNumber}}</h3>
+      <p>{{recap.sheet.character.race}} · {{localize "CRAWLSPACE.Builder.Basics" size=recap.sheet.character.size favor=recap.sheet.character.aiFavor}}</p>
+      <h4>{{localize "CRAWLSPACE.Builder.Step.Background"}}</h4>
+      <ul>{{#each recap.backgrounds}}<li>{{label}}: {{name}} · {{skills}} ({{localize "CRAWLSPACE.Builder.RankN" rank=rank}})</li>{{/each}}</ul>
+      <h4>{{localize "CRAWLSPACE.Builder.Step.Stats"}} <small>· {{recap.method}}</small></h4>
+      <table>
+        <thead><tr><th>{{localize "CRAWLSPACE.Builder.Attribute"}}</th><th>{{localize "CRAWLSPACE.Builder.Unenhanced"}}</th><th>{{localize "CRAWLSPACE.Builder.Modifier"}}</th></tr></thead>
+        <tbody>{{#each recap.stats}}<tr><td>{{label}}</td><td>{{value}}</td><td>{{mod}}</td></tr>{{/each}}</tbody>
+      </table>
+      <p>{{localize "CRAWLSPACE.Builder.Derived" evade=recap.evade perSlot=recap.perSlot mana=recap.sheet.character.currentMana}}</p>
+      <h4>{{localize "CRAWLSPACE.Builder.SkillsSpells"}}</h4>
+      <ul>{{#each recap.abilities}}<li>{{name}} · {{localize "CRAWLSPACE.Builder.RankN" rank=rank}}{{#if cooldown}} · {{cooldown}}{{/if}}</li>{{/each}}</ul>
+      {{#if recap.achievements.length}}
+      <h4>{{localize "TYPES.Item.achievement"}}</h4>
+      <ul>{{#each recap.achievements}}<li>{{name}} · {{reward}}</li>{{/each}}</ul>
+      {{/if}}
+      <h4>{{localize "CRAWLSPACE.Builder.Step.Story"}}</h4>
+      {{#if recap.story}}<dl>{{#each recap.story}}<dt>{{label}}</dt><dd>{{text}}</dd>{{/each}}</dl>{{else}}<p>{{localize "CRAWLSPACE.Builder.StoryDeferred"}}</p>{{/if}}
+      <h4>{{localize "CRAWLSPACE.Builder.Step.Gear"}}</h4>
+      {{#if recap.inventory.length}}<ul>{{#each recap.inventory}}<li>{{#if quantity}}{{quantity}} · {{/if}}{{name}}</li>{{/each}}</ul>{{else}}<p>{{localize "CRAWLSPACE.Builder.NoGear"}}</p>{{/if}}
+      <p>{{localize "CRAWLSPACE.Builder.Hotlist" items=recap.hotlist}}</p>
+    </div>
+    {{/if}}
+    {{/if}}
+    {{/if}}
+    {{#if error}}<p class="builder-error" role="alert">{{error}}</p>{{/if}}
+  </div>
+
+  <footer class="form-footer">
+    <span class="builder-count">{{localize "CRAWLSPACE.Builder.StepOf" number=stepNumber count=stepCount}}</span>
+    <button type="button" data-action="back" {{disabled (or busy (eq step 0))}}><i class="fa-solid fa-arrow-left"></i> {{localize "CRAWLSPACE.Builder.Back"}}</button>
+    <button type="button" data-action="next" {{disabled (or busy loadError)}}>{{#if last}}<i class="fa-solid fa-user-plus"></i> {{localize "CRAWLSPACE.Builder.Create"}}{{else}}{{localize "CRAWLSPACE.Builder.Next"}} <i class="fa-solid fa-arrow-right"></i>{{/if}}</button>
+  </footer>
+</div>
