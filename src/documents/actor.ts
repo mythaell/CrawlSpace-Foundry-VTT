@@ -1,3 +1,4 @@
+import { endMinion } from '../actors/minions'
 import { announceImmunity } from '../effects/immunity'
 import { creditKillingBlow, spellKillBonus } from '../effects/killing-blows'
 import { expireActorEvent } from '../time'
@@ -176,6 +177,11 @@ export class CrawlActor extends Actor {
     if (remaining > 0 && result.slotsLost >= remaining) await creditKillingBlow(options.killingBlowSpell)
     const summary = this.#describe(result, types, incoming)
     return this.#postHealthCard(`${this.name} lost ${result.slotsLost} health slot${result.slotsLost === 1 ? '' : 's'}. ${summary}`, before, options)
+  }
+
+  /** A player ends their minion through the GM relay (the minion's owners only). */
+  async endMinion() {
+    if (this.type === 'minion') return endMinion(this, 'released')
   }
 
   /** Each lethal hit credits its source spell once; subsequent damage to a defeated target gives nothing. */

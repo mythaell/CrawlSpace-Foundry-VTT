@@ -51,7 +51,51 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-174",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Shoulder Charger",
+        "stat": "STR",
+        "notes": "",
+        "range": "Melee",
+        "rank5": "Add 1d4 base damage. No longer lose an HB slot on a successful attack.",
+        "rank10": "Add 1d4 base damage. Also add one Rank damage die.",
+        "rank15": "Add 1d4 base damage. The target gains Woozy.",
+        "details": "Attack against Evade. Lose 1 HB slot on a successful attack. May use Bone Rattle. AI Favor 1 without a damage-effect skill.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Shoulder Charger",
+        "damageTypes": [
+          "Bludgeoning"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "unarmed",
+          "name": "Shoulder Charger",
+          "skill": "Shoulder Charger",
+          "effect": "Bone Rattle",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d4+CON",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d4+CON",
+        "rank10DamageFormula": "3d4+RANK_DIE+CON",
+        "rank15DamageFormula": "4d4+RANK_DIE+CON",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

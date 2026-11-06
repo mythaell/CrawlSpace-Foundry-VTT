@@ -9,7 +9,7 @@ import { debuffByName } from '../rules/debuffs.ts'
 import { durationSeconds, durationEvent } from '../rules/time.ts'
 
 export type ContentRow = { id: number; content_type: string; name: string; data: Record<string, any> }
-export type Converted = { documentName: 'Item' | 'Actor' | 'JournalEntry' | 'ActiveEffect'; pack: string; data: Record<string, any> }
+export type Converted = { documentName: 'Item' | 'Actor' | 'JournalEntry' | 'ActiveEffect' | 'RollTable'; pack: string; data: Record<string, any> }
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -218,6 +218,18 @@ export function buffToEffect(data: Record<string, any>, img = ICONS.buff) {
   const effects = [...list(properties.effects), ...legacyBonusEffects(properties)]
   const { effects: converted } = effectPropertiesToActiveEffects(effects, { name: data.name })
   const changes = converted.flatMap((effect) => effect.system.changes)
+  // A condition already resolved at a Rank carries its light and raising at the buff level (conditionAtRank).
+  const special = (key: string, value: Record<string, unknown>) =>
+    changes.some((change: any) => change.type === 'crawlspace.special' && change.key === key) ? null : { key, type: 'crawlspace.special', value: JSON.stringify(value), phase: 'initial' }
+  if (data.lightOrb) {
+    const orb = data.lightOrb
+    const light = special('lightOrb', { target: String(orb.brightFeet ?? ''), value: String(orb.rangeFeet ?? ''), dimFeet: String(orb.dimFeet ?? ''), ...(orb.doubleBright ? { doubled: true } : {}) })
+    if (light) changes.push(light as any)
+  }
+  if (data.raisesMinion) {
+    const raise = special('raiseMinion', { target: '', value: '' })
+    if (raise) changes.push(raise as any)
+  }
   const shieldSlots = int(data.shield?.slots, 0)
   return {
     name: str(data.name) || 'Condition',
@@ -473,6 +485,87 @@ export function journalFrom(name: string, contentType: string, data: Record<stri
   }
 }
 
+
+/** A pet, mount or vehicle record (CompanionFields.tsx) → companion Actor data. Free-text attacks become abilities. */
+export function companionToActor(name: string, data: Record<string, any>, kind: 'pet' | 'mount' | 'vehicle') {
+  const base = mobToActor(name, data, `${kind}-${name}`)
+  const stats = data.stats ?? {}
+  const abilities = [
+    ...['attack1', 'attack2'].filter((key) => str(data[key]).trim()).map((key) => ({ name: 'Attack', description: str(data[key]) })),
+    ...(str(data.special).trim() ? [{ name: 'Special', description: str(data.special) }] : []),
+  ]
+  return {
+    ...base,
+    type: 'companion',
+    img: str(data.portrait) || ICONS.mob,
+    system: {
+      ...base.system,
+      kind,
+      size: str(data.size) || '4',
+      evade: { published: str(stats.evade) },
+      healthSlotsOverride: null,
+      healthPerSlotOverride: null,
+      abilities: [...base.system.abilities, ...abilities],
+      description: toHtml(data.description ?? data.flavor),
+      companion: { master: '', occupants: str(data.occupants), accessories: toHtml(data.accessories) },
+    },
+    prototypeToken: { ...base.prototypeToken, actorLink: true, disposition: 1 },
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Reference tables                                                   */
+/* ------------------------------------------------------------------ */
+
+/** A reference table's columns, rows and notes as HTML (ReferenceTableCard.tsx). */
+export function referenceTableHtml(data: Record<string, any>) {
+  const columns = list(data.columns).map(str)
+  const rows = list(data.rows).map((row) => list(row).map(str))
+  const head = columns.length ? `<thead><tr>${columns.map((column) => `<th>${escapeHtml(column)}</th>`).join('')}</tr></thead>` : ''
+  const body = `<tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`).join('')}</tbody>`
+  const notes = list(data.notes).map(str).filter(Boolean)
+  return [
+    data.description ? `<p>${escapeHtml(str(data.description))}</p>` : '',
+    rows.length ? `<table class="crawl-reference-table">${head}${body}</table>` : '',
+    notes.length ? `<ul>${notes.map((note) => `<li>${escapeHtml(note)}</li>`).join('')}</ul>` : '',
+    data.source ? `<p><em>${escapeHtml(str(data.source))}</em></p>` : '',
+  ].join('')
+}
+
+/** "3", "4-6", "19+": the die range a row covers (gmEncounter.ts tableRowMatches), or null. */
+export function rowRange(cell: unknown, top: number): [number, number] | null {
+  const match = str(cell).trim().match(/^(\d+)(?:\s*[-–—‑]\s*(\d+)|(\+))?$/)
+  if (!match) return null
+  const low = Number(match[1])
+  return [low, match[3] ? Math.max(low, top) : Number(match[2] ?? match[1])]
+}
+
+/** A rollable reference table → RollTable data: the first column is the die range, the rest the result text. */
+export function referenceRollTable(name: string, data: Record<string, any>, seed: string) {
+  const formula = str(data.rollFormula)
+  // The highest total, so an open "19+" row ends there.
+  const dice = formula.match(/^\s*(\d*)d(\d+)/i)
+  const top = dice ? (Number(dice[1]) || 1) * Number(dice[2]) : 0
+  const columns = list(data.columns).map(str)
+  const results = list(data.rows)
+    .map((row, index) => {
+      const range = rowRange(list(row)[0], top)
+      if (!range) return null
+      const cells = list(row).slice(1).map(str)
+      const description = cells.length > 1 ? cells.map((cell, column) => `<strong>${escapeHtml(columns[column + 1] ?? '')}</strong> ${escapeHtml(cell)}`).join('<br>') : escapeHtml(cells[0] ?? '')
+      return { _id: stableId(`${seed}-result-${index}`), type: 'text', name: cells[0] ?? '', description, range, weight: range[1] - range[0] + 1, drawn: false, img: 'icons/svg/d20-black.svg' }
+    })
+    .filter(Boolean)
+  return {
+    name,
+    img: 'icons/svg/d20-grey.svg',
+    description: referenceTableHtml({ description: data.description, notes: data.notes, source: data.source }),
+    formula,
+    replacement: true,
+    displayRoll: true,
+    results,
+  }
+}
 /* ------------------------------------------------------------------ */
 /*  Database row dispatcher                                            */
 /* ------------------------------------------------------------------ */
@@ -510,12 +603,37 @@ export const PACK_FOR_TYPE: Record<string, string> = {
   sponsor: 'lore',
   tunnel_show: 'lore',
   location: 'lore',
-  pet: 'lore',
-  mount: 'lore',
-  vehicle: 'lore',
-  reference_table: 'lore',
+  pet: 'companions',
+  mount: 'companions',
+  vehicle: 'companions',
+  reference_table: 'reference',
   content_pack: 'lore',
 }
+
+/** A GM's prepared database box (preparedLootBoxes.ts PreparedLoot), kept as it is for awarding. */
+function preparedLoot(value: any) {
+  if (!value || typeof value !== 'object' || !Array.isArray(value.items)) return null
+  return { tier: str(value.tier) || 'Bronze', type: str(value.type) || 'Custom', floor: int(value.floor, 1), gold: Math.max(0, int(value.gold)), items: value.items }
+}
+
+/** Content the loot generator draws from or awards (lootContext.ts, CrawlerAwardsPopup.tsx). */
+const LOOT_SOURCE_TYPES = new Set([
+  'skill',
+  'spell',
+  'achievement',
+  'loot_box',
+  'weapon',
+  'consumable',
+  'tattoo',
+  'other',
+  'equipment_head',
+  'equipment_torso',
+  'equipment_arms',
+  'equipment_hands',
+  'equipment_legs',
+  'equipment_feet',
+  'equipment_accessory',
+])
 
 export function convertRow(row: ContentRow, database: 'game' | 'homebrew'): Converted | null {
   const data = row.data ?? {}
@@ -525,7 +643,9 @@ export function convertRow(row: ContentRow, database: 'game' | 'homebrew'): Conv
   const pack = PACK_FOR_TYPE[row.content_type]
   if (!pack) return null
   const source = sourceOf(row, database)
-  const flags = { crawlspace: { sourceId: `${database}-${row.id}`, contentType: row.content_type } }
+  const flags: Record<string, any> = { crawlspace: { sourceId: `${database}-${row.id}`, contentType: row.content_type } }
+  // The loot generator and awards read the original CrawlSpace record, as the app reads its database.
+  if (LOOT_SOURCE_TYPES.has(row.content_type)) flags.crawlspace.data = data
 
   switch (row.content_type) {
     case 'skill':
@@ -584,7 +704,7 @@ export function convertRow(row: ContentRow, database: 'game' | 'homebrew'): Conv
           name,
           type: 'lootBox',
           img: ICONS.lootBox,
-          system: { description: toHtml(data.description), notes: '', source, quantity: 1, tier: str(data.tier) || 'Bronze', boxType: '', contents: str(data.loot ?? data.contents), sealed: true },
+          system: { description: toHtml(data.description), notes: '', source, quantity: 1, tier: str(data.prepared?.tier ?? data.tier) || 'Bronze', boxType: str(data.prepared?.type), contents: str(data.loot ?? data.contents), sealed: true, loot: preparedLoot(data.prepared) },
           flags,
         },
       }
@@ -603,6 +723,18 @@ export function convertRow(row: ContentRow, database: 'game' | 'homebrew'): Conv
       }
     case 'mob':
       return { documentName: 'Actor', pack, data: { _id, ...mobToActor(name, data, seed), flags } }
+    case 'pet':
+    case 'mount':
+    case 'vehicle':
+      return { documentName: 'Actor', pack, data: { _id, ...companionToActor(name, data, row.content_type), flags } }
+    case 'reference_table':
+      // A table with dice rolls in Foundry's RollTable; the rest read as a journal page.
+      if (str(data.rollFormula).trim()) return { documentName: 'RollTable', pack: 'reference-tables', data: { _id, ...referenceRollTable(name, data, seed), flags } }
+      return {
+        documentName: 'JournalEntry',
+        pack,
+        data: { _id, name, pages: [{ _id: stableId(`${seed}-page`), name, type: 'text', text: { content: referenceTableHtml(data) || '<p></p>', format: 1 } }], flags },
+      }
     case 'npc':
       return {
         documentName: 'Actor',

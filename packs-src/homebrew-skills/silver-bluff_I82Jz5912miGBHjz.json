@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-193",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Silver Bluff",
+        "stat": "CHA",
+        "notes": "",
+        "rank5": "Can apply this skill to gambling.",
+        "rank10": "May use this skill to forge documents.",
+        "rank15": "On a failed check, may take one Action before opponents react.",
+        "details": "A convincing delivery can make a flimsy story sound perfectly ordinary.\n\nLie or misdirect, opposed by INT. Disadvantage against Read the Tell.",
+        "effects": [],
+        "checkType": "Opposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Silver Bluff",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

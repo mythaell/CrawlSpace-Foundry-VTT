@@ -51,7 +51,43 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-220",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Raking Talons",
+        "stat": "STR",
+        "notes": "",
+        "rank5": "Add 1d6 base damage.",
+        "rank10": "Add 1d6 base damage.",
+        "rank15": "Add 1d6 base damage; the target gains Blood Trail.",
+        "details": "You twist into a sharp raking strike with the claws your body provides.\n\nMelee attack against Evade.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Raking Talons",
+        "damageTypes": [
+          "Slashing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": true,
+        "damageFormula": "1d6+STR",
+        "isAttackSkill": true,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "1d6",
+        "rank10DamageFormula": "3d6+STR",
+        "rank15DamageFormula": "4d6+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

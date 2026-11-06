@@ -51,7 +51,33 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-1071",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "stat": "STR",
+        "range": "Melee",
+        "rank5": "Add 1d6 base damage.",
+        "rank10": "Add 1d6 base damage. The target gains Woozy.",
+        "rank15": "Add 1d6 base damage. If the target loses at least 3 HB slots, it also gains Take Down.",
+        "details": "MY EDIT",
+        "effects": [],
+        "checkType": "Attack",
+        "builderSeed": "combat:Security Baton Training",
+        "damageTypes": [
+          "Bludgeoning"
+        ],
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Security Baton",
+          "skill": "Security Baton Training",
+          "homebrew": true
+        },
+        "combatRelated": true,
+        "damageFormula": "1d6+STR",
+        "isAttackSkill": true,
+        "rank5DamageFormula": "2d6+STR",
+        "rank10DamageFormula": "3d6+STR",
+        "rank15DamageFormula": "4d6+STR"
+      }
     }
   },
   "_stats": {

@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-195",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Winning Introduction",
+        "stat": "CHA",
+        "notes": "",
+        "rank5": "Lower-level Mobs will not attack your party unless provoked.",
+        "rank10": "A Mob up to twice your level will not attack your party unless you or an ally attacks it, or your party obstructs its objective.",
+        "rank15": "May affect a group of the same Mob type, each up to twice your level, under the same non-aggression conditions.",
+        "details": "You find the friendly opening before a stranger finds a reason to distrust you.\n\nOpposed by INT; affects one non-hostile NPC or Mob, excluding crawlers, bosses and elites.",
+        "effects": [],
+        "checkType": "Opposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Winning Introduction",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": true,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

@@ -1,0 +1,139 @@
+{{!-- Crawler Awards / loot box preparation. Context: CrawlerAwards._prepareContext. --}}
+<div class="awards-layout">
+<div class="awards-body">
+  {{#if awardMode}}
+  <fieldset class="award-numbers">
+    <legend>{{localize "CRAWLSPACE.Awards.Standing"}}</legend>
+    <label>{{localize "CRAWLSPACE.Awards.aiFavor"}} <small>({{favorNow}})</small>
+      <input type="text" name="favor" value="{{favor}}" placeholder="{{favorNow}}"></label>
+    <label>{{localize "CRAWLSPACE.Awards.popularity"}} <small>({{popularityNow}})</small>
+      <input type="text" name="popularity" value="{{popularity}}" placeholder="{{popularityNow}}"></label>
+    <p class="hint">{{localize "CRAWLSPACE.Awards.NumberHint"}}</p>
+  </fieldset>
+
+  <fieldset class="award-achievement">
+    <legend><label class="award-toggle"><input type="checkbox" name="achievement.on" {{checked achievement.on}}> {{localize "CRAWLSPACE.Awards.AwardAchievement"}}</label></legend>
+    {{#if achievement.on}}
+    <div class="form-group">
+      <label>{{localize "CRAWLSPACE.Awards.Premade"}}</label>
+      <select name="achievement.premade">
+        <option value="">{{localize "CRAWLSPACE.Awards.Custom"}}</option>
+        {{selectOptions premadeChoices selected=achievement.premade valueAttr="value" labelAttr="label"}}
+      </select>
+      {{#if achievement.premade}}<button type="button" class="icon" data-action="clearPremade" data-tooltip="{{localize 'CRAWLSPACE.Awards.ClearPremade'}}"><i class="fa-solid fa-xmark"></i></button>{{/if}}
+    </div>
+    <p class="hint">{{localize "CRAWLSPACE.Awards.DropAchievement"}}</p>
+    <div class="form-group"><label>{{localize "CRAWLSPACE.Awards.name"}}</label><input type="text" name="achievement.name" value="{{achievement.name}}"></div>
+    <div class="form-group stacked"><label>{{localize "CRAWLSPACE.Awards.description"}}</label><textarea name="achievement.description" rows="3">{{achievement.description}}</textarea></div>
+    <div class="form-group"><label>{{localize "CRAWLSPACE.Awards.reward"}}</label><input type="text" name="achievement.reward" value="{{achievement.reward}}" {{disabled achievement.link}}></div>
+    <label class="award-toggle"><input type="checkbox" name="achievement.link" {{checked achievement.link}}> {{localize "CRAWLSPACE.Awards.Link"}}</label>
+    {{/if}}
+  </fieldset>
+
+  <fieldset class="award-loot">
+    <legend><label class="award-toggle"><input type="checkbox" name="loot.on" {{checked loot.on}}> {{localize "CRAWLSPACE.Awards.AwardBox"}}</label></legend>
+    {{#if loot.on}}
+    <div class="award-source">
+      {{radioBoxes "loot.source" sourceChoices checked=loot.source}}
+    </div>
+    {{#if (eq loot.source "prepared")}}
+    <div class="form-group">
+      <label>{{localize "CRAWLSPACE.Awards.SourcePrepared"}}</label>
+      <select name="loot.prepared">
+        <option value=""></option>
+        {{selectOptions preparedChoices selected=loot.prepared valueAttr="value" labelAttr="label"}}
+      </select>
+    </div>
+    {{#if preparedSummary}}<p class="loot-summary">{{preparedSummary}}</p>{{else}}<p class="hint">{{localize "CRAWLSPACE.Awards.PreparedHint"}}</p>{{/if}}
+    {{/if}}
+    {{#if (eq loot.source "named")}}
+    <div class="form-group"><label>{{localize "CRAWLSPACE.Awards.box"}}</label><input type="text" name="loot.name" value="{{loot.name}}"></div>
+    <div class="form-group"><label>{{localize "CRAWLSPACE.Awards.quantity"}}</label><input type="number" name="loot.quantity" value="{{loot.quantity}}" min="1" max="9999" step="1"></div>
+    <div class="form-group"><label>{{localize "CRAWLSPACE.Awards.notes"}}</label><input type="text" name="loot.notes" value="{{loot.notes}}"></div>
+    <p class="hint">{{localize "CRAWLSPACE.Awards.NamedHint"}}</p>
+    {{/if}}
+    {{/if}}
+  </fieldset>
+  {{/if}}
+
+  {{#if generating}}
+  <fieldset class="loot-generator">
+    <legend>{{#if awardMode}}{{localize "CRAWLSPACE.Loot.Generator"}}{{else}}{{localize "CRAWLSPACE.Loot.Contents"}}{{/if}} · {{localize "CRAWLSPACE.Loot.FloorN" floor=floor}}</legend>
+    {{#unless awardMode}}
+    <div class="form-group"><label>{{localize "CRAWLSPACE.Loot.FloorSetting"}}</label><input type="number" name="floor" value="{{floor}}" min="1" max="18" step="1"></div>
+    {{/unless}}
+    <div class="loot-tiers" role="radiogroup" aria-label="{{localize 'CRAWLSPACE.Item.Tier'}}">
+      {{#each tiers}}<button type="button" class="loot-tier tier-{{crawlLower value}} {{#if active}}active{{/if}}" role="radio" aria-checked="{{active}}" data-action="tier" data-tier="{{value}}">{{value}}</button>{{/each}}
+    </div>
+    <div class="form-group">
+      <label>{{localize "CRAWLSPACE.Loot.Type"}}</label>
+      <select name="settings.type">{{selectOptions types selected=settings.type}}</select>
+    </div>
+    {{#if earth}}
+    <p class="hint">{{localize "CRAWLSPACE.Loot.EarthHint"}}</p>
+    {{else}}
+    <dl class="loot-tier-summary">
+      <dt>{{localize "CRAWLSPACE.Loot.ContentsLabel"}}</dt><dd>{{localize "CRAWLSPACE.Loot.Counts" items=settings.items consumables=settings.consumables potions=settings.potions}}</dd>
+      <dt>{{localize "CRAWLSPACE.Crawler.Gold"}}</dt><dd>{{gold}}</dd>
+      <dt>{{localize "CRAWLSPACE.Loot.PropertyRolls"}}</dt><dd>{{propertyRolls}}</dd>
+      <dt>{{localize "CRAWLSPACE.Loot.XValuesLabel" floor=floor}}</dt><dd>{{xValues}}</dd>
+    </dl>
+    <details class="loot-quantities">
+      <summary>{{localize "CRAWLSPACE.Loot.Adjust"}}</summary>
+      <div class="loot-quantity-row">
+        <label>{{localize "CRAWLSPACE.Loot.Items"}} <input type="number" name="settings.items" value="{{settings.items}}" min="0" max="50" step="1"></label>
+        <label>{{localize "CRAWLSPACE.Loot.Consumables"}} <input type="number" name="settings.consumables" value="{{settings.consumables}}" min="0" max="50" step="1"></label>
+        <label>{{localize "CRAWLSPACE.Loot.Potions"}} <input type="number" name="settings.potions" value="{{settings.potions}}" min="0" max="50" step="1"></label>
+        <button type="button" data-action="resetQuantities">{{localize "CRAWLSPACE.Loot.Reset"}}</button>
+      </div>
+    </details>
+    {{/if}}
+    <div class="loot-actions">
+      <button type="button" data-action="generate" {{disabled loading}}><i class="fa-solid fa-dice"></i> {{#if loading}}{{localize "CRAWLSPACE.Awards.Loading"}}{{else}}{{localize "CRAWLSPACE.Loot.Generate"}}{{/if}}<small>{{localize "CRAWLSPACE.Loot.GenerateHint"}}</small></button>
+      {{#if awardMode}}<button type="button" data-action="blind" {{disabled loading}}><i class="fa-solid fa-box"></i> {{localize "CRAWLSPACE.Loot.Blind"}}<small>{{localize "CRAWLSPACE.Loot.BlindHint"}}</small></button>{{/if}}
+      <button type="button" data-action="manual"><i class="fa-solid fa-hand-pointer"></i> {{localize "CRAWLSPACE.Loot.Manual"}}<small>{{localize "CRAWLSPACE.Loot.ManualHint"}}</small></button>
+    </div>
+  </fieldset>
+
+  {{#if preview}}
+  <section class="loot-preview">
+    <header>
+      <h3>{{preview.title}}</h3>
+      {{#unless preview.manual}}<button type="button" data-action="rerollAll"><i class="fa-solid fa-rotate"></i> {{localize "CRAWLSPACE.Loot.RerollAll"}}</button>{{/unless}}
+    </header>
+    <p class="hint">{{preview.count}} · {{#if awardMode}}{{localize "CRAWLSPACE.Loot.SealedHint"}}{{else}}{{localize "CRAWLSPACE.Loot.PreparedHint"}}{{/if}}</p>
+    <ol class="loot-entries">
+      {{#each preview.entries as |entry|}}
+      <li class="loot-entry" data-index="{{entry.index}}">
+        <div class="loot-entry-head">
+          {{#if ../preview.manual}}<span class="loot-entry-name">{{entry.name}} ×{{entry.quantity}}</span>
+          {{else}}<label class="loot-entry-name"><input type="checkbox" name="entry.{{entry.index}}.checked" {{checked entry.checked}}> {{entry.name}} ×{{entry.quantity}}</label>{{/if}}
+          <button type="button" class="icon" data-action="expand" aria-expanded="{{entry.expanded}}" data-tooltip="{{localize 'CRAWLSPACE.Loot.Details'}}"><i class="fa-solid fa-{{#if entry.expanded}}chevron-up{{else}}chevron-down{{/if}}"></i></button>
+          {{#if entry.rerollable}}<button type="button" class="icon" data-action="reroll" data-tooltip="{{localize 'CRAWLSPACE.Loot.Reroll'}}"><i class="fa-solid fa-dice"></i></button>{{/if}}
+          <button type="button" class="icon" data-action="removeEntry" data-tooltip="{{localize 'CRAWLSPACE.Loot.Remove'}}"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        {{#if entry.tags.length}}<p class="loot-tags">{{#each entry.tags}}<span class="tag">{{this}}</span>{{/each}}</p>{{/if}}
+        {{#if entry.expanded}}<p class="loot-entry-details">{{entry.description}}</p>{{/if}}
+      </li>
+      {{/each}}
+    </ol>
+    <p class="loot-drop hint"><i class="fa-solid fa-arrow-down-to-bracket"></i> {{localize "CRAWLSPACE.Loot.DropItems"}}</p>
+    <label class="loot-gold">
+      <input type="checkbox" name="confirmGold" {{checked preview.confirmGold}} {{disabled (not preview.goldAllowed)}}>
+      {{localize "CRAWLSPACE.Loot.GoldToAward"}}
+      <input type="number" name="gold" value="{{preview.gold}}" min="0" step="1" {{disabled (not preview.goldAllowed)}}>
+    </label>
+  </section>
+  {{/if}}
+  {{/if}}
+
+  {{#if error}}<p class="award-error" role="alert">{{error}}</p>{{/if}}
+</div>
+<footer class="form-footer">
+  {{#if awardMode}}
+  <button type="button" data-action="award" {{disabled busy}}><i class="fa-solid fa-trophy"></i> {{localize "CRAWLSPACE.Awards.Award"}}</button>
+  {{else}}
+  <button type="button" data-action="saveBox" {{disabled busy}}><i class="fa-solid fa-floppy-disk"></i> {{localize "CRAWLSPACE.Loot.SaveContents"}}</button>
+  {{/if}}
+</footer>
+</div>

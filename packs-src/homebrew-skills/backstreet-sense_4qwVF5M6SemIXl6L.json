@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-186",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Backstreet Sense",
+        "stat": "CHA",
+        "notes": "",
+        "rank5": "Learn an additional rumor.",
+        "rank10": "Quickly find a hiding place chosen by the GM.",
+        "rank15": "Learn information that gives you bargaining power over an important local person, chosen by the GM.",
+        "details": "You know which doors open for a quiet favor and which alleys end in trouble.\n\nFind rumors and criminal contacts in a populated settlement.",
+        "effects": [],
+        "checkType": "Unopposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Backstreet Sense",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": true,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

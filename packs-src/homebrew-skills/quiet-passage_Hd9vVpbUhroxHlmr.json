@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-202",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Quiet Passage",
+        "stat": "DEX",
+        "notes": "",
+        "rank5": "May make a surprise attack with Advantage.",
+        "rank10": "Other party crawlers using this skill untrained no longer suffer Disadvantage.",
+        "rank15": "On a successful Surprise check, may also Move and Step; a Surprise attack doubles its base damage dice.",
+        "details": "You move through a watched space without becoming its most interesting feature.\n\nOpposed by INT. Start out of sight. Success grants a non-attack Action before surprise; outside combat, may Move and Step.",
+        "effects": [],
+        "checkType": "Opposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Quiet Passage",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

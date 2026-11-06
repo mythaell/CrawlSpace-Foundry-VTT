@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-222",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Springstep",
+        "stat": "DEX",
+        "notes": "",
+        "rank5": "Use × 3 for both distances.",
+        "rank10": "May leap along a non-arcing path, including straight upward.",
+        "rank15": "May stay in your leap for up to Rank seconds, resembling a glide.",
+        "details": "Your animal body turns a running start into a startling leap.\n\nAnimal only. With a 10-foot running start, jump Rank × 2 feet horizontally or DEX modifier × 2 vertically.",
+        "effects": [],
+        "checkType": "Unopposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Springstep",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

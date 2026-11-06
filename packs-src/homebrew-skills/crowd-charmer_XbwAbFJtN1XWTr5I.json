@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-215",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Crowd Charmer",
+        "stat": "CHA",
+        "notes": "",
+        "rank5": "Choose an additional performance specialty.",
+        "rank10": "Choose another performance specialty; after at least an hour of coaching, others may use one of your specialties untrained without Disadvantage.",
+        "rank15": "Choose another performance specialty; may reproduce a performance after experiencing it once.",
+        "details": "You turn a practiced routine into a moment an audience wants to remember.\n\nChoose a performance specialty. A rival performance adds their CHA to the difficulty.",
+        "effects": [],
+        "checkType": "Unopposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Crowd Charmer",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

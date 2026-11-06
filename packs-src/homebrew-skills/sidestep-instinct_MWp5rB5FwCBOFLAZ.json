@@ -130,7 +130,74 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-223",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Sidestep Instinct",
+        "stat": "",
+        "notes": "",
+        "rank5": "Gain another +1 Evade and 5 feet of Step when Evading.",
+        "rank10": "Gain another +2 Evade; Evade spells and ranged attacks with Advantage.",
+        "rank15": "Gain another +2 Evade; may Evade in combat without spending an Action.",
+        "details": "You shift out of danger before thought can slow the movement.\n\nGain +1 Evade. Advance by magical means, or training after Rank 5.",
+        "effects": [
+          {
+            "id": "starter-dodge-1",
+            "type": "evadeModifier",
+            "slots": [],
+            "value": "1",
+            "target": "",
+            "requiredRank": "1"
+          },
+          {
+            "id": "starter-dodge-5",
+            "type": "evadeModifier",
+            "slots": [],
+            "value": "1",
+            "target": "",
+            "requiredRank": "5"
+          },
+          {
+            "id": "builder-upgrade-dodge-evade-10",
+            "type": "evadeModifier",
+            "slots": [],
+            "value": "2",
+            "target": "",
+            "requiredRank": "10"
+          },
+          {
+            "id": "builder-upgrade-dodge-evade-15",
+            "type": "evadeModifier",
+            "slots": [],
+            "value": "2",
+            "target": "",
+            "requiredRank": "15"
+          }
+        ],
+        "checkType": "Passive",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Sidestep Instinct",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

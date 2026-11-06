@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-175",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Bone Rattle",
+        "stat": "",
+        "notes": "",
+        "rank5": "Add another 1d4 against creatures of your size.",
+        "rank10": "Against a target of your size, add one Rank damage die and inflict Stunned.",
+        "rank15": "Against a target of your size, add another Rank damage die and inflict Blood Trail.",
+        "details": "Passive damage effect for Shoulder slam: against a creature of your size, add 1d4 base damage.",
+        "effects": [],
+        "checkType": "Passive",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "effect:Bone Rattle",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": true,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

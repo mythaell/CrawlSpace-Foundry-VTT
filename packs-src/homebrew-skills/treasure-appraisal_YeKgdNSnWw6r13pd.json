@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-207",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Treasure Appraisal",
+        "stat": "",
+        "notes": "",
+        "rank5": "Also use value tabs and history.",
+        "rank10": "Identify which type of loot box an item would have come from.",
+        "rank15": "Newly acquired inventory items display their gold value.",
+        "details": "A glance through your belongings tells you which pieces deserve extra care.\n\nSort inventory by value without revealing exact prices. Ranks advance by magical means.",
+        "effects": [],
+        "checkType": "Passive",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Treasure Appraisal",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

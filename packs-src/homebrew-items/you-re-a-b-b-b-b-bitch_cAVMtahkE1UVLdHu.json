@@ -18,7 +18,13 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-38",
-      "contentType": "achievement"
+      "contentType": "achievement",
+      "data": {
+        "reward": "Lucky Bitch",
+        "lootBoxId": "homebrew-40",
+        "description": "You little bitch.",
+        "sharedWithCelestial": false
+      }
     }
   },
   "_stats": {

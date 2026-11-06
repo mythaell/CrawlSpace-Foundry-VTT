@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-216",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Patient Sight",
+        "stat": "",
+        "notes": "",
+        "rank5": "Add another 1d4 damage.",
+        "rank10": "Add another 1d4 base damage when using this skill.",
+        "rank15": "Add another 1d4 base damage when using this skill.",
+        "details": "You wait for the smallest opening and make a difficult shot count.\n\nWhen making a ranged attack with Disadvantage, add this skill Rank to the check and +1d4 damage on a hit.",
+        "effects": [],
+        "checkType": "Passive",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Patient Sight",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

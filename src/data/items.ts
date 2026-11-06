@@ -227,6 +227,8 @@ export class LootBoxData extends foundry.abstract.TypeDataModel {
       boxType: text(),
       contents: text(),
       sealed: new fields.BooleanField({ initial: true }),
+      /** Sealed contents (sealedLootBoxes.ts): gold and CrawlSpace inventory items, given out when opened. Empty boxes roll at opening. */
+      loot: new fields.ObjectField({ required: false, nullable: true, initial: null }),
     }
   }
 }

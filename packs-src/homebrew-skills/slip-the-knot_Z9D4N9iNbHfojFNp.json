@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-190",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Slip the Knot",
+        "stat": "DEX",
+        "notes": "",
+        "rank5": "Escape unnoticed; may Step after escaping Held.",
+        "rank10": "Other party crawlers using this skill untrained no longer suffer Disadvantage.",
+        "rank15": "After escaping, may immediately take an Action with Advantage.",
+        "details": "A little slack and a well-timed twist can turn captivity into opportunity.\n\nEscape bonds. Escaping Held instead uses STR opposed by the holding skill.",
+        "effects": [],
+        "checkType": "Unopposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Slip the Knot",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

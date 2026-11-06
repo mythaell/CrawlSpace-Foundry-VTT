@@ -1,0 +1,693 @@
+[
+  {
+    "content_type": "skill",
+    "name": "Shotgun",
+    "fields": {
+      "template": null,
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 5,
+            "width": 5,
+            "angle": 60,
+            "label": "Splash"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Bad Faith",
+    "fields": {
+      "template": null,
+      "rank5Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 5,
+            "width": 5,
+            "angle": 60,
+            "label": "Splash"
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 10,
+            "width": 5,
+            "angle": 60,
+            "label": "Splash"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Confusing Fog",
+    "fields": {
+      "template": {
+        "areas": [
+          {
+            "type": "rectangle",
+            "distance": 25,
+            "width": 25,
+            "angle": 60
+          }
+        ]
+      },
+      "rank5Template": {
+        "areas": [
+          {
+            "type": "rectangle",
+            "distance": 50,
+            "width": 50,
+            "angle": 60
+          }
+        ]
+      },
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "rectangle",
+            "distance": 100,
+            "width": 100,
+            "angle": 60
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "rectangle",
+            "distance": 500,
+            "width": 500,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Earworm",
+    "fields": {
+      "template": null,
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 10,
+            "width": 5,
+            "angle": 60,
+            "label": "Splash"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Fear",
+    "fields": {
+      "template": null,
+      "rank5Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 5,
+            "width": 5,
+            "angle": 60,
+            "label": "Blast"
+          }
+        ]
+      },
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 10,
+            "width": 5,
+            "angle": 60,
+            "label": "Blast"
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 15,
+            "width": 5,
+            "angle": 60,
+            "label": "Blast"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Fireball",
+    "fields": {
+      "template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 10,
+            "width": 5,
+            "angle": 60,
+            "label": "Blast"
+          }
+        ]
+      },
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "ray",
+            "distance": 80,
+            "width": 5,
+            "angle": 60
+          },
+          {
+            "type": "circle",
+            "distance": 10,
+            "width": 5,
+            "angle": 60,
+            "atEnd": true,
+            "label": "Blast"
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "ray",
+            "distance": 80,
+            "width": 5,
+            "angle": 60
+          },
+          {
+            "type": "circle",
+            "distance": 10,
+            "width": 5,
+            "angle": 60,
+            "atEnd": true,
+            "label": "Blast"
+          },
+          {
+            "type": "circle",
+            "distance": 50,
+            "width": 5,
+            "angle": 60,
+            "atEnd": true,
+            "label": "Splash"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Heal Others",
+    "fields": {
+      "template": null,
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 20,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Holy Aura",
+    "fields": {
+      "template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 5,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 10,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 15,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Hot Stuff Aura",
+    "fields": {
+      "template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 5,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 10,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 20,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Ice Blast",
+    "fields": {
+      "template": null,
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "cone",
+            "distance": 15,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Lightning Bolt",
+    "fields": {
+      "template": null,
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "ray",
+            "distance": 100,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Minion Army",
+    "fields": {
+      "template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 50,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 50,
+            "width": 5,
+            "angle": 60,
+            "distanceStat": "CHA",
+            "distanceMultiplier": 1
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 50,
+            "width": 5,
+            "angle": 60,
+            "distanceStat": "CHA",
+            "distanceMultiplier": 2
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Ping",
+    "fields": {
+      "template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 5280,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Protective Shell",
+    "fields": {
+      "template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 10,
+            "width": 5,
+            "angle": 60,
+            "distanceStat": "INT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Solsplash",
+    "fields": {
+      "template": null,
+      "rank5Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 5,
+            "width": 5,
+            "angle": 60,
+            "label": "Splash"
+          }
+        ]
+      },
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 15,
+            "width": 5,
+            "angle": 60,
+            "label": "Splash"
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 30,
+            "width": 5,
+            "angle": 60,
+            "label": "Splash"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Thunderlash",
+    "fields": {
+      "template": null,
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "cone",
+            "distance": 15,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Tripper",
+    "fields": {
+      "template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 30,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank5Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 30,
+            "width": 5,
+            "angle": 60,
+            "distanceStat": "INT",
+            "distanceMultiplier": 1
+          }
+        ]
+      },
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 30,
+            "width": 5,
+            "angle": 60,
+            "distanceStat": "INT",
+            "distanceMultiplier": 2
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 30,
+            "width": 5,
+            "angle": 60,
+            "distanceStat": "INT",
+            "distanceMultiplier": 3
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Turn Undead",
+    "fields": {
+      "template": {
+        "areas": [
+          {
+            "type": "cone",
+            "distance": 10,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank5Template": {
+        "areas": [
+          {
+            "type": "cone",
+            "distance": 15,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "cone",
+            "distance": 25,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "cone",
+            "distance": 40,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Wall of Fire",
+    "fields": {
+      "template": {
+        "areas": [
+          {
+            "type": "ray",
+            "distance": 30,
+            "width": 2,
+            "angle": 60
+          }
+        ]
+      },
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "ray",
+            "distance": 50,
+            "width": 3,
+            "angle": 60
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "ray",
+            "distance": 100,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Water Breathing",
+    "fields": {
+      "template": null,
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 15,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Web",
+    "fields": {
+      "template": {
+        "areas": [
+          {
+            "type": "cone",
+            "distance": 20,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank5Template": {
+        "areas": [
+          {
+            "type": "cone",
+            "distance": 25,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "cone",
+            "distance": 30,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "cone",
+            "distance": 35,
+            "width": 5,
+            "angle": 60
+          }
+        ]
+      }
+    }
+  },
+  {
+    "content_type": "spell",
+    "name": "Wilbur’s Slow-Build Fireblast",
+    "fields": {
+      "template": null,
+      "rank10Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 5,
+            "width": 5,
+            "angle": 60,
+            "label": "Splash"
+          }
+        ]
+      },
+      "rank15Template": {
+        "areas": [
+          {
+            "type": "circle",
+            "distance": 10,
+            "width": 5,
+            "angle": 60,
+            "label": "Splash"
+          }
+        ]
+      }
+    }
+  }
+]

@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-189",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Patchwork Fix",
+        "stat": "INT",
+        "notes": "",
+        "rank5": "May repair items with moving parts.",
+        "rank10": "Repairs take 1 hour.",
+        "rank15": "May rebuild a destroyed item.",
+        "details": "You coax battered equipment back into service with patience and a few spare parts.\n\nSpend two hours repairing a simple broken or damaged item (including magical items), excluding destroyed items and moving parts.",
+        "effects": [],
+        "checkType": "Unopposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Patchwork Fix",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

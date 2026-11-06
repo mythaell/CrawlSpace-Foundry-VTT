@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-201",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Take the Hit",
+        "stat": "",
+        "notes": "",
+        "rank5": "Gain 5 DR against the intercepted attack.",
+        "rank10": "Gain another +5 DR while intercepting the attack.",
+        "rank15": "Gain another +5 DR while intercepting the attack and ignore its attached Debuffs.",
+        "details": "When danger reaches for a companion, you put yourself in its way.\n\nInterrupt: take a direct, non-area attack aimed at an adjacent ally. May Step up to 10 feet to reach them; do not make your own Evade check.",
+        "effects": [],
+        "checkType": "Passive",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Take the Hit",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

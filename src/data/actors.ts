@@ -380,6 +380,57 @@ export class MobData extends CrawlActorData {
   }
 }
 
+/**
+ * A creature raised as a crawler's minion (minions.ts PartyMinion): its own copy of the mob, fighting on the
+ * crawlers' side under its caster's players, until it dies or the condition that raised it ends.
+ */
+export class MinionData extends MobData {
+  static defineSchema() {
+    const fields = f()
+    return {
+      ...super.defineSchema(),
+      minion: new fields.SchemaField({
+        /** UUID of the crawler whose condition raised it. */
+        caster: new fields.StringField({ required: true, blank: true }),
+        /** Name of the raising condition, for the sheet and chat. */
+        condition: text(),
+      }),
+    }
+  }
+}
+
+/**
+ * Pets, mounts and vehicles (mobRules.ts getMobDerived, CompanionFields.tsx). A creature sheet with 10 Health
+ * slots: a pet's slots hold its CON modifier, a mount's or vehicle's its size (1–8). Evade is a set number,
+ * not 10 + DEX. It belongs to a crawler, whose players own it.
+ */
+export class CompanionData extends MobData {
+  static defineSchema() {
+    const fields = f()
+    return {
+      ...super.defineSchema(),
+      kind: new fields.StringField({ required: true, initial: 'pet', choices: ['pet', 'mount', 'vehicle'] }),
+      size: text('4'),
+      companion: new fields.SchemaField({
+        /** UUID of the crawler it belongs to. */
+        master: new fields.StringField({ required: true, blank: true }),
+        occupants: text(),
+        accessories: html(),
+      }),
+    }
+  }
+
+  prepareDerivedData() {
+    super.prepareDerivedData()
+    const whole = (value: unknown) => (Number.isFinite(Number(value)) ? Math.max(0, Math.trunc(Number(value))) : 0)
+    const perSlot = this.kind === 'pet' ? this.attributes.con.mod : Math.min(8, Math.max(1, whole(this.size) || 4))
+    const max = this.healthSlotsOverride ?? 10
+    this.health = { max, value: Math.max(0, max - this.slotsLost), perSlot: this.healthPerSlotOverride ?? perSlot }
+    this.healthBar = { value: this.health.value, max: this.health.max }
+    this.evade.total = Math.floor(whole(this.evade.published) + this.evade.bonus)
+  }
+}
+
 /** NPCs: a person first, with an optional linked Mob for their stat block. */
 export class NpcData extends CrawlActorData {
   static defineSchema() {

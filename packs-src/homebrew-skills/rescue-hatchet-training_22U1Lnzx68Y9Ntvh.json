@@ -51,7 +51,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-146",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Rescue Hatchet Training",
+        "stat": "STR",
+        "notes": "",
+        "range": "Melee",
+        "rank5": "Add 1d6 base damage.",
+        "rank10": "Add 1d6 base damage. May make a free extra attack with Disadvantage against another foe adjacent to both you and the original target.",
+        "rank15": "Add 1d6 base damage. On an Amazing Success or better, sever an arm or similar appendage, disarming a foe wielding a two-handed weapon.",
+        "details": "Attack against Evade.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Rescue Hatchet Training",
+        "damageTypes": [
+          "Slashing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Rescue Hatchet",
+          "skill": "Rescue Hatchet Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d6+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d6+STR",
+        "rank10DamageFormula": "3d6+STR",
+        "rank15DamageFormula": "4d6+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

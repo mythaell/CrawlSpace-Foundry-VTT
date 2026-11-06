@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-206",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Gentle Nudge",
+        "stat": "CHA",
+        "notes": "",
+        "rank5": "Suggestions need only avoid being too costly.",
+        "rank10": "Suggestions may be followed even when dangerous.",
+        "rank15": "Suggestions may be followed even when against the target’s nature.",
+        "details": "You frame an idea so another person can see themselves choosing it.\n\nOpposed by INT. Requires ten minutes in safety; Disadvantage for risky, inconvenient or improper requests. The suggestion cannot be too costly, too dangerous or against the target’s nature.",
+        "effects": [],
+        "checkType": "Opposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Gentle Nudge",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

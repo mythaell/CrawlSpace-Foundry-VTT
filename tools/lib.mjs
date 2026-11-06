@@ -37,9 +37,10 @@ const EMBEDDED = {
   actors: ['items', 'effects'],
   items: ['effects'],
   journal: ['pages'],
+  tables: ['results'],
 }
 
-export const COLLECTION_FOR = { Item: 'items', Actor: 'actors', JournalEntry: 'journal', ActiveEffect: 'effects', Folder: 'folders' }
+export const COLLECTION_FOR = { Item: 'items', Actor: 'actors', JournalEntry: 'journal', ActiveEffect: 'effects', RollTable: 'tables', Folder: 'folders' }
 
 /** Assign `_id`s (deterministic) and `_key`s to a document and everything embedded in it. */
 export function keyify(doc, collection, parentPath = '', parentIds = '') {

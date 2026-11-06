@@ -51,7 +51,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-162",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Steel Throwing Stars Training",
+        "stat": "DEX",
+        "notes": "",
+        "range": "30 feet",
+        "rank5": "Add 1d4 base damage. Range increases to 40 feet.",
+        "rank10": "Add 1d4 base damage. May make one additional free attack with Disadvantage.",
+        "rank15": "Add 1d4 base damage. May make another additional free attack with Disadvantage.",
+        "details": "Attack against Evade. AI Favor 1.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Steel Throwing Stars Training",
+        "damageTypes": [
+          "Piercing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Steel Throwing Stars",
+          "skill": "Steel Throwing Stars Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d4+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d4+STR",
+        "rank10DamageFormula": "3d4+STR",
+        "rank15DamageFormula": "4d4+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

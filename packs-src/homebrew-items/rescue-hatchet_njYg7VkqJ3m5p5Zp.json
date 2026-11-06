@@ -33,7 +33,86 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-147",
-      "contentType": "weapon"
+      "contentType": "weapon",
+      "data": {
+        "name": "Rescue Hatchet",
+        "notes": "",
+        "equipped": false,
+        "expanded": false,
+        "quantity": "1",
+        "properties": {
+          "tattoo": {
+            "location": ""
+          },
+          "weapon": {
+            "type": "melee",
+            "twoHanded": false
+          },
+          "armorDr": "",
+          "details": "A practical weapon built for close quarters. Requires one hand.",
+          "effects": [],
+          "itemType": "weapon",
+          "equipment": {
+            "slot": "Hands"
+          },
+          "isHealing": false,
+          "consumable": {
+            "type": ""
+          },
+          "healingUnit": "slots",
+          "manaBonuses": [
+            {
+              "value": ""
+            }
+          ],
+          "moveBonuses": [
+            {
+              "value": ""
+            }
+          ],
+          "statBonuses": [
+            {
+              "stat": "",
+              "value": ""
+            }
+          ],
+          "stepBonuses": [
+            {
+              "value": ""
+            }
+          ],
+          "skillBonuses": [
+            {
+              "skill": "",
+              "value": ""
+            }
+          ],
+          "spellBonuses": [
+            {
+              "spell": "",
+              "value": ""
+            }
+          ],
+          "healthBonuses": [
+            {
+              "slots": [],
+              "value": ""
+            }
+          ],
+          "healingFormula": "",
+          "rank5HealingFormula": "",
+          "rank10HealingFormula": "",
+          "rank15HealingFormula": ""
+        },
+        "builderSeed": "weapon:Rescue Hatchet",
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Rescue Hatchet",
+          "skill": "Rescue Hatchet Training",
+          "homebrew": true
+        },
+        "sharedWithCelestial": false
+      }
     }
   },
   "_stats": {

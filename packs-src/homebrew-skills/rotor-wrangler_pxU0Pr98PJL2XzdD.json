@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-204",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Rotor Wrangler",
+        "stat": "DEX",
+        "notes": "",
+        "rank5": "The vehicle gains 5 feet of Move.",
+        "rank10": "Attacks while piloting no longer have Disadvantage.",
+        "rank15": "Your craft gains another 5 feet of Move; check with Advantage for extreme stunts.",
+        "details": "You keep a temperamental rotorcraft level when the sky refuses to cooperate.\n\nPilot rotorcraft. Attacks while piloting have Disadvantage; cannot use two-handed weapons.",
+        "effects": [],
+        "checkType": "Unopposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Rotor Wrangler",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

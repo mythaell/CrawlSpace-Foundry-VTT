@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-208",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Field Dressing",
+        "stat": "INT",
+        "notes": "",
+        "rank5": "Spend five minutes to remove a Minor Injury.",
+        "rank10": "Spending 10 minutes also removes a Long-Term Minor Injury.",
+        "rank15": "Heal one additional HB slot; spending 15 minutes also removes a Major Injury.",
+        "details": "You steady a wounded companion and make the most of a brief chance to help.\n\nRestore 1 HB slot plus one per higher success tier. Once per rest per patient.",
+        "effects": [],
+        "checkType": "Unopposed",
+        "completed": false,
+        "isHealing": true,
+        "builderSeed": "background-skill:Field Dressing",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "1",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": "2"
+      }
     }
   },
   "_stats": {

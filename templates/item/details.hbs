@@ -50,6 +50,14 @@
     <label>{{localize "CRAWLSPACE.Item.BoxType"}}<input type="text" name="system.boxType" value="{{systemSource.boxType}}"></label>
         <label class="check"><input type="checkbox" name="system.sealed" {{checked systemSource.sealed}}> {{localize "CRAWLSPACE.Item.Sealed"}}</label>
     <label class="wide">{{localize "CRAWLSPACE.Item.Contents"}}<textarea name="system.contents">{{systemSource.contents}}</textarea></label>
+    <div class="wide loot-box-contents">
+      <strong>{{localize "CRAWLSPACE.Loot.Sealed"}}</strong>
+      {{#if lootSummary.length}}<ul>{{#each lootSummary}}<li>{{this}}</li>{{/each}}</ul>{{else}}<p class="hint">{{localize "CRAWLSPACE.Loot.RollsOnOpen"}}</p>{{/if}}
+      <div class="card-buttons">
+        {{#if isGM}}<button type="button" data-action="prepareLoot"><i class="fa-solid fa-dice"></i> {{localize "CRAWLSPACE.Loot.Prepare"}}</button>{{/if}}
+        {{#if item.actor}}<button type="button" data-action="openBox"><i class="fa-solid fa-box-open"></i> {{localize "CRAWLSPACE.Loot.Open"}}</button>{{/if}}
+      </div>
+    </div>
   {{/if}}
 
   {{#if (eq type "ability")}}

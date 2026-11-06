@@ -51,7 +51,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-144",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Demolition Maul Training",
+        "stat": "STR",
+        "notes": "",
+        "range": "Melee",
+        "rank5": "Add 1d10 base damage.",
+        "rank10": "Add 1d10 base damage.",
+        "rank15": "Add 1d10 base damage. Push a target of your size or smaller 15 feet.",
+        "details": "Attack against Evade. Requires two hands.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Demolition Maul Training",
+        "damageTypes": [
+          "Bludgeoning"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Demolition Maul",
+          "skill": "Demolition Maul Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d10+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d10+STR",
+        "rank10DamageFormula": "3d10+STR",
+        "rank15DamageFormula": "4d10+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-199",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Hard Stare",
+        "stat": "STR",
+        "notes": "",
+        "rank5": "Target spends remaining Actions retreating until the end of the next round.",
+        "rank10": "The target also gains Woozy.",
+        "rank15": "The target drops everything held and also gains Paralyzed.",
+        "details": "You can make your intentions clear without raising your voice.\n\nOpposed by CHA; Disadvantage after hostilities begin. Success inflicts Staggered.",
+        "effects": [],
+        "checkType": "Opposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Hard Stare",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

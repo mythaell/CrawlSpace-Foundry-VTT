@@ -40,7 +40,8 @@ type CrawlFlags = { phase: number; done: string[]; declarations: Declaration[] }
 export function combatantSide(combatant: any): 'crawler' | 'mob' {
   const forced = combatant.flags?.crawlspace?.side
   if (forced === 'crawler' || forced === 'mob') return forced
-  return combatant.actor?.type === 'crawler' ? 'crawler' : 'mob'
+  // Raised minions and companions fight for the crawlers' side.
+  return ['crawler', 'minion', 'companion'].includes(combatant.actor?.type) ? 'crawler' : 'mob'
 }
 
 /**

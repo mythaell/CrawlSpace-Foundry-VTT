@@ -51,7 +51,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-166",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Pruning Glaive Training",
+        "stat": "STR",
+        "notes": "",
+        "range": "10 feet",
+        "rank5": "Add 1d8 base damage.",
+        "rank10": "Add 1d8 base damage. Gain +1 Rank in Zone of Control.",
+        "rank15": "Add 1d8 base damage. Gain another +1 Rank in Zone of Control.",
+        "details": "Attack against Evade. Requires two hands.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Pruning Glaive Training",
+        "damageTypes": [
+          "Piercing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Pruning Glaive",
+          "skill": "Pruning Glaive Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d8+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d8+STR",
+        "rank10DamageFormula": "3d8+STR",
+        "rank15DamageFormula": "4d8+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

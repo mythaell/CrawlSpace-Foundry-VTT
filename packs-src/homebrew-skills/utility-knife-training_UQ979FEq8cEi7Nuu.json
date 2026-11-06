@@ -72,7 +72,59 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-148",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Utility Knife Training",
+        "stat": "DEX",
+        "notes": "",
+        "range": "Melee",
+        "rank5": "Add 1d4 base damage. Gains armor piercing.",
+        "rank10": "Add 1d4 base damage. May throw this weapon with this skill up to Rank × 5 feet.",
+        "rank15": "Add 1d4 base damage. Attacks against a foe’s back deal double damage.",
+        "details": "Attack against Evade. AI Favor 1.",
+        "effects": [
+          {
+            "id": "starter-piercing-5",
+            "type": "armorPiercing",
+            "slots": [],
+            "value": "1",
+            "target": "",
+            "requiredRank": "5"
+          }
+        ],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Utility Knife Training",
+        "damageTypes": [
+          "Piercing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Utility Knife",
+          "skill": "Utility Knife Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d4+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d4+STR",
+        "rank10DamageFormula": "3d4+STR",
+        "rank15DamageFormula": "4d4+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": true,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

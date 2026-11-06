@@ -60,7 +60,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-178",
-      "contentType": "spell"
+      "contentType": "spell",
+      "data": {
+        "mod": "",
+        "mana": "1",
+        "name": "Gravel Flick",
+        "stat": "INT",
+        "notes": "",
+        "range": "100 feet",
+        "rank5": "Add 2d2 base damage.",
+        "rank10": "Add 1d2 base damage. The target gains Woozy.",
+        "rank15": "Add 1d2 base damage. Also add one Rank damage die.",
+        "details": "Spell attack against Evade. AI Favor 2. Must be in your hotlist to cast in combat.",
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Gravel Flick",
+        "damageTypes": [
+          "Bludgeoning"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "spell",
+          "name": "Gravel Flick",
+          "skill": "Gravel Flick",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d2+INT",
+        "isAttackSpell": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "3d2+INT",
+        "rank10DamageFormula": "4d2+INT",
+        "rank15DamageFormula": "5d2+RANK_DIE+INT",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

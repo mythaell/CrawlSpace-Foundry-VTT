@@ -3,15 +3,37 @@
     <input class="pf-name" type="text" name="name" value="{{document.name}}">
     <div class="pf-level-badge">{{levelLabel}} <input type="number" name="system.level" value="{{systemSource.level}}" min="0" aria-label="{{localize 'CRAWLSPACE.Crawler.Level'}}"></div>
   </div>
+  {{#if minion}}
+  <div class="minion-banner">
+    <i class="fa-solid fa-skull-crossbones"></i>
+    <span>{{localize "CRAWLSPACE.Minion.Of" caster=minion.caster}}{{#if minion.condition}} · {{minion.condition}}{{/if}}</span>
+    {{#if editable}}<button type="button" data-action="endMinion">{{localize "CRAWLSPACE.Minion.End"}}</button>{{/if}}
+  </div>
+  {{/if}}
+  {{#if companion}}
+  <div class="minion-banner companion-banner">
+    <i class="fa-solid fa-{{#if companion.vehicle}}horse{{else}}paw{{/if}}"></i>
+    {{#if companion.master}}
+    <a data-action="openMaster">{{localize "CRAWLSPACE.Companion.Of" name=companion.master}}</a>
+    {{#if editable}}<button type="button" data-action="clearMaster">{{localize "CRAWLSPACE.Companion.Unlink"}}</button>{{/if}}
+    {{else}}
+    <span>{{localize "CRAWLSPACE.Companion.NoMaster"}}</span>
+    {{/if}}
+  </div>
+  {{/if}}
   {{#if tagList.length}}<div class="pf-tags">{{#each tagList}}<span class="pf-tag">{{this}}</span>{{/each}}</div>{{/if}}
   <div class="pf-actor-fields">
     <label><span>{{localize "CRAWLSPACE.Mob.Kind"}}</span><select name="system.kind">{{selectOptions kindChoices selected=systemSource.kind localize=true}}</select></label>
     {{#if (eq systemSource.kind "boss")}}
     <label><span>{{localize "CRAWLSPACE.Mob.BossTier"}}</span><select name="system.bossTier">{{selectOptions bossTierChoices selected=systemSource.bossTier}}</select></label>
     {{/if}}
-    <label><span>{{localize "CRAWLSPACE.Crawler.Floor"}}</span><input type="number" name="system.floor" value="{{systemSource.floor}}" min="0"></label>
-    <label><span>{{localize "CRAWLSPACE.Crawler.Size"}}</span><input type="text" name="system.size" value="{{systemSource.size}}"></label>
+    {{#unless companion}}<label><span>{{localize "CRAWLSPACE.Crawler.Floor"}}</span><input type="number" name="system.floor" value="{{systemSource.floor}}" min="0"></label>{{/unless}}
+    <label><span>{{localize "CRAWLSPACE.Crawler.Size"}}</span><input type="text" name="system.size" value="{{systemSource.size}}"{{#if companion}} placeholder="1–8"{{/if}}></label>
+    {{#if companion.vehicle}}
+    <label><span>{{localize "CRAWLSPACE.Companion.Occupants"}}</span><input type="text" name="system.companion.occupants" value="{{systemSource.companion.occupants}}"></label>
+    {{else}}
     <label><span>{{localize "CRAWLSPACE.Mob.Type"}}</span><input type="text" name="system.type" value="{{systemSource.type}}"></label>
+    {{/if}}
     <label class="wide"><span>{{localize "CRAWLSPACE.Mob.Tags"}}</span><input type="text" name="system.tags" value="{{systemSource.tags}}"></label>
   </div>
 </header>

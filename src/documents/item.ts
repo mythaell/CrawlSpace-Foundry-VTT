@@ -1,3 +1,4 @@
+import { openLootBoxes } from '../loot/boxes'
 import { effectDuration } from '../import/convert'
 import { itemCooldown, withCooldowns } from '../effects/cooldowns'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage, type Modifier } from '../dice/rolls'
@@ -86,6 +87,8 @@ export class CrawlItem extends Item {
       case 'consumable':
         if (this.system.consumableType === 'explosives') return attackWithRow(actor, rowForItem(this), options)
         return this.#useConsumable()
+      case 'lootBox':
+        return this.#openBox()
       default:
         return this.toMessage()
     }
@@ -185,6 +188,17 @@ export class CrawlItem extends Item {
         }),
       )
     return this.toMessage()
+  }
+
+  /** Open a sealed box now. Boxes usually open during Safe Room upkeep, so this asks first. */
+  async #openBox() {
+    if (!this.system.sealed) return this.toMessage()
+    const ok = await foundry.applications.api.DialogV2.confirm({
+      window: { title: this.name },
+      content: `<p>${game.i18n.format('CRAWLSPACE.Loot.OpenConfirm', { name: foundry.utils.escapeHTML(this.name), quantity: this.system.quantity })}</p>`,
+      rejectClose: false,
+    })
+    if (ok) return openLootBoxes(this.actor, [this])
   }
 
   /** Post the item's description as a chat card. */

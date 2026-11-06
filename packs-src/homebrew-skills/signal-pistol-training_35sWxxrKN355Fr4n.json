@@ -51,7 +51,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-156",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Signal Pistol Training",
+        "stat": "DEX",
+        "notes": "",
+        "range": "150 feet",
+        "rank5": "Add 1d8 base damage.",
+        "rank10": "Add 1d8 base damage.",
+        "rank15": "Add 1d8 base damage. The target gains Staggered.",
+        "details": "Attack against Evade. Requires ammunition. After a Major Fail or worse, spend an Action reloading.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Signal Pistol Training",
+        "damageTypes": [
+          "Piercing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Signal Pistol",
+          "skill": "Signal Pistol Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d8",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d8",
+        "rank10DamageFormula": "3d8",
+        "rank15DamageFormula": "4d8",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

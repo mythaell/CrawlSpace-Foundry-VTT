@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-194",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Junkyard Design",
+        "stat": "INT",
+        "notes": "",
+        "rank5": "Specialize in one mundane item type; gain Advantage crafting it.",
+        "rank10": "May craft your specialty with a +1 bonus-level enchantment.",
+        "rank15": "May craft your specialty with up to a +2 bonus-level enchantment, in half the time.",
+        "details": "You see workable mechanisms hiding inside piles of mismatched parts.\n\nBuild mundane devices with moving parts, fluids or chemicals from junk; excludes vehicles.",
+        "effects": [],
+        "checkType": "Unopposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Junkyard Design",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

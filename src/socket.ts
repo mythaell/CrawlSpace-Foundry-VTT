@@ -5,7 +5,7 @@ import { performUpkeep } from './apps/upkeep'
  */
 const CHANNEL = 'system.crawlspace'
 
-const ACTOR_METHODS = new Set(['applyDamage', 'applyHealing', 'restoreHealth', 'addDebuff', 'awardKillingBlow'])
+const ACTOR_METHODS = new Set(['applyDamage', 'applyHealing', 'restoreHealth', 'addDebuff', 'awardKillingBlow', 'endMinion'])
 const COMBAT_METHODS = new Set(['markDone', 'respondToDeclaration', 'recordDeclarationDamage'])
 
 type Request =
@@ -51,6 +51,12 @@ function relay(request: Request) {
     return
   }
   game.socket.emit(CHANNEL, request)
+}
+
+/** Call an actor method on the active GM's client, for work only a GM may do (ending a minion swaps tokens). */
+export function gmActorAction(actor: any, method: string, ...args: unknown[]) {
+  if (game.user.isGM) return actor[method](...args)
+  relay({ type: 'actor', uuid: actor.uuid, method, args })
 }
 
 /** Call an actor method directly when permitted, otherwise through the GM. */

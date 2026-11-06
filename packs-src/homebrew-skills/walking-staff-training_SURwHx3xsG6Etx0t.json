@@ -92,7 +92,67 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-168",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Walking Staff Training",
+        "stat": "STR",
+        "notes": "",
+        "range": "10 feet",
+        "rank5": "Add 1d6 base damage.",
+        "rank10": "Add 1d6 base damage. Gain another +1 Evade.",
+        "rank15": "Add 1d6 base damage. Gain another +1 Evade.",
+        "details": "Attack against Evade. Requires two hands.",
+        "effects": [
+          {
+            "id": "builder-upgrade-staff-evade-10",
+            "type": "evadeModifier",
+            "slots": [],
+            "value": "1",
+            "target": "",
+            "requiredRank": "10"
+          },
+          {
+            "id": "builder-upgrade-staff-evade-15",
+            "type": "evadeModifier",
+            "slots": [],
+            "value": "1",
+            "target": "",
+            "requiredRank": "15"
+          }
+        ],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Walking Staff Training",
+        "damageTypes": [
+          "Bludgeoning"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Walking Staff",
+          "skill": "Walking Staff Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d6+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d6+STR",
+        "rank10DamageFormula": "3d6+STR",
+        "rank15DamageFormula": "4d6+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": true,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

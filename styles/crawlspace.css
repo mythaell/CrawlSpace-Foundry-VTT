@@ -2509,12 +2509,9 @@
 
 @layer system {
   .application.crawlspace .upkeep-participant { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
-  .application.crawlspace.grinding-dialog .form-group,
-  .application.crawlspace.awards-dialog .form-group { display: flex; gap: 12px; align-items: center; margin: 8px 0; }
-  .application.crawlspace.grinding-dialog .form-group label,
-  .application.crawlspace.awards-dialog .form-group label { flex: 1; }
+  .application.crawlspace.grinding-dialog .form-group { display: flex; gap: 12px; align-items: center; margin: 8px 0; }
+  .application.crawlspace.grinding-dialog .form-group label { flex: 1; }
   .application.crawlspace.grinding-dialog input[type=number] { width: 80px; flex: 0 0 80px; }
-  .application.crawlspace.awards-dialog textarea { min-height: 70px; }
 }
 
 @layer system {
@@ -2523,13 +2520,86 @@
 }
 
 @layer system {
-  .application.crawlspace.awards-dialog .dialog-content,
   .application.crawlspace.grinding-dialog .dialog-content,
   .application.crawlspace.upkeep-dialog .dialog-content { gap: 6px; }
-  .application.crawlspace.awards-dialog .form-group,
   .application.crawlspace.grinding-dialog .form-group { margin: 2px 0; }
   .application.crawlspace .upkeep-participant { flex-direction: row; }
   .application.crawlspace .upkeep-participant input { flex: 0 0 auto; width: 16px; }
   .application.crawlspace.grinding-dialog { max-height: 85vh; }
   .application.crawlspace.grinding-dialog .window-content { overflow-y: auto; }
+}
+
+/* ---- Crawler Awards and the loot box generator ---- */
+@layer system {
+  .application.crawlspace.crawler-awards { max-height: 90vh; }
+  .application.crawlspace.crawler-awards .window-content { padding: 0; overflow: hidden; }
+  .crawlspace.crawler-awards .awards-layout { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+  .crawlspace.crawler-awards .awards-body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 8px; padding: 10px; overflow-y: auto; }
+  .crawlspace.crawler-awards fieldset { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 8px 10px; border: 1px solid var(--crawl-border); }
+  .crawlspace.crawler-awards legend { padding: 0 4px; font-weight: 700; }
+  .crawlspace.crawler-awards .award-toggle { display: inline-flex; align-items: center; gap: 6px; }
+  .crawlspace.crawler-awards .award-toggle input { flex: none; width: 16px; margin: 0; }
+  .crawlspace.crawler-awards .award-numbers { display: grid; grid-template-columns: 1fr 1fr; }
+  .crawlspace.crawler-awards .award-numbers label { display: flex; flex-direction: column; gap: 2px; }
+  .crawlspace.crawler-awards .award-numbers .hint { grid-column: 1 / -1; }
+  .crawlspace.crawler-awards .form-group.stacked { flex-direction: column; align-items: stretch; }
+  .crawlspace.crawler-awards .award-source { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  .crawlspace.crawler-awards .award-source label { display: inline-flex; align-items: center; gap: 4px; }
+  .crawlspace.crawler-awards .award-source input { flex: none; width: 14px; margin: 0; }
+  .crawlspace.crawler-awards .hint { margin: 0; font-size: 11px; color: var(--crawl-muted); }
+  .crawlspace.crawler-awards .loot-tiers { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 3px; }
+  .crawlspace.crawler-awards .loot-tier { min-width: 0; padding: 0 2px; font-size: 11px; }
+  .crawlspace.crawler-awards .loot-tier.tier-bronze { --tier: #b06a32; }
+  .crawlspace.crawler-awards .loot-tier.tier-silver { --tier: #b9c2cc; }
+  .crawlspace.crawler-awards .loot-tier.tier-gold { --tier: #e2b33a; }
+  .crawlspace.crawler-awards .loot-tier.tier-platinum { --tier: #8fe0e6; }
+  .crawlspace.crawler-awards .loot-tier.tier-legendary { --tier: #c27cf0; }
+  .crawlspace.crawler-awards .loot-tier.tier-celestial { --tier: #fff2a8; }
+  .crawlspace.crawler-awards .loot-tier { border-bottom: 3px solid var(--tier); }
+  .crawlspace.crawler-awards .loot-tier.active { color: #08233a; background: var(--tier); text-shadow: none; }
+  .crawlspace.crawler-awards .loot-tier-summary { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; margin: 0; font-size: 12px; }
+  .crawlspace.crawler-awards .loot-tier-summary dt { font-weight: 700; }
+  .crawlspace.crawler-awards .loot-tier-summary dd { margin: 0; }
+  .crawlspace.crawler-awards .loot-quantity-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px; margin-top: 4px; }
+  .crawlspace.crawler-awards .loot-quantity-row label { display: flex; flex-direction: column; gap: 2px; width: 90px; }
+  .crawlspace.crawler-awards .loot-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 4px; }
+  .crawlspace.crawler-awards .loot-actions button { flex-direction: column; height: auto; padding: 4px; line-height: 1.3; }
+  .crawlspace.crawler-awards .loot-actions small { font-size: 10px; opacity: 0.8; }
+  .crawlspace.crawler-awards .loot-preview { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border: 1px solid var(--hud-cyan); }
+  .crawlspace.crawler-awards .loot-preview header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .crawlspace.crawler-awards .loot-preview h3 { margin: 0; border: 0; font-size: 15px; }
+  .crawlspace.crawler-awards .loot-preview header button { flex: none; width: auto; }
+  .crawlspace.crawler-awards .loot-entries { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .crawlspace.crawler-awards .loot-entry { padding: 4px 6px; border: 1px solid var(--crawl-border); }
+  .crawlspace.crawler-awards .loot-entry-head { display: flex; align-items: center; gap: 4px; }
+  .crawlspace.crawler-awards .loot-entry-name { display: flex; flex: 1; align-items: center; gap: 6px; min-width: 0; font-weight: 700; }
+  .crawlspace.crawler-awards .loot-entry-name input { flex: none; width: 16px; margin: 0; }
+  .crawlspace.crawler-awards button.icon { flex: none; width: 26px; height: 26px; min-height: 26px; padding: 0; }
+  .crawlspace.crawler-awards .loot-tags { display: flex; flex-wrap: wrap; gap: 3px; margin: 3px 0 0; }
+  .crawlspace.crawler-awards .loot-entry-details { margin: 4px 0 0; font-size: 12px; white-space: pre-wrap; }
+  .crawlspace.crawler-awards .loot-gold { display: flex; align-items: center; gap: 6px; }
+  .crawlspace.crawler-awards .loot-gold input[type='checkbox'] { flex: none; width: 16px; margin: 0; }
+  .crawlspace.crawler-awards .loot-gold input[type='number'] { width: 110px; }
+  .crawlspace.crawler-awards .award-error { margin: 0; color: var(--crawl-bad); font-weight: 700; }
+  .crawlspace.crawler-awards .form-footer { padding: 8px 10px; border-top: 1px solid var(--crawl-border); }
+  .crawlspace .loot-box-contents ul { margin: 4px 0; padding-left: 18px; }
+  .crawl-card .system-ai { font-style: italic; }
+}
+
+/* ---- Minions ---- */
+@layer system {
+  .crawlspace .minion-banner { display: flex; align-items: center; gap: 8px; margin: 4px 0; padding: 4px 8px; border: 1px solid var(--hud-cyan); background: var(--crawl-accent-soft, rgb(140 255 246 / 18%)); font-weight: 700; }
+  .crawlspace .minion-banner span { flex: 1; }
+  .crawlspace .minion-banner button { flex: none; width: auto; height: 26px; min-height: 26px; padding: 0 10px; }
+}
+
+@layer system {
+  .crawlspace.crawler .sidebar-companions { display: flex; flex-direction: column; gap: 4px; }
+  .crawlspace.crawler .sidebar-companions .response-section-header button { flex: 0 0 auto; width: auto; padding: 0 6px; }
+  .crawlspace.crawler .companion-row { display: flex; align-items: center; gap: 6px; }
+  .crawlspace.crawler .companion-row img { width: 28px; height: 28px; border: none; border-radius: 4px; object-fit: cover; }
+  .crawlspace.crawler .companion-row a { flex: 1; display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+  .crawlspace.crawler .companion-row small { opacity: 0.75; }
+  .crawlspace.crawler .companion-row button.icon { flex: 0 0 auto; width: 24px; height: 24px; padding: 0; }
+  .crawlspace .companion-banner a { flex: 1; cursor: pointer; }
 }

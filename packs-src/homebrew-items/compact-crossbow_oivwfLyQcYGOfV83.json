@@ -33,7 +33,86 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-155",
-      "contentType": "weapon"
+      "contentType": "weapon",
+      "data": {
+        "name": "Compact Crossbow",
+        "notes": "",
+        "equipped": false,
+        "expanded": false,
+        "quantity": "1",
+        "properties": {
+          "tattoo": {
+            "location": ""
+          },
+          "weapon": {
+            "type": "ranged",
+            "twoHanded": true
+          },
+          "armorDr": "",
+          "details": "A practical weapon designed for ranged use. Requires two hands.",
+          "effects": [],
+          "itemType": "weapon",
+          "equipment": {
+            "slot": "Hands"
+          },
+          "isHealing": false,
+          "consumable": {
+            "type": ""
+          },
+          "healingUnit": "slots",
+          "manaBonuses": [
+            {
+              "value": ""
+            }
+          ],
+          "moveBonuses": [
+            {
+              "value": ""
+            }
+          ],
+          "statBonuses": [
+            {
+              "stat": "",
+              "value": ""
+            }
+          ],
+          "stepBonuses": [
+            {
+              "value": ""
+            }
+          ],
+          "skillBonuses": [
+            {
+              "skill": "",
+              "value": ""
+            }
+          ],
+          "spellBonuses": [
+            {
+              "spell": "",
+              "value": ""
+            }
+          ],
+          "healthBonuses": [
+            {
+              "slots": [],
+              "value": ""
+            }
+          ],
+          "healingFormula": "",
+          "rank5HealingFormula": "",
+          "rank10HealingFormula": "",
+          "rank15HealingFormula": ""
+        },
+        "builderSeed": "weapon:Compact Crossbow",
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Compact Crossbow",
+          "skill": "Compact Crossbow Training",
+          "homebrew": true
+        },
+        "sharedWithCelestial": false
+      }
     }
   },
   "_stats": {

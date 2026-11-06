@@ -51,7 +51,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-152",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Field Bow Training",
+        "stat": "DEX",
+        "notes": "",
+        "range": "100 feet",
+        "rank5": "Add 1d6 base damage.",
+        "rank10": "Add 1d6 base damage. Also add one Rank damage die.",
+        "rank15": "Add 1d6 base damage. The target gains Blood Trail.",
+        "details": "Attack against Evade. Requires two hands and ammunition.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Field Bow Training",
+        "damageTypes": [
+          "Piercing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Field Bow",
+          "skill": "Field Bow Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d6+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d6+STR",
+        "rank10DamageFormula": "3d6+RANK_DIE+STR",
+        "rank15DamageFormula": "4d6+RANK_DIE+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

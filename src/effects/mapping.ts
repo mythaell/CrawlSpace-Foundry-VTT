@@ -131,6 +131,9 @@ export function effectPropertyToChanges(effect: CrawlEffectProperty): ChangeData
             ...(effect.interval ? { interval: String(effect.interval) } : {}),
             ...(effect.fastInterval ? { fastInterval: String(effect.fastInterval) } : {}),
             ...(effect.fastStat ? { fastStat: String(effect.fastStat) } : {}),
+            // Light: target is bright feet, value is the orb's range, dimFeet the dim radius (effectValues.ts conditionAtRank).
+            ...(effect.dimFeet ? { dimFeet: String(effect.dimFeet) } : {}),
+            ...(effect.doubled ? { doubled: true } : {}),
           }),
         ),
       ]

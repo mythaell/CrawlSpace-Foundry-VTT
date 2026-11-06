@@ -1,4 +1,6 @@
 import { CHECK_TYPES, DAMAGE_TYPES, GEAR_SLOTS, STATS } from '../config'
+import { prepareLootBox } from '../apps/awards'
+import { boxSummary } from '../loot/database'
 import { bindRulesEditor, rulesContext, ruleTypeChoices } from '../effects/rules'
 import { documentIds } from './ids'
 
@@ -27,6 +29,8 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       addBenefit: CrawlItemSheet.#onAddBenefit,
       deleteBenefit: CrawlItemSheet.#onDeleteBenefit,
       copyId: CrawlItemSheet.#onCopyId,
+      prepareLoot: CrawlItemSheet.#onPrepareLoot,
+      openBox: CrawlItemSheet.#onOpenBox,
     },
   }
 
@@ -59,6 +63,8 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     Object.assign(context, {
       item,
       system,
+      isGM: game.user.isGM,
+      lootSummary: item.type === 'lootBox' && system.loot ? boxSummary(system.loot) : [],
       systemSource: item._source.system,
       systemFields: system.schema.fields,
       type: item.type,
@@ -250,5 +256,13 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
   static async #onCopyId(this: CrawlItemSheet, _event: PointerEvent, target: HTMLElement) {
     game.clipboard.copyPlainText(target.dataset.value ?? '')
     ui.notifications.info(game.i18n.format('CRAWLSPACE.Ids.Copied', { value: target.dataset.value }))
+  }
+
+  static #onPrepareLoot(this: CrawlItemSheet) {
+    return prepareLootBox(this.item)
+  }
+
+  static #onOpenBox(this: CrawlItemSheet) {
+    return this.item.use()
   }
 }

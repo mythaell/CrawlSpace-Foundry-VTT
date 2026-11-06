@@ -16,12 +16,20 @@
     "tier": "Bronze",
     "boxType": "",
     "contents": "Randomly",
-    "sealed": true
+    "sealed": true,
+    "loot": null
   },
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-40",
-      "contentType": "loot_box"
+      "contentType": "loot_box",
+      "data": {
+        "loot": "Randomly",
+        "tier": "Bronze",
+        "expanded": true,
+        "generate": false,
+        "description": ""
+      }
     }
   },
   "_stats": {

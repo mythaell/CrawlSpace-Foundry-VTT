@@ -58,7 +58,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-36",
-      "contentType": "spell"
+      "contentType": "spell",
+      "data": {
+        "mod": "",
+        "mana": "2",
+        "name": "test spell",
+        "stat": "INT",
+        "notes": "test",
+        "range": "100",
+        "rank5": "5",
+        "rank10": "10",
+        "rank15": "15",
+        "details": "",
+        "checkType": "opposed",
+        "completed": false,
+        "isHealing": false,
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSpell": false,
+        "healingFormula": "",
+        "unenhancedRank": "0",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

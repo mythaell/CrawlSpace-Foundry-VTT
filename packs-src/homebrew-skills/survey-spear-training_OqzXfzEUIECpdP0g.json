@@ -72,7 +72,59 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-160",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Survey Spear Training",
+        "stat": "DEX",
+        "notes": "",
+        "range": "40 feet",
+        "rank5": "Add 1d8 base damage.",
+        "rank10": "Add 1d8 base damage. This attack ignores DR (armor piercing).",
+        "rank15": "Add 1d8 base damage. Increase range by your STR score in feet.",
+        "details": "Attack against Evade.",
+        "effects": [
+          {
+            "id": "builder-upgrade-spear-piercing-10",
+            "type": "armorPiercing",
+            "slots": [],
+            "value": "1",
+            "target": "",
+            "requiredRank": "10"
+          }
+        ],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Survey Spear Training",
+        "damageTypes": [
+          "Piercing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Survey Spear",
+          "skill": "Survey Spear Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d8+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d8+STR",
+        "rank10DamageFormula": "3d8+STR",
+        "rank15DamageFormula": "4d8+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

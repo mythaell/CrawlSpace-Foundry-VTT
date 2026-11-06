@@ -51,7 +51,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-164",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Pocket Catapult Training",
+        "stat": "DEX",
+        "notes": "",
+        "range": "30 feet",
+        "rank5": "Add 1d2 base damage. Range increases by your STR score in feet.",
+        "rank10": "Add 1d2 base damage. Also add one Rank damage die.",
+        "rank15": "Add 1d2 base damage. Also add another Rank damage die.",
+        "details": "Attack against Evade. Requires two hands. AI Favor 2.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Pocket Catapult Training",
+        "damageTypes": [
+          "Bludgeoning"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Pocket Catapult",
+          "skill": "Pocket Catapult Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d2+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d2+STR",
+        "rank10DamageFormula": "3d2+RANK_DIE+STR",
+        "rank15DamageFormula": "4d2+2*RANK_DIE+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

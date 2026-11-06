@@ -145,6 +145,30 @@ export const RULE_TYPES: RuleType[] = [
       make('inherentSpell', CUSTOM_CHANGE_TYPES.special, JSON.stringify({ target: String(v.target ?? '').trim(), value: String(num(v.value) || 1), cooldown: String(v.cooldown ?? '') })),
   },
   {
+    id: 'lightOrb',
+    label: 'CRAWLSPACE.Rules.Type.lightOrb',
+    fields: [
+      { name: 'bright', label: 'CRAWLSPACE.Rules.Field.brightFeet', kind: 'number' },
+      { name: 'dim', label: 'CRAWLSPACE.Rules.Field.dimFeet', kind: 'number' },
+      { name: 'range', label: 'CRAWLSPACE.Rules.Field.rangeFeet', kind: 'number' },
+    ],
+    match: (c) => c.type === CUSTOM_CHANGE_TYPES.special && c.key === 'lightOrb',
+    read: (c) => {
+      const data = json(c.value)
+      return { bright: num(data.target), dim: num(data.dimFeet), range: num(data.value) }
+    },
+    write: (v) =>
+      make('lightOrb', CUSTOM_CHANGE_TYPES.special, JSON.stringify({ target: String(num(v.bright)), value: String(num(v.range)), dimFeet: String(Math.max(num(v.dim), num(v.bright))) })),
+  },
+  {
+    id: 'raiseMinion',
+    label: 'CRAWLSPACE.Rules.Type.raiseMinion',
+    fields: [],
+    match: (c) => c.type === CUSTOM_CHANGE_TYPES.special && c.key === 'raiseMinion',
+    read: () => ({}),
+    write: () => make('raiseMinion', CUSTOM_CHANGE_TYPES.special, JSON.stringify({ target: '', value: '' })),
+  },
+  {
     id: 'special',
     label: 'CRAWLSPACE.Rules.Type.special',
     fields: [

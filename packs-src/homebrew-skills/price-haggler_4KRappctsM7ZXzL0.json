@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-205",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Price Haggler",
+        "stat": "CHA",
+        "notes": "",
+        "rank5": "The party also receives the negotiated price.",
+        "rank10": "Improve the negotiated price by another 10% in your favor (20% total).",
+        "rank15": "Improve the negotiated price by another 15% in your favor (35% total).",
+        "details": "You know when to press a deal and when to let a merchant do the talking.\n\nOpposed by INT. Negotiate five minutes for a 10% price change; Disadvantage with non-merchants. Cannot bypass minimum prices or bargain with your own party.",
+        "effects": [],
+        "checkType": "Opposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Price Haggler",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

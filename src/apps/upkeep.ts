@@ -3,6 +3,7 @@ import { rankCap } from '../effects/rank-cap'
 import { upkeepAction } from '../socket'
 import { openGrinding } from './grinding'
 import { openAwards } from './awards'
+import { openLootBoxes } from '../loot/boxes'
 import { advanceTime, expireActorEvent } from '../time'
 import { restSeconds } from '../rules/time'
 import { openTime } from './time'
@@ -93,6 +94,7 @@ export async function advanceMarked(actor: any, kind: AdvancementKind) {
     lines.push(game.i18n.format('CRAWLSPACE.Upkeep.FloorAdvanced', { floor: floor + 1 }))
   }
   if (kind === 'safeRoom') await actor.update({ 'system.upkeep.lastSafeRoomLevel': actor.system.details.level })
+  if (kind === 'safeRoom' && actor.items.some((item: any) => item.type === 'lootBox' && item.system.sealed)) await openLootBoxes(actor)
   await report(actor, game.i18n.localize(`CRAWLSPACE.Upkeep.${kind}`), lines.length ? lines : [game.i18n.localize('CRAWLSPACE.Upkeep.NothingMarked')])
 }
 

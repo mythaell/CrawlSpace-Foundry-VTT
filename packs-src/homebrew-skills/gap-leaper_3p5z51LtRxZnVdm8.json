@@ -70,7 +70,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-192",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Gap Leaper",
+        "stat": "STR",
+        "notes": "",
+        "rank5": "Add DEX modifier to vertical height.",
+        "rank10": "Gain +1 Evade.",
+        "rank15": "Horizontal leap distance becomes Rank + (STR × 2) feet.",
+        "details": "You size up a gap, plant your feet, and commit to the landing.\n\nWith a 10-foot running start, jump Rank + STR modifier feet horizontally or 1 foot vertically.",
+        "effects": [
+          {
+            "id": "builder-upgrade-leap-evade-10",
+            "type": "evadeModifier",
+            "slots": [],
+            "value": "1",
+            "target": "",
+            "requiredRank": "10"
+          }
+        ],
+        "checkType": "Unopposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Gap Leaper",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

@@ -17,6 +17,8 @@
     "Actor": {
       "crawler": { "htmlFields": ["biography", "notes"] },
       "mob": { "htmlFields": ["description", "notes"] },
+      "minion": { "htmlFields": ["description", "notes"] },
+      "companion": { "htmlFields": ["description", "notes", "companion.accessories"] },
       "npc": { "htmlFields": ["description", "notes"] }
     },
     "Item": {

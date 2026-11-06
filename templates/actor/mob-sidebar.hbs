@@ -17,9 +17,9 @@
 
   <div class="pf-side-fields">
     <label><span>{{localize "CRAWLSPACE.Stat.ArmorBase"}}</span><input type="number" name="system.dr.armor" value="{{systemSource.dr.armor}}"></label>
-    <label><span>{{localize "CRAWLSPACE.Mob.PublishedEvade"}}</span><input type="text" name="system.evade.published" value="{{systemSource.evade.published}}" placeholder="10+DEX+F"></label>
+    <label><span>{{#if isCompanion}}{{localize "CRAWLSPACE.Stat.Evade"}}{{else}}{{localize "CRAWLSPACE.Mob.PublishedEvade"}}{{/if}}</span><input type="text" name="system.evade.published" value="{{systemSource.evade.published}}" placeholder="{{#if isCompanion}}0{{else}}10+DEX+F{{/if}}"></label>
     <label><span>{{localize "CRAWLSPACE.Stat.Move"}}</span><input type="number" name="system.move.value" value="{{systemSource.move.value}}"></label>
-    <label><span>{{localize "CRAWLSPACE.Mob.Surprise"}}{{#if system.surpriseTotal}} ({{system.surpriseTotal}}){{/if}}</span><input type="text" name="system.surprise" value="{{systemSource.surprise}}"></label>
+    {{#unless isCompanion}}<label><span>{{localize "CRAWLSPACE.Mob.Surprise"}}{{#if system.surpriseTotal}} ({{system.surpriseTotal}}){{/if}}</span><input type="text" name="system.surprise" value="{{systemSource.surprise}}"></label>{{/unless}}
     <label><span>{{localize "CRAWLSPACE.Mob.HealthSlots"}}</span><input type="number" name="system.healthSlotsOverride" value="{{crawlNumberOrBlank systemSource.healthSlotsOverride}}" placeholder="{{system.health.max}}"></label>
     <label><span>{{localize "CRAWLSPACE.Mob.HealthPerSlot"}}</span><input type="number" name="system.healthPerSlotOverride" value="{{crawlNumberOrBlank systemSource.healthPerSlotOverride}}" placeholder="{{system.health.perSlot}}"></label>
   </div>

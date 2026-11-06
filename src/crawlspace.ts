@@ -5,7 +5,10 @@ import { registerImmunity } from './effects/immunity'
 import { openTime, registerClock } from './apps/time'
 import { advanceTime, settleTime, registerTime } from './time'
 import * as config from './config'
-import { CrawlerData, MobData, NpcData } from './data/actors'
+import { CompanionData, CrawlerData, MinionData, MobData, NpcData } from './data/actors'
+import { registerMinions } from './actors/minions'
+import { registerLight } from './actors/light'
+import { registerCompanions } from './actors/companions'
 import * as items from './data/items'
 import { createEffectDataModel } from './data/effect'
 import { CHANGE_TYPE_HANDLERS } from './effects/change-types'
@@ -82,7 +85,7 @@ Hooks.once('init', () => {
   CONFIG.Actor.documentClass = CrawlActor
   CONFIG.Item.documentClass = CrawlItem
   CONFIG.Combat.documentClass = CrawlCombat
-  Object.assign(CONFIG.Actor.dataModels, { crawler: CrawlerData, mob: MobData, npc: NpcData })
+  Object.assign(CONFIG.Actor.dataModels, { crawler: CrawlerData, mob: MobData, minion: MinionData, companion: CompanionData, npc: NpcData })
   Object.assign(CONFIG.Item.dataModels, {
     skill: items.SkillData,
     spell: items.SpellData,
@@ -102,6 +105,8 @@ Hooks.once('init', () => {
   Object.assign(CONFIG.Actor.trackableAttributes, {
     crawler: { bar: ['healthBar', 'mana'], value: ['evade.total', 'dr.total'] },
     mob: { bar: ['healthBar'], value: ['evade.total', 'dr.total'] },
+    minion: { bar: ['healthBar'], value: ['evade.total', 'dr.total'] },
+    companion: { bar: ['healthBar'], value: ['evade.total', 'dr.total'] },
   })
 
   // ActiveEffects: CrawlSpace condition fields on every effect, plus the crawlspace.* change types.
@@ -134,7 +139,7 @@ Hooks.once('init', () => {
   CONFIG.ui.combat = createCombatTracker()
   const sheets = foundry.applications.apps.DocumentSheetConfig
   sheets.registerSheet(Actor, 'crawlspace', CrawlerSheet, { types: ['crawler'], makeDefault: true, label: 'CRAWLSPACE.Sheet.Crawler' })
-  sheets.registerSheet(Actor, 'crawlspace', MobSheet, { types: ['mob'], makeDefault: true, label: 'CRAWLSPACE.Sheet.Mob' })
+  sheets.registerSheet(Actor, 'crawlspace', MobSheet, { types: ['mob', 'minion', 'companion'], makeDefault: true, label: 'CRAWLSPACE.Sheet.Mob' })
   sheets.registerSheet(Actor, 'crawlspace', NpcSheet, { types: ['npc'], makeDefault: true, label: 'CRAWLSPACE.Sheet.Npc' })
   sheets.registerSheet(Item, 'crawlspace', CrawlItemSheet, { makeDefault: true, label: 'CRAWLSPACE.Sheet.Item' })
   sheets.registerSheet(ActiveEffect, 'crawlspace', CrawlEffectSheet, { makeDefault: true, label: 'CRAWLSPACE.Sheet.Effect' })
@@ -152,6 +157,9 @@ Hooks.once('init', () => {
 
   registerHandlebarsHelpers()
   foundry.applications.handlebars.loadTemplates(TEMPLATES)
+  registerMinions()
+  registerLight()
+  registerCompanions()
   registerChatHandlers()
   CONFIG.Dice.rolls.unshift(CrawlRoll)
   registerClock()

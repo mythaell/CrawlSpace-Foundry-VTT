@@ -51,7 +51,55 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-219",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Scattergun Drill",
+        "stat": "DEX",
+        "notes": "",
+        "range": "30 feet",
+        "rank5": "Add 1d10 base damage.",
+        "rank10": "Add 1d10 base damage.",
+        "rank15": "Add 1d10 base damage. Add a 5-foot Splash.",
+        "details": "You handle a close-range firearm with a firm stance and deliberate follow-through.\n\nAttack against Evade. Requires two hands and ammunition. After a Major Fail or worse, spend an Action reloading.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Scattergun Drill",
+        "damageTypes": [
+          "Piercing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": true,
+        "damageFormula": "1d10",
+        "isAttackSkill": true,
+        "healingFormula": "",
+        "rank15Template": {
+          "areas": [
+            {
+              "type": "circle",
+              "angle": 60,
+              "label": "Splash",
+              "width": 5,
+              "distance": 5
+            }
+          ]
+        },
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d10",
+        "rank10DamageFormula": "3d10",
+        "rank15DamageFormula": "4d10",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

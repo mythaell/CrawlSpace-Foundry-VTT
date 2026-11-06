@@ -33,7 +33,86 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-167",
-      "contentType": "weapon"
+      "contentType": "weapon",
+      "data": {
+        "name": "Pruning Glaive",
+        "notes": "",
+        "equipped": false,
+        "expanded": false,
+        "quantity": "1",
+        "properties": {
+          "tattoo": {
+            "location": ""
+          },
+          "weapon": {
+            "type": "melee",
+            "twoHanded": true
+          },
+          "armorDr": "",
+          "details": "A practical weapon built for close quarters. Requires two hands.",
+          "effects": [],
+          "itemType": "weapon",
+          "equipment": {
+            "slot": "Hands"
+          },
+          "isHealing": false,
+          "consumable": {
+            "type": ""
+          },
+          "healingUnit": "slots",
+          "manaBonuses": [
+            {
+              "value": ""
+            }
+          ],
+          "moveBonuses": [
+            {
+              "value": ""
+            }
+          ],
+          "statBonuses": [
+            {
+              "stat": "",
+              "value": ""
+            }
+          ],
+          "stepBonuses": [
+            {
+              "value": ""
+            }
+          ],
+          "skillBonuses": [
+            {
+              "skill": "",
+              "value": ""
+            }
+          ],
+          "spellBonuses": [
+            {
+              "spell": "",
+              "value": ""
+            }
+          ],
+          "healthBonuses": [
+            {
+              "slots": [],
+              "value": ""
+            }
+          ],
+          "healingFormula": "",
+          "rank5HealingFormula": "",
+          "rank10HealingFormula": "",
+          "rank15HealingFormula": ""
+        },
+        "builderSeed": "weapon:Pruning Glaive",
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Pruning Glaive",
+          "skill": "Pruning Glaive Training",
+          "homebrew": true
+        },
+        "sharedWithCelestial": false
+      }
     }
   },
   "_stats": {

@@ -51,7 +51,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-142",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Wrench Bundle Training",
+        "stat": "STR",
+        "notes": "",
+        "range": "Melee",
+        "rank5": "Add 1d4 base damage. May also throw it Rank × 5 feet.",
+        "rank10": "Add 1d4 base damage. Make your first attack of each combat with Advantage.",
+        "rank15": "Add 1d4 base damage.",
+        "details": "Attack against Evade. Use an object weighing 1 lb to your STR in pounds. AI Favor 1.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Wrench Bundle Training",
+        "damageTypes": [
+          "Bludgeoning"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Wrench Bundle",
+          "skill": "Wrench Bundle Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d4+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d4+STR",
+        "rank10DamageFormula": "3d4+STR",
+        "rank15DamageFormula": "4d4+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": true,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

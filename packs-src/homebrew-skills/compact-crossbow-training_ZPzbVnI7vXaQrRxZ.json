@@ -51,7 +51,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-154",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Compact Crossbow Training",
+        "stat": "DEX",
+        "notes": "",
+        "range": "50 feet",
+        "rank5": "Add 1d8 base damage.",
+        "rank10": "Add 1d8 base damage. The target gains Blood Trail.",
+        "rank15": "Add 1d8 base damage. Range becomes 100 feet.",
+        "details": "Attack against Evade. Requires two hands and ammunition; attack once per round.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Compact Crossbow Training",
+        "damageTypes": [
+          "Piercing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Compact Crossbow",
+          "skill": "Compact Crossbow Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d8",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d8",
+        "rank10DamageFormula": "3d8",
+        "rank15DamageFormula": "4d8",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

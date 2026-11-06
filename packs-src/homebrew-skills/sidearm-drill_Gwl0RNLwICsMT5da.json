@@ -51,7 +51,44 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-212",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Sidearm Drill",
+        "stat": "DEX",
+        "notes": "",
+        "range": "150 feet",
+        "rank5": "Add 1d8 base damage.",
+        "rank10": "Add 1d8 base damage.",
+        "rank15": "Add 1d8 base damage. The target gains Staggered.",
+        "details": "You bring a compact firearm onto target with practiced, economical movement.\n\nAttack against Evade. Requires ammunition. After a Major Fail or worse, spend an Action reloading.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Sidearm Drill",
+        "damageTypes": [
+          "Piercing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": true,
+        "damageFormula": "1d8",
+        "isAttackSkill": true,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d8",
+        "rank10DamageFormula": "3d8",
+        "rank15DamageFormula": "4d8",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

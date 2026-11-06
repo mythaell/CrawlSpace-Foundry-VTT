@@ -72,7 +72,53 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-209",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Close Blade",
+        "stat": "DEX",
+        "notes": "",
+        "range": "Melee",
+        "rank5": "Add 1d4 base damage. Gains armor piercing.",
+        "rank10": "Add 1d4 base damage. May throw this weapon with this skill up to Rank × 5 feet.",
+        "rank15": "Add 1d4 base damage. Attacks against a foe’s back deal double damage.",
+        "details": "You keep a short blade moving through the smallest opening in a defense.\n\nAttack against Evade. AI Favor 1.",
+        "effects": [
+          {
+            "id": "starter-piercing-5",
+            "type": "armorPiercing",
+            "slots": [],
+            "value": "1",
+            "target": "",
+            "requiredRank": "5"
+          }
+        ],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Close Blade",
+        "damageTypes": [
+          "Piercing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": true,
+        "damageFormula": "1d4+STR",
+        "isAttackSkill": true,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d4+STR",
+        "rank10DamageFormula": "3d4+STR",
+        "rank15DamageFormula": "4d4+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

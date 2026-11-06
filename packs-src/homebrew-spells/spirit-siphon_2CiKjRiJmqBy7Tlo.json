@@ -60,7 +60,50 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-182",
-      "contentType": "spell"
+      "contentType": "spell",
+      "data": {
+        "mod": "",
+        "mana": "4",
+        "name": "Spirit Siphon",
+        "stat": "INT",
+        "notes": "",
+        "range": "50 feet",
+        "rank5": "Add 1d4 base damage. A killing blow against a foe of at least half your level grants +1 damage until a long rest, stacking up to your spell Rank.",
+        "rank10": "Add 1d4 base damage. The accumulated killing-blow damage bonus lasts one week.",
+        "rank15": "Add 1d4 base damage. The accumulated killing-blow damage bonus lasts until you leave the current floor.",
+        "details": "Spell attack against Evade. AI Favor 1. Must be in your hotlist to cast in combat.",
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Spirit Siphon",
+        "damageTypes": [
+          "Necrotic"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "spell",
+          "name": "Spirit Siphon",
+          "skill": "Spirit Siphon",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d4+INT",
+        "isAttackSpell": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d4+INT",
+        "rank10DamageFormula": "3d4+INT",
+        "rank15DamageFormula": "4d4+INT",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

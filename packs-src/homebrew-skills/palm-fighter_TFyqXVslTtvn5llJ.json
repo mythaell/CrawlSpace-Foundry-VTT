@@ -51,7 +51,51 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-170",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Palm Fighter",
+        "stat": "DEX",
+        "notes": "",
+        "range": "Melee",
+        "rank5": "Add 2d2 base damage.",
+        "rank10": "Add 1d2 base damage.",
+        "rank15": "Add 1d2 base damage. May make an additional free attack with Disadvantage.",
+        "details": "Attack against Evade. May use Hammer Palm. AI Favor 2 when attacking without a damage-effect skill.",
+        "effects": [],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Palm Fighter",
+        "damageTypes": [
+          "Bludgeoning"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "unarmed",
+          "name": "Palm Fighter",
+          "skill": "Palm Fighter",
+          "effect": "Hammer Palm",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d2+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "3d2+STR",
+        "rank10DamageFormula": "4d2+STR",
+        "rank15DamageFormula": "5d2+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

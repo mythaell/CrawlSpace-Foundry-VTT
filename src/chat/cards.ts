@@ -1,3 +1,4 @@
+import { undoAward } from '../apps/awards'
 import { rollDamage } from '../dice/rolls'
 import { actorAction, combatAction } from '../socket'
 import { debuffByName } from '../rules/debuffs'
@@ -74,6 +75,8 @@ async function onAction(message: any, button: HTMLElement) {
       if (message.isOwner || game.user.isGM) await message.update({ 'flags.crawlspace.undone': true })
       return
     }
+    case 'undo-award':
+      return undoAward(message)
     case 'apply-debuff': {
       const debuff = debuffByName(button.dataset.debuff ?? '')
       if (!debuff) return
@@ -137,7 +140,7 @@ async function renderFooter(message: any) {
 
 export function registerChatHandlers() {
   Hooks.on('renderChatMessageHTML', (message: any, html: HTMLElement) => {
-    if (message.flags?.crawlspace?.undone) html.querySelector('[data-crawl-action="undo"]')?.setAttribute('disabled', '')
+    if (message.flags?.crawlspace?.undone) html.querySelector('[data-crawl-action="undo"], [data-crawl-action="undo-award"]')?.setAttribute('disabled', '')
     // One delegated listener, so buttons added below (the footer) work too.
     html.addEventListener('click', (event) => {
       const button = (event.target as HTMLElement).closest<HTMLElement>('[data-crawl-action]')

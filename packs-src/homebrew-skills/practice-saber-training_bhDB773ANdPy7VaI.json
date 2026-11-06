@@ -72,7 +72,59 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-150",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Practice Saber Training",
+        "stat": "STR",
+        "notes": "",
+        "range": "Melee",
+        "rank5": "Add 1d8 base damage.",
+        "rank10": "Add 1d8 base damage.",
+        "rank15": "Add 1d8 base damage. Gain another +1 Evade.",
+        "details": "Attack against Evade.",
+        "effects": [
+          {
+            "id": "builder-upgrade-blade-evade-15",
+            "type": "evadeModifier",
+            "slots": [],
+            "value": "1",
+            "target": "",
+            "requiredRank": "15"
+          }
+        ],
+        "checkType": "Attack",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "combat:Practice Saber Training",
+        "damageTypes": [
+          "Slashing"
+        ],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "builderCombat": {
+          "kind": "weapon",
+          "name": "Practice Saber",
+          "skill": "Practice Saber Training",
+          "homebrew": true
+        },
+        "combatRelated": false,
+        "damageFormula": "1d8+STR",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "2d8+STR",
+        "rank10DamageFormula": "3d8+STR",
+        "rank15DamageFormula": "4d8+STR",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

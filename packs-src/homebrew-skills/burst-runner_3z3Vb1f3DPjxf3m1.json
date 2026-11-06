@@ -110,7 +110,66 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-217",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Burst Runner",
+        "stat": "DEX",
+        "notes": "",
+        "rank5": "Check every two minutes; gain 5 feet of Move.",
+        "rank10": "Gain another permanent +10 feet of Move; check every 4 minutes.",
+        "rank15": "Gain another permanent +15 feet of Move; check every 6 minutes.",
+        "details": "You find another burst of speed just when the distance matters most.\n\nCheck every minute; add +1 per 10 feet of Move. For short bursts rather than prolonged Lasting Grit.",
+        "effects": [
+          {
+            "id": "starter-running-5",
+            "type": "moveModifier",
+            "slots": [],
+            "value": "5",
+            "target": "",
+            "requiredRank": "5"
+          },
+          {
+            "id": "builder-upgrade-running-move-10",
+            "type": "moveModifier",
+            "slots": [],
+            "value": "10",
+            "target": "",
+            "requiredRank": "10"
+          },
+          {
+            "id": "builder-upgrade-running-move-15",
+            "type": "moveModifier",
+            "slots": [],
+            "value": "15",
+            "target": "",
+            "requiredRank": "15"
+          }
+        ],
+        "checkType": "Unopposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Burst Runner",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": true,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

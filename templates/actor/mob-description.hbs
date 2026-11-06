@@ -1,4 +1,8 @@
 <section class="tab notes {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+  {{#if (and isCompanion (ne systemSource.kind "pet"))}}
+  <h3 class="pf-section">{{localize "CRAWLSPACE.Companion.Accessories"}}</h3>
+  {{#if editable}}<prose-mirror name="system.companion.accessories" value="{{systemSource.companion.accessories}}" toggled>{{{enriched.accessories}}}</prose-mirror>{{else}}{{{enriched.accessories}}}{{/if}}
+  {{/if}}
   <h3 class="pf-section">{{localize "CRAWLSPACE.Item.Description"}}</h3>
   {{#if editable}}<prose-mirror name="system.description" value="{{systemSource.description}}" toggled>{{{enriched.description}}}</prose-mirror>{{else}}{{{enriched.description}}}{{/if}}
   <h3 class="pf-section">{{localize "CRAWLSPACE.Crawler.Notes"}}</h3>

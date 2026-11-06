@@ -49,7 +49,41 @@
   "flags": {
     "crawlspace": {
       "sourceId": "homebrew-210",
-      "contentType": "skill"
+      "contentType": "skill",
+      "data": {
+        "mod": "",
+        "name": "Light Fingers",
+        "stat": "DEX",
+        "notes": "",
+        "rank5": "May pick NPC and Mob pockets.",
+        "rank10": "May plant an item on a target with pockets or similar storage.",
+        "rank15": "May manipulate objects up to half your size, rounded down.",
+        "details": "Your hands finish their work while attention is still somewhere else.\n\nOpposed by INT. Conceal or manipulate hand-sized objects, excluding other inventories or hotlists. Disadvantage against an observer with a higher Sharp Senses Rank.",
+        "effects": [],
+        "checkType": "Opposed",
+        "completed": false,
+        "isHealing": false,
+        "builderSeed": "background-skill:Light Fingers",
+        "damageTypes": [],
+        "healingUnit": "slots",
+        "enhancedRank": "",
+        "armorPiercing": false,
+        "combatRelated": false,
+        "damageFormula": "",
+        "isAttackSkill": false,
+        "healingFormula": "",
+        "unenhancedRank": "",
+        "rank5DamageTypes": [],
+        "rank10DamageTypes": [],
+        "rank15DamageTypes": [],
+        "rank5DamageFormula": "",
+        "rank10DamageFormula": "",
+        "rank15DamageFormula": "",
+        "rank5HealingFormula": "",
+        "sharedWithCelestial": false,
+        "rank10HealingFormula": "",
+        "rank15HealingFormula": ""
+      }
     }
   },
   "_stats": {

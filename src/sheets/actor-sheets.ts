@@ -3,6 +3,9 @@ import { CHECK_TYPES, DAMAGE_TYPES, GEAR_SLOTS, STATS, STAT_KEYS } from '../conf
 import { DEBUFFS } from '../rules/debuffs'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage } from '../dice/rolls'
 import { levelUp, openUpkeep } from '../apps/upkeep'
+import { openAwards } from '../apps/awards'
+import { gmActorAction } from '../socket'
+import { companionsOf, createCompanion, linkCompanion } from '../actors/companions'
 import { pendingStatPoints } from '../rules/upkeep'
 import { attackRows, attackWithRow, damageWithRow, displayFormula, findAttackRow, resolveAttack, UNARMED_ID, unarmedRow } from '../actors/attacks'
 import { castInherent, inherentSpellRows } from '../actors/inherent'
@@ -428,6 +431,7 @@ export class CrawlerSheet extends CrawlActorSheet {
       shieldPrompt: CrawlerSheet.#onShieldPrompt,
       shieldDr: CrawlerSheet.#onShieldDr,
       upkeep: CrawlerSheet.#onUpkeep,
+      awards: CrawlerSheet.#onAwards,
       levelUp: CrawlerSheet.#onLevelUp,
       openEffects: CrawlerSheet.#onOpenEffects,
       editTraits: CrawlerSheet.#onEditTraits,
@@ -445,6 +449,9 @@ export class CrawlerSheet extends CrawlActorSheet {
       useAction: CrawlerSheet.#onUseAction,
       actionToChat: CrawlerSheet.#onActionToChat,
       castInherent: CrawlerSheet.#onCastInherent,
+      openCompanion: CrawlerSheet.#onOpenCompanion,
+      addCompanion: CrawlerSheet.#onAddCompanion,
+      unlinkCompanion: CrawlerSheet.#onUnlinkCompanion,
     },
   }
 
@@ -481,6 +488,13 @@ export class CrawlerSheet extends CrawlActorSheet {
     const items = [...actor.items].sort((a: any, b: any) => (a.sort || 0) - (b.sort || 0))
     switch (partId) {
       case 'sidebar': {
+        context.companions = companionsOf(actor).map((companion: any) => ({
+          uuid: companion.uuid,
+          name: companion.name,
+          img: companion.img,
+          kind: game.i18n.localize(`CRAWLSPACE.Companion.${companion.system.kind}`),
+          health: companion.system.health,
+        }))
         const evadeBuffs = system.evade.buff + (system.evade.bonus ?? 0)
         const drBuffs = system.dr.buff + (system.dr.bonus ?? 0)
         context.evadeTooltip = `DEX MOD (${system.attributes.dex.mod}) + ${game.i18n.localize('CRAWLSPACE.Stat.EvadeBuffs')} (${evadeBuffs}) = ${system.evade.total}`
@@ -886,6 +900,31 @@ export class CrawlerSheet extends CrawlActorSheet {
     return openUpkeep(this.actor)
   }
 
+  static #onAwards(this: CrawlerSheet) {
+    return openAwards([this.actor])
+  }
+
+  static #onOpenCompanion(this: CrawlerSheet, _event: Event, target: HTMLElement) {
+    fromUuidSync(target.closest<HTMLElement>('[data-uuid]')?.dataset.uuid ?? '')?.sheet.render(true)
+  }
+
+  static #onAddCompanion(this: CrawlerSheet, _event: Event, target: HTMLElement) {
+    return createCompanion(this.actor, (target.dataset.kind as 'pet' | 'mount') ?? 'pet')
+  }
+
+  static async #onUnlinkCompanion(this: CrawlerSheet, _event: Event, target: HTMLElement) {
+    const companion = fromUuidSync(target.closest<HTMLElement>('[data-uuid]')?.dataset.uuid ?? '')
+    if (companion) await companion.update({ 'system.companion.master': '' })
+    this.render()
+  }
+
+  /** Drop a pet, mount or vehicle onto the crawler to make it theirs. */
+  async _onDropActor(_event: DragEvent, actor: any) {
+    if (actor.type !== 'companion') return
+    await linkCompanion(actor, this.actor)
+    this.render()
+  }
+
   /**
    * Drops: onto the hotlist (or the Actions tab icon) pins the item; onto the Attacks table adds an attack
    * row for it. Anything else is the normal item drop.
@@ -917,6 +956,9 @@ export class MobSheet extends CrawlActorSheet {
       deleteAbility: MobSheet.#onDeleteAbility,
       abilityToChat: MobSheet.#onAbilityToChat,
       slotLost: MobSheet.#onSlot,
+      endMinion: MobSheet.#onEndMinion,
+      openMaster: MobSheet.#onOpenMaster,
+      clearMaster: MobSheet.#onClearMaster,
     },
   }
 
@@ -951,10 +993,21 @@ export class MobSheet extends CrawlActorSheet {
         context.traitSections = TRAIT_SECTIONS.map((key) => ({ key, label: game.i18n.localize(`CRAWLSPACE.Sheet.${key}`), values: [...(system.traits?.[key] ?? [])].sort() }))
         break
       case 'header':
-        context.kindChoices = { mob: 'CRAWLSPACE.Mob.KindMob', boss: 'CRAWLSPACE.Mob.KindBoss' }
+        context.kindChoices =
+          actor.type === 'companion'
+            ? { pet: 'CRAWLSPACE.Companion.pet', mount: 'CRAWLSPACE.Companion.mount', vehicle: 'CRAWLSPACE.Companion.vehicle' }
+            : { mob: 'CRAWLSPACE.Mob.KindMob', boss: 'CRAWLSPACE.Mob.KindBoss' }
         context.bossTierChoices = Object.fromEntries(Object.keys(CONFIG.CRAWLSPACE.BOSS_TIERS).map((tier) => [tier, tier]))
-        context.levelLabel = game.i18n.localize(system.kind === 'boss' ? 'CRAWLSPACE.Mob.KindBoss' : 'CRAWLSPACE.Mob.KindMob')
+        context.levelLabel = game.i18n.localize(
+          actor.type === 'companion' ? `CRAWLSPACE.Companion.${system.kind}` : system.kind === 'boss' ? 'CRAWLSPACE.Mob.KindBoss' : 'CRAWLSPACE.Mob.KindMob',
+        )
+        if (actor.type === 'companion') {
+          const master = system.companion.master ? fromUuidSync(system.companion.master) : null
+          context.companion = { master: master?.name ?? '', vehicle: system.kind !== 'pet' }
+        }
         context.tagList = String(system.tags ?? '').split(',').map((tag) => tag.trim()).filter(Boolean)
+        if (actor.type === 'minion')
+          context.minion = { caster: fromUuidSync(system.minion.caster)?.name ?? game.i18n.localize('CRAWLSPACE.Minion.NoCaster'), condition: system.minion.condition }
         break
       case 'main':
         context.attacks = await Promise.all(
@@ -990,8 +1043,15 @@ export class MobSheet extends CrawlActorSheet {
         break
       case 'notes':
         context.enriched = { description: await this.enrich(system.description), notes: await this.enrich(system.notes) }
+        if (actor.type === 'companion' && system.kind !== 'pet') context.enriched.accessories = await this.enrich(system.companion.accessories)
         break
     }
+    return context
+  }
+
+  async _prepareContext(options: any) {
+    const context = await super._prepareContext(options)
+    context.isCompanion = this.actor.type === 'companion'
     return context
   }
 
@@ -1061,6 +1121,26 @@ export class MobSheet extends CrawlActorSheet {
     const remaining = this.actor.system.health.value
     const nextRemaining = index + 1 === remaining ? index : index + 1
     await this.actor.update({ 'system.slotsLost': Math.max(0, max - nextRemaining) })
+  }
+
+  /** End the minion now (the app's "End Second Chance"); the GM's client does the work. */
+  static async #onEndMinion(this: MobSheet) {
+    return gmActorAction(this.actor, 'endMinion')
+  }
+
+  static async #onOpenMaster(this: MobSheet) {
+    const master = await fromUuid(this.actor.system.companion?.master)
+    master?.sheet.render(true)
+  }
+
+  static async #onClearMaster(this: MobSheet) {
+    await this.actor.update({ 'system.companion.master': '' })
+  }
+
+  /** Drop a crawler onto a companion to make it the companion's owner. */
+  async _onDropActor(_event: DragEvent, actor: any) {
+    if (this.actor.type !== 'companion' || actor.type !== 'crawler') return
+    return linkCompanion(this.actor, actor)
   }
 }
 
