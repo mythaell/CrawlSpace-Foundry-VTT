@@ -144,6 +144,9 @@ const sheetActionSchema = () => {
     skillId: text(),
     formula: text(),
     notes: text(),
+    /** From an Actions pack entry: what using it does, and the skills its check prefers. */
+    behavior: text(),
+    skills: text(),
   })
 }
 

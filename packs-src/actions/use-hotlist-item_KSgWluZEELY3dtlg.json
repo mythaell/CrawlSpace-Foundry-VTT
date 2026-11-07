@@ -1,0 +1,36 @@
+{
+  "_id": "KSgWluZEELY3dtlg",
+  "name": "Use Hotlist Item",
+  "type": "action",
+  "img": "icons/svg/chest.svg",
+  "sort": 500,
+  "system": {
+    "description": "<p>Use a potion, scroll, tool or other item on your Hotlist. Pick the item when you use it.</p>",
+    "notes": "",
+    "source": {
+      "database": "",
+      "id": null,
+      "book": "",
+      "pages": ""
+    },
+    "kind": "action",
+    "behavior": "hotlist",
+    "skills": "",
+    "formula": ""
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!KSgWluZEELY3dtlg"
+}

@@ -1,0 +1,36 @@
+{
+  "_id": "xnFkzV0PHfICdNKf",
+  "name": "Catcher",
+  "type": "action",
+  "img": "icons/svg/shield.svg",
+  "sort": 300,
+  "system": {
+    "description": "<p>Step in and take a hit meant for another party member. You can’t Evade the damage you catch.</p>",
+    "notes": "",
+    "source": {
+      "database": "",
+      "id": null,
+      "book": "",
+      "pages": ""
+    },
+    "kind": "interrupt",
+    "behavior": "check",
+    "skills": "Catcher",
+    "formula": ""
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!xnFkzV0PHfICdNKf"
+}

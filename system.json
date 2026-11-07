@@ -31,6 +31,7 @@
       "loot": { "htmlFields": ["description"] },
       "lootBox": { "htmlFields": ["description"] },
       "ability": { "htmlFields": ["description"] },
+      "action": { "htmlFields": ["description"] },
       "race": { "htmlFields": ["description"] },
       "class": { "htmlFields": ["description"] },
       "background": { "htmlFields": ["description"] },
@@ -57,6 +58,20 @@
       "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
     },
     {
+      "name": "actions",
+      "label": "Actions",
+      "path": "packs/actions",
+      "type": "Item",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "interrupt-actions",
+      "label": "Interrupt Actions",
+      "path": "packs/interrupt-actions",
+      "type": "Item",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
       "name": "homebrew-items",
       "label": "Homebrew Items",
       "path": "packs/homebrew-items",
@@ -65,6 +80,11 @@
     }
   ],
   "packFolders": [
+    {
+      "name": "CrawlSpace Rules",
+      "color": "#1f5f8f",
+      "packs": ["actions", "interrupt-actions"]
+    },
     {
       "name": "CrawlSpace Homebrew",
       "color": "#7a2e1d",

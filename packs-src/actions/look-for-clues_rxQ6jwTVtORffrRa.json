@@ -1,0 +1,36 @@
+{
+  "_id": "rxQ6jwTVtORffrRa",
+  "name": "Look for Clues",
+  "type": "action",
+  "img": "icons/svg/eye.svg",
+  "sort": 200,
+  "system": {
+    "description": "<p>Study a foe (usually a Boss) for something the party can use against it. Roll Perception, Investigation or a fitting Skill.</p>",
+    "notes": "",
+    "source": {
+      "database": "",
+      "id": null,
+      "book": "",
+      "pages": ""
+    },
+    "kind": "action",
+    "behavior": "check",
+    "skills": "Perception, Investigation",
+    "formula": ""
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!rxQ6jwTVtORffrRa"
+}

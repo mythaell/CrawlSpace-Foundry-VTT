@@ -21,7 +21,8 @@
       "class": "Class",
       "background": "Background",
       "achievement": "Achievement",
-      "trap": "Trap"
+      "trap": "Trap",
+      "action": "Action"
     }
   },
   "CRAWLSPACE": {
@@ -147,10 +148,17 @@
       "ClearShield": "Remove all shield slots"
     },
     "Hotlist": {
-      "Empty": "Drag items here to pin them to the hotlist.",
-      "Hint": "Pin items with the pin icon, or drop them here or on the Actions tab icon.",
-      "Pin": "Pin to hotlist",
-      "Unpin": "Unpin from hotlist"
+      "Empty": "Nothing on the hotlist. Use Configure to set it.",
+      "Configure": "Configure",
+      "ConfigureHint": "Open the hotlist slots; drag items onto them from the sheet's other tabs.",
+      "ConfigHint": "Drag items, skills or spells from the character sheet onto a slot. Drag a filled slot onto another to swap them.",
+      "DropHere": "Drop an item here",
+      "Remove": "Remove from the hotlist",
+      "OwnedOnly": "Only this crawler's own items can go on the hotlist.",
+      "Nothing": "Nothing usable on the hotlist.",
+      "NoHealing": "No healing items, scrolls or spells on the hotlist.",
+      "UseTitle": "Use Hotlist Item",
+      "UseHint": "Pick the hotlist item to use."
     },
     "Empty": {
       "Skills": "No skills yet. Drag one in from a compendium.",
@@ -555,7 +563,9 @@
       "HotlistFull": "The hotlist is full ({capacity}).",
       "NoDamage": "{name} has no damage formula.",
       "NoPack": "No matching compendium is installed.",
-      "SpellNotFound": "Could not find a spell named {name}."
+      "SpellNotFound": "Could not find a spell named {name}.",
+      "RowGone": "That attack or action is no longer on the sheet.",
+      "NoBuildContent": "No compendium has any {kind} entries yet."
     },
     "Actions": {
       "action": "Action",
@@ -564,7 +574,34 @@
       "interruptPlural": "Interrupt Actions",
       "Add": "Add",
       "newAction": "New Action",
-      "newInterrupt": "New Interrupt Action"
+      "newInterrupt": "New Interrupt Action",
+      "Configure": "Actions & Interrupt Actions",
+      "ConfigureHint": "Open the actions popup; drag items, skills, spells, abilities or pack actions onto it.",
+      "ConfigHint": "Drag items, skills, spells or abilities from the character sheet, or actions from the Actions packs (magnifier), onto a table. Drag a row onto the other table to move it.",
+      "Browse": "Browse the actions compendium",
+      "FromHotlist": "Hotlist",
+      "DropHere": "Drop here",
+      "OwnedOnly": "Drop this crawler's own items, or actions from the Actions packs.",
+      "MoveCard": "Move {move} ft + Step {step} ft = up to {total} ft.",
+      "CheckWith": "Check with",
+      "Stats": "Stats",
+      "KindAuto": "Automatic",
+      "KindBoth": "Action and Interrupt",
+      "KindHint": "Which actions table this shows in when it is on the hotlist. Automatic: both when its text mentions Interrupt, else Actions.",
+      "UsedAs": "Used as",
+      "Type": "Type",
+      "BehaviorLabel": "When used",
+      "Behavior": {
+        "none": "Post to chat",
+        "check": "Roll a check",
+        "evade": "Roll Evade",
+        "hotlist": "Use a hotlist item",
+        "hotlistHealing": "Use a healing hotlist item",
+        "move": "Show movement"
+      },
+      "Skills": "Check skills",
+      "SkillsHint": "Skills the check uses, comma separated. If the crawler has exactly one of them it is rolled; otherwise they pick.",
+      "Formula": "Roll formula"
     },
     "Filter": {
       "Search": "Search…",
@@ -1170,7 +1207,15 @@
         "advanceBonus": "+1 per count on end-of-floor advancement checks for linked skills.",
         "advanceAdvantage": "Advantage on advancement checks for the linked skill.",
         "advancePenalty": "−1 per count on advancement checks for the linked skill once it is rank 5 or higher."
-      }
+      },
+      "Detriment": "Detriment",
+      "Replace": "Replace {old} with {new}? The abilities that came with {old} are removed.",
+      "Added": "{name} added with {count} abilities.",
+      "Browse": "Browse the compendium (drag one onto the sheet)",
+      "Kindrace": "race",
+      "Kindclass": "class",
+      "Kindbackground": "background",
+      "Kinddeity": "deity"
     },
     "Area": {
       "Title": "Area",
@@ -1281,7 +1326,8 @@
       "Option": "{name}: {parts}",
       "Damage": "+{formula} damage",
       "RankToHit": "+{rank} to hit",
-      "Optional": "option"
+      "Optional": "option",
+      "ByHand": "applied by hand (see the skill)"
     },
     "Repair": {
       "Button": "Repair Item",
@@ -1340,6 +1386,22 @@
       "KeysPoint": "Arrow keys: nudge measurement point · Shift: ×10",
       "KeysScale": "Arrow keys: adjust X/Y scale · Shift: ×10",
       "KeysPan": "Right-drag: pan · Wheel: zoom · Esc: cancel"
+    },
+    "Advance": {
+      "ChooseTitle": "Mark for Advancement",
+      "ChooseHint": "A damage effect was used, so only one of these skills is marked for advancement. Pick one."
+    },
+    "Doll": {
+      "head": "Head",
+      "arms": "Arms",
+      "hands": "Hands",
+      "mainHand": "Main hand",
+      "torso": "Torso",
+      "offHand": "Off hand",
+      "legs": "Legs",
+      "feet": "Feet",
+      "accessories": "Accessories",
+      "accessoryHint": "Drop an accessory here to wear it"
     }
   }
 }

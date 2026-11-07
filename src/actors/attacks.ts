@@ -1,5 +1,5 @@
 import { applyCastEffects } from '../effects/use-conditions'
-import { markForAdvancement } from '../documents/item'
+import { markAttackAdvancement } from '../documents/item'
 import { spellKillBonus } from '../effects/killing-blows'
 /**
  * Crawler attacks: rows in `system.attacks`, plus automatic rows for equipped weapons, attack skills and
@@ -83,6 +83,8 @@ export function unarmedRow(): AttackRow {
  * unbroken and linked to a skill in its details, and then stands in for that skill (automaticAttackItems).
  */
 export function attackRows(actor: any): AttackRow[] {
+  // A crawler's attack spells are the ones on their hotlist (ready to cast).
+  const hotlisted = actor.system.hotlist ? new Set<string>((actor.system.hotlist.items ?? []).filter(Boolean)) : undefined
   // Rows you saved follow the same rules: no broken or unequipped weapons, and a weapon skill only through its weapon.
   const usable = (row: AttackRow) => {
     const source = row.sourceId ? actor.items.get(row.sourceId) : null
@@ -90,11 +92,12 @@ export function attackRows(actor: any): AttackRow[] {
     if (source.system?.broken) return false
     if (source.type === 'weapon') return !!source.system.equipped
     if (source.type === 'skill') return usableAlone(source)
+    if (source.type === 'spell' && hotlisted) return hotlisted.has(source.id)
     return true
   }
   const saved: AttackRow[] = (actor.system.attacks ?? []).filter(usable)
   const used = new Set((actor.system.attacks ?? []).map((row: AttackRow) => row.sourceId).filter(Boolean))
-  const automatic = automaticAttackItems([...actor.items], (item: any) => item.weaponSkill())
+  const automatic = automaticAttackItems([...actor.items], (item: any) => item.weaponSkill(), hotlisted)
     .filter((item: any) => !used.has(item.id))
     .sort((a: any, b: any) => (a.sort || 0) - (b.sort || 0))
     .map(rowForItem)
@@ -131,7 +134,7 @@ function damageEffectModifiers(actor: any, attackSkill: string): Modifier[] {
       ...(option.rollMode ? [game.i18n.localize(`CRAWLSPACE.Roll.Mode.${option.rollMode}`)] : []),
       ...(option.damage || option.undoubled ? [t('Damage', { formula: joinFormula(option.damage, option.undoubled) })] : []),
     ]
-    return { ...option, detail: parts.join(', ') }
+    return { ...option, detail: parts.join(', ') || game.i18n.localize('CRAWLSPACE.DamageEffect.ByHand') }
   })
 }
 
@@ -235,7 +238,7 @@ export async function attackWithRow(actor: any, row: AttackRow, options: { fast?
   return withCooldowns(actor, uses, async () => {
     const result = await rollAttack(actor, resolveAttack(actor, row), options)
     // The skill or spell behind the attack counts as rolled, for advancement.
-    if (result) await markForAdvancement([source, skill])
+    if (result) await markAttackAdvancement(actor, [source, skill], result.effectSkills)
     if (result && source?.type === 'spell') await applyCastEffects(source)
     return result
   })

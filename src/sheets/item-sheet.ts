@@ -126,6 +126,9 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       slotChoices: GEAR_SLOTS,
       damageTypeList: DAMAGE_TYPES.join(', '),
       damageTypesText: (system.damage?.types ?? []).join(', '),
+      actionKindChoices: { '': 'CRAWLSPACE.Actions.KindAuto', action: 'CRAWLSPACE.Actions.action', interrupt: 'CRAWLSPACE.Actions.interrupt', both: 'CRAWLSPACE.Actions.KindBoth' },
+      actionTypeChoices: { action: 'CRAWLSPACE.Actions.action', interrupt: 'CRAWLSPACE.Actions.interrupt' },
+      actionBehaviorChoices: { '': 'CRAWLSPACE.Actions.Behavior.none', check: 'CRAWLSPACE.Actions.Behavior.check', evade: 'CRAWLSPACE.Actions.Behavior.evade', hotlist: 'CRAWLSPACE.Actions.Behavior.hotlist', hotlistHealing: 'CRAWLSPACE.Actions.Behavior.hotlistHealing', move: 'CRAWLSPACE.Actions.Behavior.move' },
       usageChoices: { learned: 'CRAWLSPACE.Usage.learned', inherent: 'CRAWLSPACE.Usage.inherent', scroll: 'CRAWLSPACE.Usage.scroll', tome: 'CRAWLSPACE.Usage.tome' },
       weaponTypeChoices: Object.fromEntries(['melee', 'ranged', 'thrown', 'ammunition', 'other'].map((t) => [t, `CRAWLSPACE.WeaponType.${t}`])),
       abilityCategories: Object.fromEntries(['racial', 'class', 'other'].map((c) => [c, `CRAWLSPACE.Ability.${c}`])),
@@ -173,6 +176,7 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       if (system.isAttack) add(game.i18n.localize('CRAWLSPACE.Item.IsAttack'))
     }
     if (item.type === 'ability') add(game.i18n.localize(`CRAWLSPACE.Ability.${system.category}`))
+    if (item.type === 'action') add(game.i18n.localize(`CRAWLSPACE.Actions.${system.kind}`))
     for (const type of system.damage?.types ?? []) add(type)
     if (system.damage?.magic) add(game.i18n.localize('CRAWLSPACE.Item.Magic'))
     if (system.damage?.armorPiercing) add(game.i18n.localize('CRAWLSPACE.Item.ArmorPiercing'))

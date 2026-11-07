@@ -8,6 +8,7 @@ import { penaltyModifiers, rollAttack, rollCheck, rollDamage, type Modifier } fr
 import { STATS, statKeyFromCode } from '../config'
 import { attackWithRow, resolveAttack, rowForItem, withEffectBonuses } from '../actors/attacks'
 import { conditionRows, itemCardDetails } from '../effects/use-conditions'
+import { advancementPick } from '../rules/damage-effects'
 
 /** Targeted tokens, or the user themself when nothing is targeted. */
 const healTargets = (actor: any): string[] => {
@@ -90,7 +91,7 @@ export class CrawlItem extends Item {
         return withCooldowns(actor, [itemCooldown(this)], async () => {
           const result = await this.#useRanked(options)
           // A Passive skill only posts its card; anything rolled (or any spell cast) counts toward advancement.
-          if (result && (this.type === 'spell' || this.system.checkType !== 'Passive')) await markForAdvancement([this])
+          if (result && (this.type === 'spell' || this.system.checkType !== 'Passive')) await markAttackAdvancement(actor, [this], (result as any)?.effectSkills ?? [])
           if (result) await applyCastEffects(this)
           return result
         })
@@ -288,4 +289,27 @@ export async function markForAdvancement(items: any[]) {
     byActor.set(actor, [...(byActor.get(actor) ?? []), item.id])
   }
   for (const [actor, ids] of byActor) await actor.updateEmbeddedDocuments('Item', [...new Set(ids)].map((_id) => ({ _id, 'system.marked': true })))
+}
+
+/**
+ * Mark an attack's skills for advancement. With damage effect skills ticked, the rules mark only one of the skills
+ * used: an unmarked one when the rest already are, else the player's pick.
+ */
+export async function markAttackAdvancement(actor: any, attackItems: any[], effectNames: string[] = []) {
+  const effects = [...new Set(effectNames)].map((name) => actor.items.find((item: any) => item.type === 'skill' && item.name === name)).filter(Boolean)
+  if (!effects.length) return markForAdvancement(attackItems)
+  if (actor.type !== 'crawler' || !actor.isOwner) return
+  const entry = (item: any) => ({ id: item.id, marked: !!item.system.marked, item })
+  const ranked = attackItems.filter((item) => item && ['skill', 'spell'].includes(item.type))
+  const { mark, choose } = advancementPick(ranked.map(entry), effects.map(entry))
+  if (mark.length) return markForAdvancement(mark.map((candidate) => candidate.item))
+  if (!choose.length) return
+  const picked = await foundry.applications.api.DialogV2.wait({
+    window: { title: game.i18n.localize('CRAWLSPACE.Advance.ChooseTitle'), icon: 'fa-solid fa-arrow-up-right-dots' },
+    content: `<p>${game.i18n.localize('CRAWLSPACE.Advance.ChooseHint')}</p>`,
+    buttons: choose.map((candidate, index) => ({ action: candidate.id, label: candidate.item.name, default: index === 0 })),
+    rejectClose: false,
+  })
+  const item = picked ? actor.items.get(picked) : null
+  if (item) await markForAdvancement([item])
 }

@@ -1,0 +1,23 @@
+<section class="slot-config-body">
+  <p class="hint">{{localize "CRAWLSPACE.Actions.ConfigHint"}}</p>
+  {{#each groups as |group|}}
+  <section class="config-group" data-drop-kind="{{group.kind}}">
+    <header class="config-group-head">
+      <span>{{group.label}}</span>
+      <a data-action="openActionPack" data-kind="{{group.kind}}" data-tooltip="{{localize 'CRAWLSPACE.Actions.Browse'}}"><i class="fa-solid fa-magnifying-glass"></i></a>
+    </header>
+    <ol class="config-slots">
+      {{#each group.rows as |row|}}
+      <li class="config-slot" {{#unless row.auto}}data-action-index="{{row.index}}" draggable="true"{{/unless}}>
+        <img src="{{row.img}}" alt="">
+        <span class="slot-name">{{row.name}}</span>
+        <small class="slot-type">{{#if row.auto}}{{localize "CRAWLSPACE.Actions.FromHotlist"}}{{else}}{{row.sourceType}}{{/if}}</small>
+        {{#if (and @root.editable (not row.auto))}}<a class="slot-clear" data-action="removeAction" data-tooltip="{{localize 'CRAWLSPACE.Item.Delete'}}"><i class="fa-solid fa-xmark"></i></a>{{/if}}
+      </li>
+      {{else}}
+      <li class="config-slot empty"><span class="slot-drop">{{localize "CRAWLSPACE.Actions.DropHere"}}</span></li>
+      {{/each}}
+    </ol>
+  </section>
+  {{/each}}
+</section>

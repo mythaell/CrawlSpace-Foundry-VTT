@@ -76,3 +76,21 @@ test('ticked effects set the roll mode, keep-lower first', () => {
   assert.equal(toggledRollMode('disadvantage', [{ rollMode: 'advantage' }]), 'disadvantage')
   assert.equal(toggledRollMode('advantage', [{}]), 'advantage')
 })
+
+test('published damage effect skills are read from their text', async () => {
+  const { damageEffectFromText, isRangedAttackText } = await import('../src/rules/damage-effects.ts')
+  assert.deepEqual(damageEffectFromText('<p>Pugilism Damage Effect, Passive</p><p>You deal +1d2 base damage.</p>'), { skills: ['Pugilism'], damage: '1d2' })
+  assert.deepEqual(damageEffectFromText('Foot Soldier, Noggin Nocker, or Pugilism Damage Effect, Passive Multiply your base damage'), {
+    skills: ['Foot Soldier', 'Noggin Nocker', 'Pugilism'],
+    damage: '',
+  })
+  assert.deepEqual(damageEffectFromText('Wrasslin’ Damage Effect, Passive You deal +1d8 base damage + Str Bludgeoning'), { skills: ["Wrasslin'"], damage: '1d8+STR' })
+  assert.equal(damageEffectFromText('Melee Attack, Str Choose the Iron Punch Damage Effect (if you wish)'), null)
+  assert.ok(isRangedAttackText('<p>Ranged Attack, Dex</p>'))
+  assert.ok(!isRangedAttackText('Melee Attack, Str'))
+})
+
+test('an effect with nothing for the dice is still offered, and curly apostrophes match', () => {
+  const skills = [{ name: 'Choke Out', rank: 2, effect: { enabled: true, skills: ["Wrasslin'"] }, damage: { base: '', dice: '' } }]
+  assert.deepEqual(linkedDamageEffects(skills, 'Wrasslin’'), [{ label: 'Choke Out', value: 0, enabled: false, rollMode: undefined, damage: '', undoubled: '', skillRank: 2 }])
+})

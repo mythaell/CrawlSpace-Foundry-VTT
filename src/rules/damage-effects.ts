@@ -6,7 +6,7 @@
  */
 export type RollModeName = 'normal' | 'advantage' | 'disadvantage'
 
-const normalize = (name: unknown) => String(name ?? '').trim().replace(/\s+/g, ' ').toLowerCase()
+const normalize = (name: unknown) => String(name ?? '').trim().replace(/[‘’]/g, "'").replace(/\s+/g, ' ').toLowerCase()
 
 /** Unarmed attack skills by name (characterSheetRules.ts unarmedAttackSkillNames). */
 const UNARMED_SKILLS = new Set([
@@ -37,15 +37,21 @@ export function usableAlone(item: { type: string; name: string; system: any }) {
 /**
  * Items that get an automatic attack row. A weapon needs to be equipped, unbroken and to name its skill in its
  * details; it then stands in for that skill. A weapon skill never has a row of its own, only unarmed skills and
- * attack spells do. Broken items never attack.
+ * attack spells do (spells once they are on the hotlist). Broken items never attack.
  */
-export function automaticAttackItems<T extends { id: string; type: string; name: string; system: any }>(items: T[], skillOf: (item: T) => { id: string } | null) {
+export function automaticAttackItems<T extends { id: string; type: string; name: string; system: any }>(
+  items: T[],
+  skillOf: (item: T) => { id: string } | null,
+  /** Hotlisted item ids: an attack spell needs to be on the hotlist (when given). */
+  hotlisted?: Set<string>,
+) {
   const weapons = items.filter((item) => item.type === 'weapon' && item.system.equipped && !item.system.broken && String(item.system.skill ?? '').trim())
   const replaced = new Set(weapons.map((weapon) => skillOf(weapon)?.id).filter(Boolean))
   return items.filter((item) => {
     if (item.system.broken) return false
     if (item.type === 'weapon') return weapons.includes(item)
     if (item.type === 'consumable') return item.system.consumableType === 'explosives'
+    if (item.type === 'spell' && hotlisted && !hotlisted.has(item.id)) return false
     if (item.type === 'skill' || item.type === 'spell') return !!item.system.isAttack && usableAlone(item) && !replaced.has(item.id)
     return false
   })
@@ -84,7 +90,7 @@ export function linkedDamageEffects(skills: DamageEffectSkill[], attackSkill: st
     const settings = damageEffectSettings({ name: skill.name, addRank: skill.effect.addRank, mode: skill.effect.mode })
     const damage = String(skill.damage.base ?? '').trim()
     const undoubled = String(skill.damage.dice ?? '').trim()
-    if (!damage && !undoubled && !settings.addRank && settings.mode === 'normal') return []
+    // An effect the dice can't do (Choke Out's ×2, Powerful Strike) is still offered: it is applied by hand.
     return [
       {
         label: skill.name,
@@ -105,3 +111,44 @@ export function toggledRollMode(mode: RollModeName, ticked: { rollMode?: RollMod
   if (mode !== 'disadvantage' && ticked.some((modifier) => modifier.rollMode === 'advantage')) return 'advantage'
   return mode
 }
+
+/**
+ * Advancement after an attack: with a damage effect ticked, only one of the skills used (the attack skill or a
+ * damage effect skill) is marked. Marking an already marked skill gains nothing, so when only one is unmarked it
+ * is marked without asking; when several are, the player chooses.
+ */
+export function advancementPick<T extends { id: string; marked: boolean }>(attack: T[], effects: T[]): { mark: T[]; choose: T[] } {
+  if (!effects.length) return { mark: attack.filter((entry) => !entry.marked), choose: [] }
+  const seen = new Set<string>()
+  const unmarked = [...attack, ...effects].filter((entry) => !entry.marked && !seen.has(entry.id) && seen.add(entry.id))
+  return unmarked.length === 1 ? { mark: unmarked, choose: [] } : { mark: [], choose: unmarked }
+}
+
+const plain = (html: unknown) =>
+  String(html ?? '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[‘’]/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim()
+
+/**
+ * A published skill names what it modifies in its first line ("Pugilism or Wrasslin' Damage Effect, Passive"), and
+ * its extra damage in its text ("You deal +1d2 base damage", "+1d8 base damage + Str"). Null when it isn't one.
+ */
+export function damageEffectFromText(details: unknown): { skills: string[]; damage: string } | null {
+  const text = plain(details)
+  const header = /^(.+?)\s+Damage Effect\b/i.exec(text)
+  if (!header || header[1].length > 120) return null
+  const skills = header[1]
+    .split(/\s*,\s*|\s+or\s+|\s+and\s+/i)
+    .map((name) => name.replace(/^(or|and)\s+/i, '').trim())
+    .filter(Boolean)
+  // Only a list of skill names counts ("Choose the Iron Punch Damage Effect" in an attack skill's text doesn't).
+  if (!skills.every((name) => /^[A-Z][\w'-]*(?: [A-Z][\w'-]*)*$/.test(name))) return null
+  const bonus = /\+\s*(\d+d\d+)\s+base damage(?:\s*\+\s*(Str|Dex|Con|Int|Cha)\b)?/i.exec(text)
+  const damage = bonus ? joinFormula(bonus[1], bonus[2] ? bonus[2].toUpperCase() : '') : ''
+  return skills.length ? { skills, damage } : null
+}
+
+/** A skill whose text opens with "Ranged Attack" (the skills Aiming modifies). */
+export const isRangedAttackText = (details: unknown) => /^Ranged Attack\b/i.test(plain(details))

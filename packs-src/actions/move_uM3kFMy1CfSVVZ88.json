@@ -1,0 +1,36 @@
+{
+  "_id": "uM3kFMy1CfSVVZ88",
+  "name": "Move",
+  "type": "action",
+  "img": "icons/svg/walk.svg",
+  "sort": 300,
+  "system": {
+    "description": "<p>Travel up to your Move plus your Step.</p>",
+    "notes": "",
+    "source": {
+      "database": "",
+      "id": null,
+      "book": "",
+      "pages": ""
+    },
+    "kind": "action",
+    "behavior": "move",
+    "skills": "",
+    "formula": ""
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!uM3kFMy1CfSVVZ88"
+}

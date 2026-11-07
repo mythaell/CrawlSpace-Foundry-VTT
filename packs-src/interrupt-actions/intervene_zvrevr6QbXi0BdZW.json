@@ -1,0 +1,36 @@
+{
+  "_id": "zvrevr6QbXi0BdZW",
+  "name": "Intervene",
+  "type": "action",
+  "img": "icons/svg/angel.svg",
+  "sort": 200,
+  "system": {
+    "description": "<p>Roll 1d6 and add it to a party member’s d20 roll, after it is known whether that roll succeeded.</p>",
+    "notes": "",
+    "source": {
+      "database": "",
+      "id": null,
+      "book": "",
+      "pages": ""
+    },
+    "kind": "interrupt",
+    "behavior": "",
+    "skills": "",
+    "formula": "1d6"
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!zvrevr6QbXi0BdZW"
+}

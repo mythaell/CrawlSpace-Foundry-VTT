@@ -1,0 +1,36 @@
+{
+  "_id": "2q5N91L3gOVt9DV1",
+  "name": "Evade",
+  "type": "action",
+  "img": "icons/svg/wingfoot.svg",
+  "sort": 100,
+  "system": {
+    "description": "<p>Roll an Evade check against an attack aimed at you. Each attack this round gets its own Evade check.</p>",
+    "notes": "",
+    "source": {
+      "database": "",
+      "id": null,
+      "book": "",
+      "pages": ""
+    },
+    "kind": "interrupt",
+    "behavior": "evade",
+    "skills": "",
+    "formula": ""
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!2q5N91L3gOVt9DV1"
+}

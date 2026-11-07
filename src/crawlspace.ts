@@ -36,6 +36,9 @@ import { characterToActor } from './import/convert'
 import { fillActorDamage, fillDamageData } from './import/fill-damage'
 import { registerUpkeep, openUpkeep, rest, performUpkeep } from './apps/upkeep'
 import { migrateShieldLoss } from './rules/repair'
+import { actionRowsOf, runAction } from './apps/actions-config'
+import { attackWithRow, findAttackRow } from './actors/attacks'
+import { registerHotlistUpkeep } from './rules/hotlist-upkeep'
 
 const TEMPLATES = [
   'chat/card-footer',
@@ -53,6 +56,7 @@ const TEMPLATES = [
   'actor/crawler-biography',
   'actor/effects',
   'actor/item-row',
+  'actor/paper-doll',
   'actor/filter-bar',
   'actor/mob-sidebar',
   'actor/mob-header',
@@ -107,6 +111,7 @@ Hooks.once('init', () => {
     loot: items.LootData,
     lootBox: items.LootBoxData,
     ability: items.AbilityData,
+    action: items.ActionData,
     race: items.RaceData,
     class: items.ClassData,
     background: items.BackgroundData,
@@ -197,8 +202,9 @@ Hooks.once('init', () => {
   registerAreas()
   registerUpkeep()
   registerLootTools()
+  registerHotlistUpkeep()
 
-  game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, calibrateGrid, declareAttack: () => game.combat && promptDeclaration(game.combat) }
+  game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, calibrateGrid, useAttack: useAttackRow, useAction: useActionRow, declareAttack: () => game.combat && promptDeclaration(game.combat) }
 })
 
 /** A new crawler's tokens are linked to it unless the creator said otherwise. */
@@ -229,10 +235,35 @@ Hooks.once('ready', () => {
 
 /** Dragging an owned item to the hotbar makes a macro that uses it. */
 Hooks.on('hotbarDrop', (_bar: any, data: any, slot: number) => {
-  if (data.type !== 'Item') return
-  createItemMacro(data, slot)
+  if (data.type === 'Item') createItemMacro(data, slot)
+  else if (data.type === 'CrawlAttack' || data.type === 'CrawlAction') createRowMacro(data, slot)
+  else return
   return false
 })
+
+/** An attack or action row from a crawler's sheet becomes a macro that uses it. */
+async function createRowMacro(data: any, slot: number) {
+  const use = data.type === 'CrawlAttack' ? 'useAttack' : 'useAction'
+  const command = `game.crawlspace.${use}(${JSON.stringify(data.actorUuid)}, ${JSON.stringify(data.id)}, { fast: event?.shiftKey });`
+  let macro = game.macros.find((entry: any) => entry.command === command)
+  macro ??= await foundry.documents.Macro.implementation.create({ name: data.name, type: 'script', img: data.img || 'icons/svg/sword.svg', command, flags: { crawlspace: { rowMacro: true } } })
+  game.user.assignHotbarMacro(macro, slot)
+}
+
+/** Hotbar macros: an Attacks row, or an Actions row, by the actor's UUID and the row's id. */
+async function useAttackRow(actorUuid: string, id: string, options: { fast?: boolean } = {}) {
+  const actor: any = await fromUuid(actorUuid)
+  const row = actor ? findAttackRow(actor, id) : null
+  if (!row) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Warn.RowGone'))
+  return attackWithRow(actor, row, options)
+}
+
+async function useActionRow(actorUuid: string, id: string, options: { fast?: boolean } = {}) {
+  const actor: any = await fromUuid(actorUuid)
+  const row = actor ? actionRowsOf(actor).find((entry: any) => entry.id === id) : null
+  if (!row) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Warn.RowGone'))
+  return runAction(actor, row, options)
+}
 
 async function createItemMacro(data: any, slot: number) {
   const item = await fromUuid(data.uuid)

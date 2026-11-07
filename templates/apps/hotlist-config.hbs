@@ -1,0 +1,18 @@
+<section class="slot-config-body">
+  <p class="hint">{{localize "CRAWLSPACE.Hotlist.ConfigHint"}}</p>
+  <ol class="config-slots">
+    {{#each slots as |slot|}}
+    <li class="config-slot {{#unless slot.item}}empty{{/unless}}" data-slot="{{slot.index}}" {{#if slot.item}}data-uuid="{{slot.item.uuid}}" draggable="true"{{/if}}>
+      <span class="slot-number">{{slot.number}}</span>
+      {{#if slot.item}}
+      <img src="{{slot.item.img}}" alt="">
+      <a class="slot-name" data-action="openItem">{{#if slot.item.broken}}<i class="fa-solid fa-heart-crack row-broken"></i> {{/if}}{{slot.item.name}}</a>
+      <small class="slot-type">{{slot.item.type}}{{#if (ne slot.item.quantity undefined)}} ×{{slot.item.quantity}}{{/if}}</small>
+      {{#if @root.editable}}<a class="slot-clear" data-action="clearSlot" data-tooltip="{{localize 'CRAWLSPACE.Hotlist.Remove'}}"><i class="fa-solid fa-xmark"></i></a>{{/if}}
+      {{else}}
+      <span class="slot-drop">{{localize "CRAWLSPACE.Hotlist.DropHere"}}</span>
+      {{/if}}
+    </li>
+    {{/each}}
+  </ol>
+</section>

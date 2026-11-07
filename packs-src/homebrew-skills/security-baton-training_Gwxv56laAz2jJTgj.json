@@ -17,6 +17,12 @@
     "marked": false,
     "isAttack": true,
     "isUnarmed": false,
+    "damageEffect": {
+      "enabled": false,
+      "skills": [],
+      "addRank": null,
+      "mode": ""
+    },
     "damage": {
       "formula": "1d6+STR",
       "types": [

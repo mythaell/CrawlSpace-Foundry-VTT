@@ -4,6 +4,7 @@ import { normalizeGrinding } from '../rules/grinding.ts'
  *
  * Pure (no Foundry globals) so the Node pack builders and the in-world importer share it.
  */
+import { damageEffectFromText } from '../rules/damage-effects.ts'
 import { effectPropertiesToActiveEffects, type CrawlEffectProperty } from '../effects/mapping.ts'
 import { debuffByName } from '../rules/debuffs.ts'
 import { raceClassGrant } from '../crawlspace-shared/shared/raceClassGrants.ts'
@@ -155,6 +156,7 @@ const hasArea = (data: Record<string, any>) =>
   ['template', 'rank5Template', 'rank10Template', 'rank15Template'].some((key) => Array.isArray(data[key]?.areas) && data[key].areas.length > 0)
 
 export function rankedSystem(data: Record<string, any>, kind: 'skill' | 'spell'): Record<string, any> {
+  const textEffect = kind === 'skill' && !data.isDamageEffectSkill ? damageEffectFromText(data.details) : null
   return {
     description: toHtml(data.details),
     notes: str(data.notes),
@@ -169,15 +171,16 @@ export function rankedSystem(data: Record<string, any>, kind: 'skill' | 'spell')
     ...(kind === 'skill'
       ? {
           damageEffect: {
-            enabled: !!data.isDamageEffectSkill,
-            skills: Array.isArray(data.damageEffectSkills) ? data.damageEffectSkills.map(str).filter(Boolean) : [],
+            // Saved settings win; published skills name what they modify in their text.
+            enabled: !!data.isDamageEffectSkill || !!textEffect,
+            skills: Array.isArray(data.damageEffectSkills) && data.damageEffectSkills.length ? data.damageEffectSkills.map(str).filter(Boolean) : (textEffect?.skills ?? []),
             addRank: typeof data.damageEffectAddRankToAttack === 'boolean' ? data.damageEffectAddRankToAttack : null,
             mode: ['normal', 'advantage', 'disadvantage'].includes(data.damageEffectAttackMode) ? data.damageEffectAttackMode : '',
           },
         }
       : {}),
     damage: {
-      formula: str(data.damageFormula),
+      formula: str(data.damageFormula) || textEffect?.damage || '',
       types: types(data.damageTypes),
       armorPiercing: !!data.armorPiercing,
       magic: kind === 'spell',

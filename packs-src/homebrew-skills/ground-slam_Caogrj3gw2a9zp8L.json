@@ -17,6 +17,14 @@
     "marked": false,
     "isAttack": false,
     "isUnarmed": false,
+    "damageEffect": {
+      "enabled": true,
+      "skills": [
+        "Passive"
+      ],
+      "addRank": null,
+      "mode": ""
+    },
     "damage": {
       "formula": "",
       "types": [],

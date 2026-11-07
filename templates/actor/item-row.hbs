@@ -30,7 +30,6 @@
 
     <span class="row-controls">
       {{#if item.equippable}}<a data-action="toggleEquip" class="{{#if item.system.equipped}}active{{/if}}" data-tooltip="{{localize (ifThen item.system.equipped 'CRAWLSPACE.Item.Unequip' 'CRAWLSPACE.Item.Equip')}}"><i class="fa-solid fa-shirt"></i></a>{{/if}}
-      {{#if item.canPin}}<a data-action="togglePin" class="{{#if item.pinned}}active{{/if}}" data-tooltip="{{localize (ifThen item.pinned 'CRAWLSPACE.Hotlist.Unpin' 'CRAWLSPACE.Hotlist.Pin')}}"><i class="fa-solid fa-thumbtack"></i></a>{{/if}}
       <a data-action="itemToChat" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
       <a data-action="editItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
       {{#if @root.editable}}<a data-action="deleteItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Delete'}}"><i class="fa-solid fa-trash"></i></a>{{/if}}

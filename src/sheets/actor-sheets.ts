@@ -13,6 +13,9 @@ import { attackRows, attackWithRow, damageWithRow, displayFormula, findAttackRow
 import { castInherent, inherentSpellRows } from '../actors/inherent'
 import { CrawlRowConfig, type RowKind } from '../apps/row-config'
 import { fillActorDamage } from '../import/fill-damage'
+import { paperDollContext } from './paper-doll'
+import { applyBackground, applyBuildItem, openBuildPacks } from '../apps/build-drop'
+import { ActionsConfig, actionRowsOf, addActionRow, addToHotlist, HotlistConfig, hotlistOf, openActionPack, postAction, runAction } from '../apps/actions-config'
 
 const { HandlebarsApplicationMixin } = foundry.applications.api
 const { ActorSheetV2 } = foundry.applications.sheets
@@ -74,7 +77,6 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       addDebuff: CrawlActorSheet.#onAddDebuff,
       stackEffect: CrawlActorSheet.#onStackEffect,
       itemToChat: CrawlActorSheet.#onItemToChat,
-      togglePin: CrawlActorSheet.#onTogglePin,
       toggleExpand: CrawlActorSheet.#onToggleExpand,
       setFilter: CrawlActorSheet.#onSetFilter,
       openPack: CrawlActorSheet.#onOpenPack,
@@ -209,7 +211,6 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   }
 
   protected async itemRow(item: any) {
-    const pinned = (this.actor.system.hotlist?.items ?? []).includes(item.id)
     return {
       id: item.id,
       uuid: item.uuid,
@@ -218,8 +219,6 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       type: item.type,
       typeLabel: game.i18n.localize(`TYPES.Item.${item.type}`),
       system: item.system,
-      pinned,
-      canPin: !!this.actor.system.hotlist,
       equippable: ['weapon', 'equipment', 'tattoo'].includes(item.type),
       hasQuantity: item.system.quantity !== undefined,
       expanded: this.expanded.has(item.id),
@@ -312,23 +311,6 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     const pack = ids.map((id) => game.packs.get(id)).find(Boolean)
     if (!pack) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Warn.NoPack'))
     return pack.render(true)
-  }
-
-  static async #onTogglePin(this: CrawlActorSheet, _event: PointerEvent, target: HTMLElement) {
-    const item = this.itemFrom(target)
-    if (item) await this.pin(item)
-  }
-
-  /** Pin an item to the hotlist, or unpin it. */
-  protected async pin(item: any, force?: boolean) {
-    const hotlist = this.actor.system.hotlist
-    if (!hotlist) return
-    const ids: string[] = [...hotlist.items]
-    const pinned = ids.includes(item.id)
-    if (pinned && force !== true) return this.actor.update({ 'system.hotlist.items': ids.filter((id) => id !== item.id) })
-    if (pinned) return
-    if (ids.length >= hotlist.capacity) return ui.notifications.warn(game.i18n.format('CRAWLSPACE.Warn.HotlistFull', { capacity: hotlist.capacity }))
-    return this.actor.update({ 'system.hotlist.items': [...ids, item.id] })
   }
 
   static async #onRollStat(this: CrawlActorSheet, event: PointerEvent, target: HTMLElement) {
@@ -501,6 +483,10 @@ export class CrawlerSheet extends CrawlActorSheet {
       deleteAction: CrawlerSheet.#onDeleteAction,
       useAction: CrawlerSheet.#onUseAction,
       actionToChat: CrawlerSheet.#onActionToChat,
+      configureHotlist: CrawlerSheet.#onConfigureHotlist,
+      configureActions: CrawlerSheet.#onConfigureActions,
+      browseActions: CrawlerSheet.#onBrowseActions,
+      openBuildPack: CrawlerSheet.#onOpenBuildPack,
       castInherent: CrawlerSheet.#onCastInherent,
       openCompanion: CrawlerSheet.#onOpenCompanion,
       addCompanion: CrawlerSheet.#onAddCompanion,
@@ -593,8 +579,8 @@ export class CrawlerSheet extends CrawlActorSheet {
         break
       case 'actions':
         context.hotlist = await Promise.all(
-          system.hotlist.items
-            .map((id: string) => actor.items.get(id))
+          hotlistOf(actor)
+            .map((id: string) => (id ? actor.items.get(id) : null))
             .filter(Boolean)
             .map((i: any) => this.itemRow(i)),
         )
@@ -646,6 +632,7 @@ export class CrawlerSheet extends CrawlActorSheet {
           names: boxes.map((box: any) => `${box.name}${Number(box.system.quantity) > 1 ? ` ×${box.system.quantity}` : ''}`).join(', '),
         }
         context.packs = ITEM_PACKS
+        context.doll = paperDollContext(actor)
         break
       }
       case 'abilities': {
@@ -708,14 +695,13 @@ export class CrawlerSheet extends CrawlActorSheet {
   async #actionContext() {
     const actor = this.actor
     const rows = await Promise.all(
-      (actor.system.sheetActions ?? []).map(async (action: any, index: number) => {
+      actionRowsOf(actor).map(async (action: any) => {
         const source = action.sourceId ? actor.items.get(action.sourceId) : null
         const key = `action:${action.id}`
         return {
           ...action,
-          index,
           img: action.img || source?.img || 'icons/svg/clockwork.svg',
-          sourceName: source?.name ?? '',
+          sourceName: source && source.name !== action.name ? source.name : '',
           expanded: this.expanded.has(key),
           expandKey: key,
           notesHtml: await this.enrich(action.notes || source?.system?.description || ''),
@@ -725,7 +711,7 @@ export class CrawlerSheet extends CrawlActorSheet {
     return ['action', 'interrupt'].map((kind) => ({
       kind,
       label: game.i18n.localize(`CRAWLSPACE.Actions.${kind}Plural`),
-      rows: rows.filter((row: any) => (row.kind || 'action') === kind),
+      rows: rows.filter((row: any) => row.kind === kind),
     }))
   }
 
@@ -829,6 +815,24 @@ export class CrawlerSheet extends CrawlActorSheet {
     return Number(target.closest<HTMLElement>('[data-action-index]')?.dataset.actionIndex)
   }
 
+  /** The row clicked: a saved one by index, or one the hotlist adds by id. */
+  #actionRow(target: HTMLElement) {
+    const id = target.closest<HTMLElement>('[data-action-row]')?.dataset.actionRow
+    return actionRowsOf(this.actor).find((row: any) => row.id === id) ?? null
+  }
+
+  static #onConfigureHotlist(this: CrawlerSheet) {
+    return HotlistConfig.open(this.actor)
+  }
+
+  static #onConfigureActions(this: CrawlerSheet) {
+    return ActionsConfig.open(this.actor)
+  }
+
+  static #onBrowseActions(this: CrawlerSheet, _event: PointerEvent, target: HTMLElement) {
+    return openActionPack(target.dataset.kind ?? 'action')
+  }
+
   static async #onAddAction(this: CrawlerSheet, _event: PointerEvent, target: HTMLElement) {
     const kind = target.dataset.kind ?? 'action'
     return this.addRow('action', 'system.sheetActions', { kind, name: game.i18n.localize(`CRAWLSPACE.Actions.new${kind === 'interrupt' ? 'Interrupt' : 'Action'}`) })
@@ -842,32 +846,17 @@ export class CrawlerSheet extends CrawlActorSheet {
     return this.deleteRow('system.sheetActions', this.#actionIndex(target))
   }
 
-  /** Use an action: its item, else a check with its skill, else roll its formula, else post it. */
+  /** Use an action: its item, its behavior (check, Evade, hotlist item, move), its skill, its formula, or post it. */
   static async #onUseAction(this: CrawlerSheet, event: PointerEvent, target: HTMLElement) {
-    const action = this.actor.system.sheetActions?.[this.#actionIndex(target)]
-    if (!action) return
-    const source = action.sourceId ? this.actor.items.get(action.sourceId) : null
-    if (source) return source.use({ fast: event.shiftKey })
-    const skill = action.skillId ? this.actor.items.get(action.skillId) : null
-    if (skill) {
-      return rollCheck(this.actor, { label: `${action.name} (${skill.name})`, kind: 'check', modifiers: skill.checkModifiers(), sources: [skill.name], fast: event.shiftKey })
-    }
-    if (action.formula) {
-      const roll = await Roll.create(action.formula, this.actor.getRollData()).evaluate()
-      return roll.toMessage({ speaker: ChatMessage.implementation.getSpeaker({ actor: this.actor }), flavor: action.name })
-    }
-    return CrawlerSheet.#postAction(this.actor, action)
+    const action = this.#actionRow(target)
+    if (action) return runAction(this.actor, action, { fast: event.shiftKey })
   }
 
   static async #onActionToChat(this: CrawlerSheet, _event: PointerEvent, target: HTMLElement) {
-    const action = this.actor.system.sheetActions?.[this.#actionIndex(target)]
-    if (action) return CrawlerSheet.#postAction(this.actor, action)
-  }
-
-  static #postAction(actor: any, action: any) {
-    const kind = game.i18n.localize(`CRAWLSPACE.Actions.${action.kind || 'action'}`)
-    const content = `<h3>${foundry.utils.escapeHTML(action.name)} <small>(${kind})</small></h3>${action.notes ?? ''}`
-    return ChatMessage.implementation.create({ speaker: ChatMessage.implementation.getSpeaker({ actor }), content })
+    const action = this.#actionRow(target)
+    if (!action) return
+    const source = action.sourceId ? this.actor.items.get(action.sourceId) : null
+    return source && !action.notes ? source.toMessage() : postAction(this.actor, action)
   }
 
   // ---- Inherent spells ----
@@ -966,6 +955,35 @@ export class CrawlerSheet extends CrawlActorSheet {
     this.render()
   }
 
+  /** A deity from the lore compendium (or dropped onto the Deity field) names the crawler's deity. */
+  async _onDropDocument(event: DragEvent, document: any) {
+    if (document?.documentName === 'JournalEntry') {
+      const onField = (event.target as HTMLElement)?.closest?.('[data-deity-drop]')
+      if (onField || document.flags?.crawlspace?.contentType === 'deity') return this.actor.update({ 'system.details.deity': document.name })
+      return null
+    }
+    return super._onDropDocument(event, document)
+  }
+
+  static #onOpenBuildPack(this: CrawlerSheet, _event: PointerEvent, target: HTMLElement) {
+    return openBuildPacks(target.dataset.kind as any, target.dataset.stage)
+  }
+
+  /** Attack and action rows drag as their own data, for the hotbar; item rows drag as items. */
+  async _onDragStart(event: DragEvent) {
+    const target = event.currentTarget as HTMLElement
+    const attackId = target.dataset.attackId
+    const actionId = target.dataset.actionRow
+    if (attackId || actionId) {
+      const row = attackId ? findAttackRow(this.actor, attackId) : actionRowsOf(this.actor).find((entry: any) => entry.id === actionId)
+      if (!row) return
+      const source = row.sourceId ? this.actor.items.get(row.sourceId) : null
+      const data = { type: attackId ? 'CrawlAttack' : 'CrawlAction', actorUuid: this.actor.uuid, id: row.id, name: row.name, img: row.img || source?.img || '' }
+      return event.dataTransfer?.setData('text/plain', JSON.stringify(data))
+    }
+    return super._onDragStart(event)
+  }
+
   /** Drop a pet, mount, vehicle or minion onto the crawler to make it theirs. */
   async _onDropActor(_event: DragEvent, actor: any) {
     if (!['companion', 'minion'].includes(actor.type)) return
@@ -974,13 +992,29 @@ export class CrawlerSheet extends CrawlActorSheet {
   }
 
   /**
-   * Drops: onto the hotlist (or the Actions tab icon) pins the item; onto the Attacks table adds an attack
+   * Drops: onto the hotlist puts the item in its first empty slot; onto an actions table adds an action row; onto the Attacks table adds an attack
    * row for it. Anything else is the normal item drop.
    */
   async _onDropItem(event: DragEvent, item: any) {
     const target = event.target as HTMLElement
     const owned = item.parent === this.actor
-    if (owned && target?.closest?.('[data-hotlist]')) return this.pin(item, true)
+    if (target?.closest?.('[data-hotlist]')) return addToHotlist(this.actor, item)
+    // Gear dropped on a paper doll slot is worn there.
+    const dollSlot = target?.closest?.('[data-doll-slot]') as HTMLElement | null
+    if (owned && dollSlot && ['weapon', 'equipment'].includes(item.type)) {
+      const slot = dollSlot.dataset.dollSlot
+      const update: Record<string, unknown> = { 'system.equipped': true }
+      if (item.type === 'equipment' && slot) update['system.slot'] = slot
+      if (item.type === 'weapon' && dollSlot.dataset.dollHand !== 'true') return
+      return item.update(update)
+    }
+    // A race or class brings its abilities; a background fills its stage.
+    if (!owned && (item.type === 'race' || item.type === 'class')) return applyBuildItem(this.actor, item)
+    if (!owned && item.type === 'background') return applyBackground(this.actor, item)
+    const actionTable = target?.closest?.('[data-action-drop]') as HTMLElement | null
+    if (actionTable && (owned || item.type === 'action')) return addActionRow(this.actor, item, actionTable.dataset.actionDrop as 'action' | 'interrupt')
+    // Pack actions only go on the actions tables.
+    if (item.type === 'action') return addActionRow(this.actor, item, item.system.kind)
     if (owned && target?.closest?.('[data-attack-drop]')) {
       const saved = this.actor._source.system.attacks ?? []
       return this.actor.update({ 'system.attacks': [...saved, { id: foundry.utils.randomID(), name: item.name, img: item.img, sourceId: item.id }] })

@@ -62,6 +62,8 @@ const rankedSchema = () => {
     marked: new fields.BooleanField(),
     isAttack: new fields.BooleanField(),
     isUnarmed: new fields.BooleanField(),
+    /** Which actions table a hotlisted spell (or skill) shows in; blank: both when its text mentions Interrupt. */
+    actionKind: new fields.StringField({ required: true, blank: true, initial: '', choices: ['', 'action', 'interrupt', 'both'] }),
     damage: damageSchema(),
     healing: healingSchema(),
     upgrades: new fields.SchemaField({
@@ -372,6 +374,26 @@ export class BackgroundData extends foundry.abstract.TypeDataModel {
       species: new fields.StringField({ required: true, initial: 'human', choices: ['human', 'animal'] }),
       /** The three skills a crawler picks two of in the character builder. */
       skills: new fields.ArrayField(new fields.StringField({ required: true, blank: true }), { initial: ['', '', ''] }),
+    }
+  }
+}
+
+/** What using an action does beyond posting it (actions-config.ts runAction). */
+export const ACTION_BEHAVIORS = ['', 'check', 'evade', 'hotlist', 'hotlistHealing', 'move'] as const
+
+/** A common combat action or interrupt (the Actions packs), dropped onto a crawler's actions tables. */
+export class ActionData extends foundry.abstract.TypeDataModel {
+  [key: string]: any
+  static defineSchema() {
+    const fields = f()
+    return {
+      ...common(),
+      kind: new fields.StringField({ required: true, initial: 'action', choices: ['action', 'interrupt'] }),
+      behavior: new fields.StringField({ required: true, blank: true, initial: '', choices: [...ACTION_BEHAVIORS] }),
+      /** Skills the check uses, comma separated, in order of preference (Look for Clues: Perception, Investigation). */
+      skills: text(),
+      /** Rolled when used (Intervene: 1d6). */
+      formula: text(),
     }
   }
 }

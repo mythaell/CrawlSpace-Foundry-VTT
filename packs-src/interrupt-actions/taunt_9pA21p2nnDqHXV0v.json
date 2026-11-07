@@ -1,0 +1,36 @@
+{
+  "_id": "9pA21p2nnDqHXV0v",
+  "name": "Taunt",
+  "type": "action",
+  "img": "icons/svg/terror.svg",
+  "sort": 400,
+  "system": {
+    "description": "<p>Try to pull attacks announced against your allies onto yourself instead. You may still Evade them.</p>",
+    "notes": "",
+    "source": {
+      "database": "",
+      "id": null,
+      "book": "",
+      "pages": ""
+    },
+    "kind": "interrupt",
+    "behavior": "check",
+    "skills": "Taunt",
+    "formula": ""
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!9pA21p2nnDqHXV0v"
+}

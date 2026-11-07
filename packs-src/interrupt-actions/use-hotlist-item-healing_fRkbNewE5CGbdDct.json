@@ -1,0 +1,36 @@
+{
+  "_id": "fRkbNewE5CGbdDct",
+  "name": "Use Hotlist Item (Healing)",
+  "type": "action",
+  "img": "icons/svg/heal.svg",
+  "sort": 500,
+  "system": {
+    "description": "<p>Use a healing item, healing scroll or healing spell from your Hotlist. Only healing items can be used as an Interrupt.</p>",
+    "notes": "",
+    "source": {
+      "database": "",
+      "id": null,
+      "book": "",
+      "pages": ""
+    },
+    "kind": "interrupt",
+    "behavior": "hotlistHealing",
+    "skills": "",
+    "formula": ""
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!fRkbNewE5CGbdDct"
+}

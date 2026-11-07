@@ -12,7 +12,7 @@
   <section class="crawl-table hotlist-table" data-hotlist>
     <div class="table-head plain-head">
       <span class="head-name">{{localize "CRAWLSPACE.Section.Hotlist"}} <small>({{hotlist.length}}/{{system.hotlist.capacity}})</small></span>
-      <span class="head-hint">{{localize "CRAWLSPACE.Hotlist.Hint"}}</span>
+      <span class="head-controls">{{#if editable}}<a data-action="configureHotlist" data-tooltip="{{localize 'CRAWLSPACE.Hotlist.ConfigureHint'}}"><i class="fa-solid fa-gear"></i> {{localize "CRAWLSPACE.Hotlist.Configure"}}</a>{{/if}}</span>
     </div>
     <ol class="table-rows">
       {{#each hotlist as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="hotlist"}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Hotlist.Empty"}}</li>{{/each}}
@@ -26,7 +26,7 @@
     </div>
     <ol class="table-rows">
       {{#each attacks as |attack|}}
-      <li class="pf-strike {{#if attack.expanded}}expanded{{/if}}" data-attack-id="{{attack.id}}" data-expand-key="{{attack.expandKey}}">
+      <li class="pf-strike draggable {{#if attack.expanded}}expanded{{/if}}" data-attack-id="{{attack.id}}" data-expand-key="{{attack.expandKey}}">
         <div class="strike-main">
           <img class="row-img" src="{{attack.img}}" alt="" data-action="attackRoll" data-tooltip="{{localize 'CRAWLSPACE.Attack.Roll'}}">
           <div class="strike-body">
@@ -55,21 +55,23 @@
   </section>
 
   {{#each actionGroups as |group|}}
-  <section class="crawl-table action-table">
+  <section class="crawl-table action-table" data-action-drop="{{group.kind}}">
     <div class="table-head plain-head">
       <span class="head-name">{{group.label}}</span>
-      <span class="head-controls">{{#if @root.editable}}<a data-action="addAction" data-kind="{{group.kind}}" data-tooltip="{{localize 'CRAWLSPACE.Actions.Add'}}"><i class="fa-solid fa-plus"></i> {{localize "CRAWLSPACE.Actions.Add"}}</a>{{/if}}</span>
+      <span class="head-controls">{{#if @root.editable}}<a data-action="configureActions" data-tooltip="{{localize 'CRAWLSPACE.Actions.ConfigureHint'}}"><i class="fa-solid fa-gear"></i> {{localize "CRAWLSPACE.Hotlist.Configure"}}</a>
+        <a data-action="browseActions" data-kind="{{group.kind}}" data-tooltip="{{localize 'CRAWLSPACE.Actions.Browse'}}"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a data-action="addAction" data-kind="{{group.kind}}" data-tooltip="{{localize 'CRAWLSPACE.Actions.Add'}}"><i class="fa-solid fa-plus"></i> {{localize "CRAWLSPACE.Actions.Add"}}</a>{{/if}}</span>
     </div>
     <ol class="table-rows">
       {{#each group.rows as |action|}}
-      <li class="crawl-row {{#if action.expanded}}expanded{{/if}}" data-action-index="{{action.index}}" data-expand-key="{{action.expandKey}}">
+      <li class="crawl-row draggable {{#if action.expanded}}expanded{{/if}}" data-action-row="{{action.id}}" {{#unless action.auto}}data-action-index="{{action.index}}"{{/unless}} data-expand-key="{{action.expandKey}}">
         <div class="row-main">
           <img class="row-img" src="{{action.img}}" alt="" data-action="useAction" data-tooltip="{{localize 'CRAWLSPACE.Item.Use'}}">
-          <a class="row-name" data-action="toggleExpand">{{action.name}}{{#if action.sourceName}} <small>({{action.sourceName}})</small>{{/if}}</a>
+          <a class="row-name" data-action="toggleExpand">{{action.name}}{{#if action.sourceName}} <small>({{action.sourceName}})</small>{{/if}}{{#if action.auto}} <small class="row-auto">{{localize "CRAWLSPACE.Actions.FromHotlist"}}</small>{{/if}}</a>
           <span class="col">{{action.formula}}</span>
           <span class="row-controls">
             <a data-action="actionToChat" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
-            {{#if @root.editable}}
+ {{#if (and @root.editable (not action.auto))}}
             <a data-action="editAction" data-tooltip="{{localize 'CRAWLSPACE.Item.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
             <a data-action="deleteAction" data-tooltip="{{localize 'CRAWLSPACE.Item.Delete'}}"><i class="fa-solid fa-trash"></i></a>
             {{/if}}

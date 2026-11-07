@@ -1,0 +1,36 @@
+{
+  "_id": "kUnRTeaMSh5eJLwo",
+  "name": "Make a Check",
+  "type": "action",
+  "img": "icons/svg/d20-black.svg",
+  "sort": 100,
+  "system": {
+    "description": "<p>Roll a Skill or stat check for something you attempt this turn. Pick the Skill or stat when you use it.</p>",
+    "notes": "",
+    "source": {
+      "database": "",
+      "id": null,
+      "book": "",
+      "pages": ""
+    },
+    "kind": "action",
+    "behavior": "check",
+    "skills": "",
+    "formula": ""
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!kUnRTeaMSh5eJLwo"
+}

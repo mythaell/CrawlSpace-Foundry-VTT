@@ -4,10 +4,10 @@
       <div class="portrait-box" {{#if editable}}data-tooltip="{{localize 'CRAWLSPACE.Sheet.PortraitHint'}}"{{/if}}><img src="{{document.img}}" alt="{{document.name}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}}></div>
     </div>
     <div class="char-fields">
-      <label><span>{{localize "CRAWLSPACE.Crawler.Race"}}</span><input type="text" name="system.details.race" value="{{systemSource.details.race}}"></label>
+      <label><span>{{localize "CRAWLSPACE.Crawler.Race"}}</span><span class="field-with-pack"><input type="text" name="system.details.race" value="{{systemSource.details.race}}">{{#if editable}}<a class="field-pack" data-action="openBuildPack" data-kind="race" data-tooltip="{{localize 'CRAWLSPACE.Build.Browse'}}"><i class="fa-solid fa-magnifying-glass"></i></a>{{/if}}</span></label>
       <label><span>{{localize "CRAWLSPACE.Crawler.Number"}}</span><input type="text" name="system.details.crawlerNumber" value="{{systemSource.details.crawlerNumber}}"></label>
-      <label><span>{{localize "CRAWLSPACE.Crawler.Class"}}</span><input type="text" name="system.details.className" value="{{systemSource.details.className}}"></label>
-      <label><span>{{localize "CRAWLSPACE.Crawler.Deity"}}</span><textarea name="system.details.deity" rows="1">{{systemSource.details.deity}}</textarea></label>
+      <label><span>{{localize "CRAWLSPACE.Crawler.Class"}}</span><span class="field-with-pack"><input type="text" name="system.details.className" value="{{systemSource.details.className}}">{{#if editable}}<a class="field-pack" data-action="openBuildPack" data-kind="class" data-tooltip="{{localize 'CRAWLSPACE.Build.Browse'}}"><i class="fa-solid fa-magnifying-glass"></i></a>{{/if}}</span></label>
+      <label data-deity-drop><span>{{localize "CRAWLSPACE.Crawler.Deity"}}</span><span class="field-with-pack"><textarea name="system.details.deity" rows="1">{{systemSource.details.deity}}</textarea>{{#if editable}}<a class="field-pack" data-action="openBuildPack" data-kind="deity" data-tooltip="{{localize 'CRAWLSPACE.Build.Browse'}}"><i class="fa-solid fa-magnifying-glass"></i></a>{{/if}}</span></label>
       <label><span>{{localize "CRAWLSPACE.Crawler.Size"}}</span><input type="text" name="system.details.size" value="{{systemSource.details.size}}"></label>
       <label><span>{{localize "CRAWLSPACE.Sheet.Pronouns"}}</span><input type="text" name="system.details.gender" value="{{systemSource.details.gender}}"></label>
     </div>
@@ -37,10 +37,10 @@
   <hr>
 
   <div class="char-background">
-    <label><span>{{localize "CRAWLSPACE.Crawler.Childhood"}}</span><textarea name="system.background.childhood" rows="1">{{systemSource.background.childhood}}</textarea></label>
-    <label><span>{{localize "CRAWLSPACE.Crawler.Career"}}</span><textarea name="system.background.career" rows="1">{{systemSource.background.career}}</textarea></label>
-    <label><span>{{localize "CRAWLSPACE.Crawler.Adolescence"}}</span><textarea name="system.background.adolescence" rows="1">{{systemSource.background.adolescence}}</textarea></label>
-    <label><span>{{localize "CRAWLSPACE.Crawler.Hobby"}}</span><textarea name="system.background.hobby" rows="1">{{systemSource.background.hobby}}</textarea></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.Childhood"}}</span><span class="field-with-pack"><textarea name="system.background.childhood" rows="1">{{systemSource.background.childhood}}</textarea>{{#if editable}}<a class="field-pack" data-action="openBuildPack" data-kind="background" data-stage="childhood" data-tooltip="{{localize 'CRAWLSPACE.Build.Browse'}}"><i class="fa-solid fa-magnifying-glass"></i></a>{{/if}}</span></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.Career"}}</span><span class="field-with-pack"><textarea name="system.background.career" rows="1">{{systemSource.background.career}}</textarea>{{#if editable}}<a class="field-pack" data-action="openBuildPack" data-kind="background" data-stage="career" data-tooltip="{{localize 'CRAWLSPACE.Build.Browse'}}"><i class="fa-solid fa-magnifying-glass"></i></a>{{/if}}</span></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.Adolescence"}}</span><span class="field-with-pack"><textarea name="system.background.adolescence" rows="1">{{systemSource.background.adolescence}}</textarea>{{#if editable}}<a class="field-pack" data-action="openBuildPack" data-kind="background" data-stage="adolescence" data-tooltip="{{localize 'CRAWLSPACE.Build.Browse'}}"><i class="fa-solid fa-magnifying-glass"></i></a>{{/if}}</span></label>
+    <label><span>{{localize "CRAWLSPACE.Crawler.Hobby"}}</span><span class="field-with-pack"><textarea name="system.background.hobby" rows="1">{{systemSource.background.hobby}}</textarea>{{#if editable}}<a class="field-pack" data-action="openBuildPack" data-kind="background" data-stage="hobby" data-tooltip="{{localize 'CRAWLSPACE.Build.Browse'}}"><i class="fa-solid fa-magnifying-glass"></i></a>{{/if}}</span></label>
   </div>
   <hr>
 

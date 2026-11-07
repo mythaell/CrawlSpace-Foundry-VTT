@@ -1,0 +1,36 @@
+{
+  "_id": "vJNYLoA9t4kup7bT",
+  "name": "Retrieve",
+  "type": "action",
+  "img": "icons/svg/item-bag.svg",
+  "sort": 400,
+  "system": {
+    "description": "<p>Take an item from your inventory or the world: into your hand, onto the ground, or onto your Hotlist.</p>",
+    "notes": "",
+    "source": {
+      "database": "",
+      "id": null,
+      "book": "",
+      "pages": ""
+    },
+    "kind": "action",
+    "behavior": "",
+    "skills": "",
+    "formula": ""
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "crawlspace",
+    "systemVersion": "0.1.0",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null
+  },
+  "_key": "!items!vJNYLoA9t4kup7bT"
+}

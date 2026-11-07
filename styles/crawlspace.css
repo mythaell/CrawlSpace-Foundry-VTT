@@ -3173,3 +3173,282 @@
   .crawlspace .damage-effect .damage-effect-links { display: flex; flex-wrap: wrap; gap: 4px 12px; }
   .crawlspace .damage-effect label.check { flex-direction: row; align-items: center; gap: 4px; }
 }
+
+@layer system {
+  /* White checkboxes on every blue sheet and dialog: a white box, a navy tick when checked. */
+  .application.crawlspace input[type='checkbox'],
+  #crawlspace-timers.crawlspace input[type='checkbox'],
+  #sidebar input[type='checkbox'] {
+    --checkbox-background-color: #ffffff;
+    --checkbox-checked-color: #ffffff;
+    --checkbox-checkmark-color: #0d2f52;
+    --checkbox-disabled-color: rgb(255 255 255 / 45%);
+  }
+  /* The unchecked box is a solid white square, not an outline. */
+  :is(.application.crawlspace, #crawlspace-timers.crawlspace, #sidebar) input[type='checkbox']:not(:checked)::before {
+    font-weight: 900;
+  }
+
+  /* A field with a compendium button beside it (race, class, deity, backgrounds). */
+  .crawlspace .field-with-pack { display: flex; align-items: stretch; gap: 4px; }
+  .crawlspace .field-with-pack > :is(input, textarea) { flex: 1; min-width: 0; }
+  .crawlspace .field-with-pack .field-pack { flex: 0 0 26px; display: grid; place-items: center; border: 1px solid var(--dcc-blue-light, var(--crawl-border)); background: var(--btn-bg, transparent); border-radius: 2px; font-size: 11px; }
+  .crawlspace .field-with-pack .field-pack:hover { border-color: var(--hud-cyan); }
+  .crawlspace .crawl-table .head-controls { display: flex; align-items: center; gap: 10px; }
+  .crawlspace .row-name .row-auto { padding: 0 4px; border: 1px solid var(--crawl-border); border-radius: 2px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* Hotlist and actions popups: drop slots listed top to bottom. */
+  .crawlspace.slot-config .window-content { padding: 8px 10px; }
+  .crawlspace.slot-config .slot-config-body { display: flex; flex-direction: column; gap: 8px; }
+  .crawlspace.slot-config .hint { margin: 0; }
+  .crawlspace.slot-config .config-slots { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+  .crawlspace.slot-config .config-slot {
+    display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 3px 8px;
+    background: var(--row-bg); border: 1px solid rgb(131 223 255 / 35%); border-radius: 2px;
+  }
+  .crawlspace.slot-config .config-slot[draggable='true'] { cursor: grab; }
+  .crawlspace.slot-config .config-slot.empty { border-style: dashed; background: rgb(13 52 99 / 25%); }
+  .crawlspace.slot-config .config-slot.drop-hover,
+  .crawlspace.slot-config .config-group.drop-hover { border-color: var(--hud-cyan); box-shadow: inset 0 0 0 1px var(--hud-cyan), 0 0 10px rgb(140 255 246 / 30%); }
+  .crawlspace.slot-config .slot-number { flex: 0 0 22px; text-align: center; font-weight: 700; color: var(--hud-cyan); }
+  .crawlspace.slot-config .config-slot img { flex: 0 0 32px; width: 32px; height: 32px; border: 1px solid var(--crawl-border); object-fit: cover; }
+  .crawlspace.slot-config .slot-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+  .crawlspace.slot-config .slot-type { color: var(--crawl-muted); font-size: 11px; white-space: nowrap; }
+  .crawlspace.slot-config .slot-drop { flex: 1; color: var(--crawl-muted); font-style: italic; font-size: 12px; }
+  .crawlspace.slot-config .slot-clear { flex: 0 0 auto; opacity: 0.7; }
+  .crawlspace.slot-config .slot-clear:hover { opacity: 1; color: #ff8a80; }
+  .crawlspace.slot-config .config-group { display: flex; flex-direction: column; gap: 4px; padding: 6px; border: 1px solid var(--crawl-border); background: rgb(13 52 99 / 25%); }
+  .crawlspace.slot-config .config-group-head { display: flex; justify-content: space-between; align-items: center; padding: 3px 8px; background: var(--panel-title-bg); border: 1px solid var(--dcc-blue-light); font-weight: 700; }
+
+  /* ---------- Paper doll ---------- */
+  .crawlspace .crawl-paper-doll { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+  .crawlspace .crawl-paper-doll .doll-stage { position: relative; width: 100%; max-width: 620px; margin: 0 auto; aspect-ratio: 560 / 400; }
+  .crawlspace .crawl-paper-doll .doll-art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .crawlspace .crawl-paper-doll .doll-frame-fill { fill: rgb(6 26 52 / 72%); }
+  .crawlspace .crawl-paper-doll .doll-frame-edge { fill: none; stroke: #66dfff; stroke-width: 2; filter: drop-shadow(0 0 4px rgb(102 223 255 / 55%)); }
+  /* The mannequin's black backdrop drops out against the panel. */
+  .crawlspace .crawl-paper-doll .doll-figure { mix-blend-mode: screen; opacity: 0.92; }
+  .crawlspace .crawl-paper-doll .doll-floor { fill: rgb(140 255 246 / 18%); }
+  .crawlspace .crawl-paper-doll .doll-link polyline { fill: none; stroke: rgb(140 255 246 / 35%); stroke-width: 1.2; stroke-dasharray: 3 3; }
+  .crawlspace .crawl-paper-doll .doll-link circle { fill: rgb(6 26 52 / 90%); stroke: rgb(140 255 246 / 45%); stroke-width: 1.2; }
+  .crawlspace .crawl-paper-doll .doll-link.filled polyline { stroke: #8cfff6; stroke-dasharray: none; filter: drop-shadow(0 0 2px rgb(140 255 246 / 80%)); }
+  .crawlspace .crawl-paper-doll .doll-link.filled circle { fill: #8cfff6; stroke: #ffffff; }
+  .crawlspace .crawl-paper-doll .doll-slot {
+    position: absolute; display: grid; place-items: center;
+    background: radial-gradient(circle at 50% 40%, rgb(40 110 170 / 55%), rgb(8 30 58 / 92%));
+    border: 2px solid rgb(131 223 255 / 55%); border-radius: 6px; corner-shape: bevel;
+    box-shadow: inset 0 0 0 1px rgb(6 26 52), inset 0 0 12px rgb(60 175 255 / 25%), 0 2px 6px rgb(2 13 33 / 60%);
+  }
+  .crawlspace .crawl-paper-doll .doll-slot.filled { border-color: #8cfff6; box-shadow: inset 0 0 0 1px rgb(6 26 52), 0 0 10px rgb(140 255 246 / 40%); }
+  .crawlspace .crawl-paper-doll .doll-slot.broken { border-color: #ff6b6b; box-shadow: inset 0 0 14px rgb(255 80 80 / 45%); }
+  .crawlspace .crawl-paper-doll .doll-slot.echo img { opacity: 0.4; filter: grayscale(0.6); }
+  .crawlspace .crawl-paper-doll .doll-slot:hover { border-color: #ffffff; }
+  .crawlspace .crawl-paper-doll .doll-slot img { width: 84%; height: 84%; object-fit: contain; border: 0; cursor: pointer; }
+  .crawlspace .crawl-paper-doll .doll-placeholder { font-size: 22px; color: rgb(140 255 246 / 28%); }
+  .crawlspace .crawl-paper-doll .doll-label {
+    position: absolute; left: 50%; top: 100%; transform: translate(-50%, 2px); white-space: nowrap;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #c0dfef; text-shadow: 0 1px 2px #071b35;
+  }
+  .crawlspace .crawl-paper-doll .doll-unequip {
+    position: absolute; top: -7px; right: -7px; width: 16px; height: 16px; display: none; place-items: center;
+    font-size: 9px; background: #164976; border: 1px solid #8cfff6; border-radius: 50%;
+  }
+  .crawlspace .crawl-paper-doll .doll-slot:hover .doll-unequip { display: grid; }
+  .crawlspace .crawl-paper-doll .doll-accessories { max-width: 620px; width: 100%; margin: 0 auto; padding: 6px 10px 8px; border: 1px solid var(--crawl-border); background: rgb(6 26 52 / 55%); }
+  .crawlspace .crawl-paper-doll .doll-acc-title { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .crawlspace .crawl-paper-doll .doll-acc-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .crawlspace .crawl-paper-doll .doll-acc-row .doll-slot { position: relative; width: 46px; height: 46px; }
+  .crawlspace .crawl-paper-doll .doll-acc-row .empty-accessory { border-style: dashed; }
+  .crawl-doll-tip { max-width: 260px; text-align: left; }
+  .crawl-doll-tip strong { display: block; font-size: 13px; }
+  .crawl-doll-tip .broken { color: #ff8a80; }
+  .crawl-doll-tip .facts { display: flex; flex-wrap: wrap; gap: 3px; margin: 4px 0; }
+  .crawl-doll-tip .facts span { padding: 0 4px; border: 1px solid rgb(140 255 246 / 45%); border-radius: 2px; font-size: 11px; }
+  .crawl-doll-tip p { margin: 0; font-size: 11px; line-height: 1.35; }
+}
+
+@layer system {
+  /* =========================================================
+     Right sidebar (chat, combat, directories, settings...) in the CrawlSpace HUD theme,
+     for both the light and dark interface themes. Popped-out sidebar tabs match.
+     ========================================================= */
+  #sidebar,
+  #sidebar :is(.themed, .theme-light, .theme-dark),
+  .sidebar-popout,
+  .sidebar-popout :is(.themed, .theme-light, .theme-dark) {
+    --hud-cyan: #8cfff6;
+    --hud-edge: #66dfff;
+    --hud-surface: linear-gradient(170deg, rgb(33 108 180 / 94%), rgb(26 82 142 / 95%) 50%, rgb(17 50 92 / 97%));
+    --sidebar-background: var(--hud-surface);
+    --sidebar-separator: 1px solid rgb(131 223 255 / 40%);
+    --sidebar-entry-hover-bg: rgb(52 106 137 / 65%);
+    --sidebar-folder-color: #1d527a;
+    --color-scheme: dark;
+    --color-text-emphatic: #ffffff;
+    --color-text-primary: #f2fcff;
+    --color-text-secondary: #c0dfef;
+    --color-text-subtle: #9cc4da;
+    --color-border: rgb(131 223 255 / 55%);
+    --color-scrollbar: #bfeaff;
+    --color-scrollbar-track: #153c68;
+    --input-background-color: #d9e6f2;
+    --input-text-color: #111820;
+    --input-border-color: #245a78;
+    --input-placeholder-color: #6a7682;
+    --input-focus-outline-color: var(--hud-cyan);
+    --chat-message-background: linear-gradient(160deg, rgb(19 70 122 / 92%), rgb(12 44 82 / 95%));
+    --chat-message-border-color: rgb(131 223 255 / 55%);
+    --chat-input-border: 1px solid rgb(131 223 255 / 55%);
+    --content-link-background: rgb(10 40 75 / 80%);
+    --content-link-border-color: rgb(131 223 255 / 55%);
+    --content-link-icon-color: var(--hud-cyan);
+    --content-link-text-color: #f2fcff;
+    color: var(--color-text-primary);
+    font-family: 'Quantico', var(--font-sans, sans-serif);
+  }
+
+  /* The tab strip: square HUD buttons. */
+  #sidebar-tabs > menu .ui-control {
+    color: #ffffff;
+    background: #164976;
+    border: 1px solid #83dfff;
+    border-radius: 3px;
+    corner-shape: bevel;
+    box-shadow: inset 0 0 10px rgb(80 190 255 / 15%), 0 2px 5px rgb(2 15 35 / 35%);
+  }
+  #sidebar-tabs > menu .ui-control:hover,
+  #sidebar-tabs > menu .ui-control.active,
+  #sidebar-tabs > menu .ui-control[aria-pressed='true'] {
+    background: linear-gradient(180deg, #318fda, #216baf);
+    border-color: var(--hud-cyan, #8cfff6);
+    box-shadow: inset 0 -2px #8cfff6, 0 0 9px rgb(90 228 255 / 35%);
+  }
+
+  /* Each tab is a HUD panel. */
+  #sidebar .sidebar-tab,
+  .sidebar-popout .window-content {
+    background: var(--hud-surface);
+    color: var(--color-text-primary);
+  }
+  #sidebar .sidebar-tab:not(.sidebar-popout) {
+    border: 2px solid var(--hud-edge);
+    border-right: none;
+    border-radius: 12px 0 0 12px;
+    corner-shape: bevel;
+    box-shadow: 0 0 0 1px rgb(155 255 251 / 25%), 0 0 16px rgb(45 188 255 / 25%), inset 0 0 24px rgb(60 175 255 / 10%);
+  }
+  :is(#sidebar, .sidebar-popout) :is(h1, h2, h3, h4, label, .folder-name, .entry-name, .document-name) {
+    color: var(--color-text-primary);
+    text-shadow: 0 1px 2px #071b35;
+  }
+  :is(#sidebar, .sidebar-popout) a:hover { color: var(--hud-cyan); text-shadow: 0 0 6px rgb(140 255 246 / 50%); }
+
+  /* Buttons and inputs, as on the sheets. */
+  :is(#sidebar, .sidebar-popout) :is(button, .button):not(.ui-control, .inline-control, .icon) {
+    --button-background-color: #164976;
+    --button-border-color: #83dfff;
+    --button-text-color: #ffffff;
+    --button-hover-background-color: #246ca7;
+    --button-hover-border-color: #8cfff6;
+    --button-hover-text-color: #ffffff;
+    font-family: inherit;
+    border-radius: 2px;
+  }
+  :is(#sidebar, .sidebar-popout) :is(.inline-control, button.icon) {
+    --button-text-color: #e6f8ff;
+    --button-hover-text-color: #8cfff6;
+    --button-hover-background-color: rgb(52 106 137 / 65%);
+  }
+  :is(#sidebar, .sidebar-popout) :is(input[type='text'], input[type='search'], input[type='number'], select, textarea) {
+    color: #111820;
+    background: #d9e6f2;
+    border: 1px solid #245a78;
+    font-family: inherit;
+  }
+
+  /* Directories (scenes, actors, items, journal, tables, cards, playlists, compendiums, macros). */
+  #sidebar .directory .directory-header,
+  .sidebar-popout .directory .directory-header {
+    border-bottom: 1px solid rgb(131 223 255 / 40%);
+  }
+  :is(#sidebar, .sidebar-popout) .directory-item.folder > .folder-header {
+    background: linear-gradient(180deg, #214e68, #17384f);
+    border-top: 1px solid rgb(131 223 255 / 45%);
+    border-bottom: 1px solid rgb(131 223 255 / 45%);
+    color: #ffffff;
+  }
+  :is(#sidebar, .sidebar-popout) .directory-item.entry {
+    border-bottom: 1px solid rgb(131 223 255 / 18%);
+  }
+  :is(#sidebar, .sidebar-popout) .directory-item.entry:hover { background: var(--sidebar-entry-hover-bg); }
+  :is(#sidebar, .sidebar-popout) .directory-item img.thumbnail { border: 1px solid rgb(131 223 255 / 45%); }
+  :is(#sidebar, .sidebar-popout) .directory-footer { border-top: 1px solid rgb(131 223 255 / 40%); }
+
+  /* Chat: messages are HUD cards. */
+  #sidebar .chat-log .chat-message,
+  .chat-popout .chat-message,
+  #chat-notifications .chat-message {
+    color: #f2fcff;
+    background: var(--chat-message-background);
+    border: 1px solid var(--chat-message-border-color);
+    border-radius: 6px;
+    corner-shape: bevel;
+    box-shadow: inset 0 0 14px rgb(60 175 255 / 12%), 0 2px 6px rgb(2 13 33 / 40%);
+  }
+  :is(#sidebar, .chat-popout, #chat-notifications) .chat-message :is(.message-header, .message-sender, .message-metadata, h3, h4, strong, .card-title) { color: #ffffff; }
+  :is(#sidebar, .chat-popout, #chat-notifications) .chat-message :is(.message-metadata, .hint, .card-sub, .flavor-text) { color: #c0dfef; }
+  :is(#sidebar, .chat-popout, #chat-notifications) .chat-message .message-header { border-bottom: 1px solid rgb(131 223 255 / 30%); }
+  :is(#sidebar, .chat-popout, #chat-notifications) .chat-message :is(.dice-formula, .dice-total, .dice-tooltip .dice) {
+    color: #ffffff;
+    background: rgb(6 26 52 / 65%);
+    border: 1px solid rgb(131 223 255 / 45%);
+    box-shadow: none;
+  }
+  :is(#sidebar, .chat-popout, #chat-notifications) .chat-message .dice-total { color: var(--hud-cyan, #8cfff6); }
+  :is(#sidebar, .chat-popout, #chat-notifications) .chat-message button {
+    color: #ffffff;
+    background: #164976;
+    border: 1px solid #83dfff;
+    border-radius: 2px;
+  }
+  :is(#sidebar, .chat-popout, #chat-notifications) .chat-message button:hover:not(:disabled) { background: #246ca7; border-color: #8cfff6; }
+  :is(#sidebar, .chat-popout, #chat-notifications) .chat-message .crawl-card :is(.attack-targets li, .declaration-targets li) { border-color: rgb(131 223 255 / 30%); }
+  :is(#sidebar, .chat-popout, #chat-notifications) .chat-message .crawl-card .tag {
+    color: #ffffff;
+    background: rgb(6 26 52 / 60%);
+    border: 1px solid rgb(140 255 246 / 55%);
+    border-radius: 2px;
+    text-shadow: none;
+  }
+  #chat-notifications .chat-form :is(textarea, prose-mirror, .editor) { color: #111820; background: rgb(217 230 242 / 92%); border: 1px solid #66dfff; }
+  #sidebar .chat-form { border-top: 1px solid rgb(131 223 255 / 40%); }
+  #sidebar .chat-form :is(textarea, .editor, prose-mirror, #chat-message) { color: #111820; background: #d9e6f2; }
+
+  /* Combat tracker (docked or popped out). */
+  :is(#sidebar, .sidebar-popout) .combat-tracker-header { border-bottom: 1px solid rgb(131 223 255 / 40%); }
+  :is(#sidebar, .sidebar-popout) .combat-tracker .combatant {
+    color: #f2fcff;
+    border-bottom: 1px solid rgb(131 223 255 / 20%);
+  }
+  :is(#sidebar, .sidebar-popout) .combat-tracker .combatant:hover { background: var(--sidebar-entry-hover-bg); }
+  :is(#sidebar, .sidebar-popout) .combat-tracker .combatant.active {
+    background: rgb(140 255 246 / 14%);
+    border: 1px solid rgb(140 255 246 / 60%);
+  }
+  :is(#sidebar, .sidebar-popout) .combat-tracker .combatant .token-image { border: 1px solid rgb(131 223 255 / 45%); background: rgb(6 26 52 / 60%); }
+  :is(#sidebar, .sidebar-popout) .combat-tracker .combatant .token-initiative { color: var(--hud-cyan, #8cfff6); }
+  :is(#sidebar, .sidebar-popout) .combat-controls { border-top: 1px solid rgb(131 223 255 / 40%); }
+  :is(#sidebar, .sidebar-popout) .crawl-phases { color: #f2fcff; }
+  :is(#sidebar, .sidebar-popout) .crawl-phases .phase-current { color: #ffffff; text-shadow: 0 1px 2px #071b35; }
+  :is(#sidebar, .sidebar-popout) .crawl-phases .phase-strip li { color: #c0dfef; background: rgb(6 26 52 / 55%); border-color: rgb(131 223 255 / 45%); }
+  :is(#sidebar, .sidebar-popout) .crawl-phases .phase-waiting li { color: #e6f8ff; }
+  :is(#sidebar, .sidebar-popout) .crawl-phases .phase-strip li.side-mob { border-color: rgb(255 120 110 / 70%); }
+  :is(#sidebar, .sidebar-popout) .crawl-phases .phase-strip li.side-crawler { border-color: rgb(110 230 150 / 70%); }
+  :is(#sidebar, .sidebar-popout) .crawl-phases .phase-strip li.active { color: #ffffff; font-weight: 700; box-shadow: 0 0 8px rgb(140 255 246 / 35%); }
+  :is(#sidebar, .sidebar-popout) .crawl-phases .phase-strip li.active.side-mob { background: #b3261e; }
+  :is(#sidebar, .sidebar-popout) .crawl-phases .phase-strip li.active.side-crawler { background: #2f8f4e; }
+  :is(#sidebar, .sidebar-popout) .crawl-phases .phase-waiting li { background: rgb(6 26 52 / 55%); border-color: rgb(131 223 255 / 45%); }
+
+  /* Settings and other plain lists. */
+  :is(#sidebar, .sidebar-popout) #settings :is(section, .info) { border-color: rgb(131 223 255 / 40%); }
+}

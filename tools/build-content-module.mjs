@@ -8,6 +8,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { convertRow, stableId } from '../src/import/convert.ts'
+import { isRangedAttackText } from '../src/rules/damage-effects.ts'
 import { ROOT, COLLECTION_FOR, ITEM_TYPE_LABELS, assertPacksClosed, compile, foldersFor, keyify, loadCrawlSpaceEnv, readContent, stamp, writeSource } from './lib.mjs'
 
 const MODULE_ID = 'crawlspace-content'
@@ -57,6 +58,13 @@ for (const row of rows) {
   if (PACKS[converted.pack].type !== converted.documentName) throw new Error(`${row.content_type} produced ${converted.documentName} for pack ${converted.pack}`)
   if (row.data?.book) converted.data.flags.crawlspace.book = row.data.book
   byPack[converted.pack].push(stamp(converted.data, systemManifest.version))
+}
+
+// Aiming modifies Ranged Attack skills; its text doesn't list them, so link every ranged attack skill.
+const rangedSkills = byPack.skills.filter((skill) => skill.system?.isAttack && isRangedAttackText(skill.system.description)).map((skill) => skill.name)
+for (const skill of byPack.skills) {
+  if (!/^aim(ing)?$/i.test(skill.name.trim()) || skill.system.damageEffect?.skills?.length) continue
+  skill.system.damageEffect = { ...skill.system.damageEffect, enabled: true, skills: rangedSkills }
 }
 
 // NPC stat blocks point at mobs by database seed; turn them into compendium UUIDs.

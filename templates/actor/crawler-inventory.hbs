@@ -3,6 +3,7 @@
     <label class="gold"><i class="fa-solid fa-coins"></i> {{localize "CRAWLSPACE.Crawler.Gold"}} <input type="number" name="system.details.gold" value="{{systemSource.details.gold}}" min="0"></label>
     <span class="loot-box-count" data-tooltip="{{#if lootBoxes.count}}{{lootBoxes.names}}{{else}}{{localize 'CRAWLSPACE.Loot.NoPending'}}{{/if}}"><i class="fa-solid fa-gift"></i> {{localize "CRAWLSPACE.Loot.Pending" count=lootBoxes.count}}</span>
   </div>
+  {{> "systems/crawlspace/templates/actor/paper-doll.hbs"}}
   {{> "systems/crawlspace/templates/actor/filter-bar.hbs" table="inventory" categories=categories stats=false checks=false}}
   <div class="inventory-sections" data-filter-scope="inventory">
     {{#each inventorySections as |section|}}

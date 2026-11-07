@@ -294,7 +294,9 @@ export async function rollAttack(actor: any, attack: AttackSource, options: { fa
     { messageMode: messageMode() },
   )
   await afterAction(actor)
-  return { roll, targets: rows }
+  // Damage effect skills ticked for this attack: only one skill used may be marked for advancement.
+  const effectSkills = result.modifiers.filter((modifier) => modifier.skillRank !== undefined).map((modifier) => modifier.label)
+  return { roll, targets: rows, effectSkills }
 }
 
 /** Tags under a card's title: damage formula (attacks), types, Armor Piercing, Magic, Area. */

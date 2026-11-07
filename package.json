@@ -11,7 +11,8 @@
     "test": "node --test tests/*.test.mjs",
     "packs:homebrew": "node tools/build-homebrew-packs.mjs",
     "packs:content": "node tools/build-content-module.mjs",
-    "packs": "npm run packs:homebrew && npm run packs:content",
+    "packs:actions": "node tools/build-action-packs.mjs",
+    "packs": "npm run packs:homebrew && npm run packs:actions && npm run packs:content",
     "link": "node tools/link-foundry.mjs"
   },
   "repository": {

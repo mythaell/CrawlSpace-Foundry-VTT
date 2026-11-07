@@ -2,7 +2,7 @@
   <strong class="crawl-tab-title">{{activeTabLabel}}</strong>
   <div class="crawl-tab-icons">
     {{#each tabs as |tab|}}
-    <a class="{{tab.cssClass}}" {{#if (eq tab.id "actions")}}data-hotlist{{/if}} data-action="tab" data-group="{{tab.group}}" data-tab="{{tab.id}}" data-tooltip="{{localize tab.label}}" aria-label="{{localize tab.label}}" data-label="{{localize tab.label}}">
+    <a class="{{tab.cssClass}}" data-action="tab" data-group="{{tab.group}}" data-tab="{{tab.id}}" data-tooltip="{{localize tab.label}}" aria-label="{{localize tab.label}}" data-label="{{localize tab.label}}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{{tab.svg}}}</svg>
     </a>
     {{/each}}

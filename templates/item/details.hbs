@@ -13,6 +13,7 @@
     <label>{{localize "CRAWLSPACE.Item.Duration"}}<span class="time-input"><input type="text" name="system.duration" value="{{systemSource.duration}}"><a class="time-picker" data-time-picker="effect" data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span></label>
     <label>{{localize "CRAWLSPACE.Item.Usage"}}<select name="system.usage">{{selectOptions usageChoices selected=systemSource.usage localize=true}}</select></label>
     {{/if}}
+    <label data-tooltip="{{localize 'CRAWLSPACE.Actions.KindHint'}}">{{localize "CRAWLSPACE.Actions.UsedAs"}}<select name="system.actionKind">{{selectOptions actionKindChoices selected=systemSource.actionKind localize=true}}</select></label>
     <label class="check"><input type="checkbox" name="system.isAttack" {{checked systemSource.isAttack}}> {{localize "CRAWLSPACE.Item.IsAttack"}}</label>
     {{#if (eq type "skill")}}<label class="check" data-tooltip="{{localize 'CRAWLSPACE.Item.IsUnarmedHint'}}"><input type="checkbox" name="system.isUnarmed" {{checked systemSource.isUnarmed}}> {{localize "CRAWLSPACE.Item.IsUnarmed"}}</label>{{/if}}
     <label class="check"><input type="checkbox" name="system.marked" {{checked systemSource.marked}}> {{localize "CRAWLSPACE.Item.Marked"}}</label>
@@ -77,6 +78,12 @@
     </div>
   {{/if}}
 
+  {{#if (eq type "action")}}
+    <label>{{localize "CRAWLSPACE.Actions.Type"}}<select name="system.kind">{{selectOptions actionTypeChoices selected=systemSource.kind localize=true}}</select></label>
+    <label>{{localize "CRAWLSPACE.Actions.BehaviorLabel"}}<select name="system.behavior">{{selectOptions actionBehaviorChoices selected=systemSource.behavior localize=true}}</select></label>
+    <label data-tooltip="{{localize 'CRAWLSPACE.Actions.SkillsHint'}}">{{localize "CRAWLSPACE.Actions.Skills"}}<input type="text" name="system.skills" value="{{systemSource.skills}}"></label>
+    <label>{{localize "CRAWLSPACE.Actions.Formula"}}<input type="text" name="system.formula" value="{{systemSource.formula}}"></label>
+  {{/if}}
   {{#if (eq type "ability")}}
     <label>{{localize "CRAWLSPACE.Item.Category"}}<select name="system.category">{{selectOptions abilityCategories selected=systemSource.category localize=true}}</select></label>
     <label>{{localize "CRAWLSPACE.Item.Cooldown"}}<span class="time-input"><input type="text" name="system.cooldown" value="{{systemSource.cooldown}}"><a class="time-picker" data-time-picker data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span></label>
