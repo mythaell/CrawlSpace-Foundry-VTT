@@ -33,6 +33,12 @@ export type DamageOptions = {
 }
 
 export class CrawlActor extends Actor {
+  /** The Create Actor dialog is marked so the "Build a crawler" button can be added to it (crawlspace.ts). */
+  static async createDialog(data: any = {}, createOptions: any = {}, options: any = {}, ...rest: any[]) {
+    const classes = [...(options.classes ?? []), 'crawl-create-actor']
+    return (super.createDialog as any)(data, createOptions, { ...options, classes }, ...rest)
+  }
+
   /** Not a class field: Foundry prepares data inside the Document constructor, before fields initialize. */
   declare _rankPrepass: Record<string, Record<string, number>> | null
 

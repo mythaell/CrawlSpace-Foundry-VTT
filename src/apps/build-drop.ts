@@ -3,6 +3,10 @@
  * hold them (official and homebrew), opened at the right folder; dropping one onto the sheet fills the field.
  * A race or class also brings its benefits and detriments as abilities.
  */
+import { damageResponsesFromText } from '../rules/build-text'
+import { effectPropertiesToActiveEffects } from '../effects/mapping'
+import { findCompendiumEntry } from '../import/fill-damage'
+
 const { DialogV2 } = foundry.applications.api
 
 type BuildKind = 'race' | 'class' | 'background' | 'deity'
@@ -55,10 +59,14 @@ export function buildAbilities(item: any) {
       const target = String(entry.target ?? '').trim()
       const links = (entry.links ?? []).map((link: any) => link.name).filter(Boolean)
       const text = [entry.description, target && `${game.i18n.localize('CRAWLSPACE.Build.Target')}: ${target}`, links.length && links.join(', ')].filter(Boolean)
+      // Damage responses written in the text (Immunity to Poison) become the ability's effect.
+      const responses = damageResponsesFromText(`${entry.name} ${entry.description ?? ''}`)
+      const effects = responses.length ? effectPropertiesToActiveEffects(responses, { name: entry.name.trim(), img: item.img, transfer: true }).effects : []
       return {
         name: entry.name.trim(),
         type: 'ability',
         img: item.img,
+        effects,
         system: {
           category,
           description: text.map((line: string) => `<p>${foundry.utils.escapeHTML(String(line))}</p>`).join(''),
@@ -67,6 +75,27 @@ export function buildAbilities(item: any) {
         flags: { crawlspace: { grantedBy: item.name, detriment } },
       }
     })
+}
+
+/**
+ * The skills and spells a race or class grants ranks in (its Build effect adds the ranks) that the crawler doesn't
+ * have yet, from the compendium (official first) or as a blank entry when no compendium has it.
+ */
+async function grantedSkills(actor: any, item: any) {
+  const out: any[] = []
+  for (const [key, type] of [['skillBonuses', 'skill'], ['spellBonuses', 'spell']] as const)
+    for (const bonus of item.system[key] ?? []) {
+      const name = String(bonus.name ?? '').trim()
+      if (!name || actor.items.some((owned: any) => owned.type === type && owned.name.toLowerCase() === name.toLowerCase())) continue
+      if (out.some((entry) => entry.type === type && entry.name.toLowerCase() === name.toLowerCase())) continue
+      const source = (bonus.uuid ? await fromUuid(bonus.uuid) : null) ?? (await findCompendiumEntry(type, name))
+      const data: any = source ? game.items.fromCompendium(source) : { name, type, system: {} }
+      // The race or class's ranks come from its Build effect, on top of a base of 0.
+      foundry.utils.setProperty(data, 'system.rank.value', 0)
+      foundry.utils.setProperty(data, 'flags.crawlspace.grantedBy', item.name)
+      out.push(data)
+    }
+  return out
 }
 
 /**
@@ -84,15 +113,21 @@ export async function applyBuildItem(actor: any, item: any) {
     })
     if (!ok) return null
     const names = new Set(current.map((owned: any) => owned.name))
-    const granted = actor.items.filter((owned: any) => owned.type === 'ability' && names.has(owned.flags?.crawlspace?.grantedBy))
+    // Its abilities go, and so do the skills and spells it gave that were never ranked up.
+    const granted = actor.items.filter(
+      (owned: any) =>
+        names.has(owned.flags?.crawlspace?.grantedBy) &&
+        (owned.type === 'ability' || (['skill', 'spell'].includes(owned.type) && !(Number(owned._source.system?.rank?.value) > 0))),
+    )
     await actor.deleteEmbeddedDocuments('Item', [...current, ...granted].map((owned: any) => owned.id))
   }
   const data = game.items.fromCompendium(item)
   const owned = new Set(actor.items.filter((entry: any) => entry.type === 'ability').map((entry: any) => entry.name.toLowerCase()))
   const abilities = buildAbilities(item).filter((ability) => !owned.has(ability.name.toLowerCase()))
-  const created = await actor.createEmbeddedDocuments('Item', [data, ...abilities])
+  const skills = await grantedSkills(actor, item)
+  const created = await actor.createEmbeddedDocuments('Item', [data, ...abilities, ...skills])
   await actor.update({ [field]: item.name })
-  ui.notifications.info(game.i18n.format('CRAWLSPACE.Build.Added', { name: item.name, count: abilities.length }))
+  ui.notifications.info(game.i18n.format('CRAWLSPACE.Build.Added', { name: item.name, count: abilities.length, skills: skills.length }))
   return created
 }
 

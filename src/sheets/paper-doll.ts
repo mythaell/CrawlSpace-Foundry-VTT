@@ -4,6 +4,7 @@
  * to drop onto). Coordinates are in the doll's 560×400 viewBox; slots are placed in percentages of it.
  */
 import { ACCESSORY_LIMIT, GEAR_SLOTS } from '../config'
+import { heldItems } from '../rules/hands'
 
 const W = 560
 const H = 400
@@ -46,12 +47,17 @@ function tooltip(item: any) {
 const slotItem = (item: any) => (item ? { id: item.id, uuid: item.uuid, name: item.name, img: item.img, tooltip: tooltip(item), broken: !!item.system.broken } : null)
 
 export function paperDollContext(actor: any) {
-  const equipped = actor.items.filter((item: any) => item.system?.equipped)
-  // Shields are held in the off hand, whatever slot they list.
-  const shield = equipped.find((item: any) => item.type === 'equipment' && item.system.isShield)
-  const gear = (slot: string) => equipped.find((item: any) => item.type === 'equipment' && item !== shield && item.system.slot === slot)
-  const weapons = equipped.filter((item: any) => item.type === 'weapon')
-  const twoHanded = weapons[0] && (weapons[0].system.twoHanded || String(weapons[0].system.hands ?? '').trim() === '2')
+  const items = [...actor.items]
+  const equipped = items.filter((item: any) => item.system?.equipped)
+  const held = heldItems(items)
+  const inHand = (hand: string) => {
+    const entry = held.find((h) => h.hand === hand)
+    return entry ? actor.items.get(entry.id) : undefined
+  }
+  const twoHanded = held.find((h) => h.twoHanded)
+  const shields = new Set(held.filter((h) => h.shield).map((h) => h.id))
+  // Shields are held, whatever gear slot they list.
+  const gear = (slot: string) => equipped.find((item: any) => item.type === 'equipment' && !item.system.isShield && item.system.slot === slot)
   const filled: Record<string, any> = {
     head: gear('head'),
     arms: gear('arms'),
@@ -59,9 +65,9 @@ export function paperDollContext(actor: any) {
     torso: gear('torso'),
     legs: gear('legs'),
     feet: gear('feet'),
-    mainHand: weapons[0],
-    // A shield is worn on the off hand; a two-handed weapon takes it too.
-    offHand: weapons[1] ?? shield ?? (twoHanded ? weapons[0] : undefined),
+    mainHand: inHand('main'),
+    // A two-handed weapon fills the off hand too.
+    offHand: inHand('off') ?? (twoHanded ? actor.items.get(twoHanded.id) : undefined),
   }
   const slots = SLOTS.map((def) => {
     const x = def.side === 'left' ? 34 : W - 34 - SLOT
@@ -73,15 +79,15 @@ export function paperDollContext(actor: any) {
       label: game.i18n.localize(`CRAWLSPACE.Doll.${def.key}`),
       icon: def.icon,
       slot: ['mainHand', 'offHand'].includes(def.key) ? '' : def.key,
-      hand: ['mainHand', 'offHand'].includes(def.key),
+      hand: def.key === 'mainHand' ? 'main' : def.key === 'offHand' ? 'off' : '',
       style: `left:${pct(x, W)};top:${pct(y, H)};width:${pct(SLOT, W)};height:${pct(SLOT, H)}`,
       item: slotItem(filled[def.key]),
-      twoHandedEcho: def.key === 'offHand' && twoHanded && filled.offHand === weapons[0],
+      twoHandedEcho: def.key === 'offHand' && !!twoHanded && filled.offHand?.id === twoHanded.id,
       line: `${edge},${ROWS[def.row]} ${elbow},${ROWS[def.row]} ${def.point.x.toFixed(1)},${def.point.y.toFixed(1)}`,
       point: def.point,
     }
   })
-  const accessories = equipped.filter((item: any) => item.type === 'equipment' && item !== shield && item.system.slot === 'accessory').slice(0, ACCESSORY_LIMIT)
+  const accessories = equipped.filter((item: any) => item.type === 'equipment' && !shields.has(item.id) && !item.system.isShield && item.system.slot === 'accessory').slice(0, ACCESSORY_LIMIT)
   return {
     viewBox: `0 0 ${W} ${H}`,
     figure: FIGURE,

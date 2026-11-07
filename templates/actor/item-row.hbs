@@ -32,7 +32,7 @@
       {{#if item.equippable}}<a data-action="toggleEquip" class="{{#if item.system.equipped}}active{{/if}}" data-tooltip="{{localize (ifThen item.system.equipped 'CRAWLSPACE.Item.Unequip' 'CRAWLSPACE.Item.Equip')}}"><i class="fa-solid fa-shirt"></i></a>{{/if}}
       <a data-action="itemToChat" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
       <a data-action="editItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
-      {{#if @root.editable}}<a data-action="deleteItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Delete'}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
+      {{#if @root.editable}}{{#if (eq mode "hotlist")}}<a data-action="removeFromHotlist" data-tooltip="{{localize 'CRAWLSPACE.Hotlist.Remove'}}"><i class="fa-solid fa-xmark"></i></a>{{else}}<a data-action="deleteItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Delete'}}"><i class="fa-solid fa-trash"></i></a>{{/if}}{{/if}}
     </span>
   </div>
   <div class="row-details">

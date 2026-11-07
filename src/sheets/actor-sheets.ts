@@ -13,7 +13,8 @@ import { attackRows, attackWithRow, damageWithRow, displayFormula, findAttackRow
 import { castInherent, inherentSpellRows } from '../actors/inherent'
 import { CrawlRowConfig, type RowKind } from '../apps/row-config'
 import { fillActorDamage } from '../import/fill-damage'
-import { paperDollContext } from './paper-doll'
+import { PaperDollApp } from '../apps/paper-doll-app'
+import { moveInOrder } from '../rules/row-order'
 import { applyBackground, applyBuildItem, openBuildPacks } from '../apps/build-drop'
 import { ActionsConfig, actionRowsOf, addActionRow, addToHotlist, HotlistConfig, hotlistOf, openActionPack, postAction, runAction } from '../apps/actions-config'
 
@@ -487,6 +488,8 @@ export class CrawlerSheet extends CrawlActorSheet {
       configureActions: CrawlerSheet.#onConfigureActions,
       browseActions: CrawlerSheet.#onBrowseActions,
       openBuildPack: CrawlerSheet.#onOpenBuildPack,
+      openPaperDoll: CrawlerSheet.#onOpenPaperDoll,
+      removeFromHotlist: CrawlerSheet.#onRemoveFromHotlist,
       castInherent: CrawlerSheet.#onCastInherent,
       openCompanion: CrawlerSheet.#onOpenCompanion,
       addCompanion: CrawlerSheet.#onAddCompanion,
@@ -632,7 +635,6 @@ export class CrawlerSheet extends CrawlActorSheet {
           names: boxes.map((box: any) => `${box.name}${Number(box.system.quantity) > 1 ? ` ×${box.system.quantity}` : ''}`).join(', '),
         }
         context.packs = ITEM_PACKS
-        context.doll = paperDollContext(actor)
         break
       }
       case 'abilities': {
@@ -789,7 +791,9 @@ export class CrawlerSheet extends CrawlActorSheet {
     const index = saved.findIndex((entry: any) => entry.id === row.id)
     if (index >= 0) return this.openRow('attack', index)
     const materialised = row.id === UNARMED_ID ? { ...unarmedRow(), id: UNARMED_ID } : { ...row, id: foundry.utils.randomID() }
-    await this.actor.update({ 'system.attacks': [...saved, materialised] })
+    // The row keeps its place in the table under its new id.
+    const order = (this.actor.flags?.crawlspace?.rowOrder?.attacks ?? []).map((id: string) => (id === row.id ? materialised.id : id))
+    await this.actor.update({ 'system.attacks': [...saved, materialised], 'flags.crawlspace.rowOrder.attacks': order })
     return this.openRow('attack', saved.length)
   }
 
@@ -819,6 +823,17 @@ export class CrawlerSheet extends CrawlActorSheet {
   #actionRow(target: HTMLElement) {
     const id = target.closest<HTMLElement>('[data-action-row]')?.dataset.actionRow
     return actionRowsOf(this.actor).find((row: any) => row.id === id) ?? null
+  }
+
+  /** The hotlist's × only takes the item off the hotlist; the item stays in the inventory. */
+  static async #onRemoveFromHotlist(this: CrawlerSheet, _event: PointerEvent, target: HTMLElement) {
+    const id = target.closest<HTMLElement>('[data-item-id]')?.dataset.itemId
+    const slots = hotlistOf(this.actor).map((slot: string) => (slot === id ? '' : slot))
+    await this.actor.update({ 'system.hotlist.items': slots })
+  }
+
+  static #onOpenPaperDoll(this: CrawlerSheet) {
+    return PaperDollApp.open(this.actor)
   }
 
   static #onConfigureHotlist(this: CrawlerSheet) {
@@ -984,6 +999,49 @@ export class CrawlerSheet extends CrawlActorSheet {
     return super._onDragStart(event)
   }
 
+  /** Attack and action rows dragged within the sheet reorder their table (an action can also change tables). */
+  async _onDrop(event: DragEvent) {
+    const data: any = foundry.applications.ux.TextEditor.implementation.getDragEventData(event)
+    if ((data?.type === 'CrawlAttack' || data?.type === 'CrawlAction') && data.actorUuid === this.actor.uuid) {
+      if (!this.isEditable) return
+      return data.type === 'CrawlAttack' ? this.#dropAttackRow(event, data.id) : this.#dropActionRow(event, data.id)
+    }
+    return super._onDrop(event)
+  }
+
+  async #dropAttackRow(event: DragEvent, id: string) {
+    const targetId = (event.target as HTMLElement)?.closest?.<HTMLElement>('[data-attack-id]')?.dataset.attackId
+    if (!targetId || targetId === id) return
+    const ids = attackRows(this.actor).map((row) => row.id)
+    return this.actor.setFlag('crawlspace', 'rowOrder.attacks', moveInOrder(ids, id, targetId))
+  }
+
+  async #dropActionRow(event: DragEvent, id: string) {
+    const target = event.target as HTMLElement
+    const table = target?.closest?.<HTMLElement>('[data-action-drop]')
+    if (!table) return
+    const rows = actionRowsOf(this.actor)
+    const row = rows.find((entry: any) => entry.id === id)
+    if (!row) return
+    const kind = table.dataset.actionDrop as 'action' | 'interrupt'
+    const targetId = target.closest<HTMLElement>('[data-action-row]')?.dataset.actionRow
+    const ids = rows.map((entry: any) => entry.id)
+    // Onto the other table: a saved row changes tables (rows the hotlist adds stay where they are).
+    const update: Record<string, unknown> = {}
+    if (row.kind !== kind) {
+      if (row.auto) return
+      const saved = foundry.utils.deepClone(this.actor._source.system.sheetActions ?? [])
+      const entry = saved.find((action: any) => action.id === id)
+      if (entry) entry.kind = kind
+      update['system.sheetActions'] = saved
+    }
+    let order = ids
+    if (targetId && targetId !== id) order = moveInOrder(ids, id, targetId)
+    else if (row.kind !== kind) order = [...ids.filter((other: string) => other !== id), id]
+    update['flags.crawlspace.rowOrder.actions'] = order
+    return this.actor.update(update)
+  }
+
   /** Drop a pet, mount, vehicle or minion onto the crawler to make it theirs. */
   async _onDropActor(_event: DragEvent, actor: any) {
     if (!['companion', 'minion'].includes(actor.type)) return
@@ -999,15 +1057,6 @@ export class CrawlerSheet extends CrawlActorSheet {
     const target = event.target as HTMLElement
     const owned = item.parent === this.actor
     if (target?.closest?.('[data-hotlist]')) return addToHotlist(this.actor, item)
-    // Gear dropped on a paper doll slot is worn there.
-    const dollSlot = target?.closest?.('[data-doll-slot]') as HTMLElement | null
-    if (owned && dollSlot && ['weapon', 'equipment'].includes(item.type)) {
-      const slot = dollSlot.dataset.dollSlot
-      const update: Record<string, unknown> = { 'system.equipped': true }
-      if (item.type === 'equipment' && slot) update['system.slot'] = slot
-      if (item.type === 'weapon' && dollSlot.dataset.dollHand !== 'true') return
-      return item.update(update)
-    }
     // A race or class brings its abilities; a background fills its stage.
     if (!owned && (item.type === 'race' || item.type === 'class')) return applyBuildItem(this.actor, item)
     if (!owned && item.type === 'background') return applyBackground(this.actor, item)

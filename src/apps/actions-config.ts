@@ -3,6 +3,7 @@
  * other tabs, or actions from the Actions packs), and what using an action does.
  */
 import { hotlistActions, hotlistSlots, placeInSlot } from '../rules/hotlist'
+import { orderRows } from '../rules/row-order'
 import { penaltyModifiers, rollCheck } from '../dice/rolls'
 import { markForAdvancement } from '../documents/item'
 import { STATS, STAT_KEYS } from '../config'
@@ -41,7 +42,7 @@ export async function addActionRow(actor: any, item: any, kind: 'action' | 'inte
 export function actionRowsOf(actor: any) {
   const saved = (actor.system.sheetActions ?? []).map((action: any, index: number) => ({ ...action, kind: action.kind || 'action', index, auto: false }))
   const auto = hotlistActions([...actor.items], hotlistOf(actor)).map((row) => ({ ...row, index: -1 }))
-  return [...saved, ...auto]
+  return orderRows([...saved, ...auto], actor.flags?.crawlspace?.rowOrder?.actions)
 }
 
 const isHealing = (item: any) => !!(String(item.system?.healing?.formula ?? '').trim() || String(item.system?.healing?.atRank ?? '').trim())
@@ -144,14 +145,14 @@ async function useFromHotlist(actor: any, healingOnly: boolean, options: { fast?
 }
 
 /** Drop data from an event, as the item it names. */
-async function droppedItem(event: DragEvent) {
+export async function droppedItem(event: DragEvent) {
   const data = TextEditor().getDragEventData(event)
   if (data?.type !== 'Item') return { data, item: null }
   return { data, item: await (Item.implementation as any).fromDropData(data) }
 }
 
 /** Shared by both popups: kept on the actor's apps so it re-renders with the actor. */
-abstract class ActorPopup extends HandlebarsApplicationMixin(ApplicationV2) {
+export abstract class ActorPopup extends HandlebarsApplicationMixin(ApplicationV2) {
   actor: any
   constructor(actor: any, options: any = {}) {
     super(options)

@@ -1,4 +1,5 @@
 import { applyCastEffects } from '../effects/use-conditions'
+import { orderRows } from '../rules/row-order'
 import { markAttackAdvancement } from '../documents/item'
 import { spellKillBonus } from '../effects/killing-blows'
 /**
@@ -107,7 +108,7 @@ export function attackRows(actor: any): AttackRow[] {
   const unarmed = saved.some((row) => row.id === UNARMED_ID || row.name === unarmedRow().name) || (unarmedSkill && listed.has(unarmedSkill.id))
     ? []
     : [unarmedSkill ? { ...unarmedRow(), damage: '', damageTypes: [], skillId: unarmedSkill.id } : unarmedRow()]
-  return [...saved, ...automatic, ...unarmed]
+  return orderRows([...saved, ...automatic, ...unarmed], actor.flags?.crawlspace?.rowOrder?.attacks)
 }
 
 export function findAttackRow(actor: any, id: string): AttackRow | null {

@@ -3420,9 +3420,41 @@
     border-radius: 2px;
     text-shadow: none;
   }
-  #chat-notifications .chat-form :is(textarea, prose-mirror, .editor) { color: #111820; background: rgb(217 230 242 / 92%); border: 1px solid #66dfff; }
+  /* The chat box: a dark HUD well with light text, its format menu and the message-mode buttons in HUD blue. */
   #sidebar .chat-form { border-top: 1px solid rgb(131 223 255 / 40%); }
-  #sidebar .chat-form :is(textarea, .editor, prose-mirror, #chat-message) { color: #111820; background: #d9e6f2; }
+  :is(#sidebar, #chat-notifications) .chat-form :is(textarea, prose-mirror, #chat-message) {
+    --chat-message-placeholder-color: #9cc4da;
+    color: #f2fcff;
+    background: linear-gradient(180deg, rgb(8 33 64 / 92%), rgb(5 22 45 / 95%));
+    border: 1px solid rgb(131 223 255 / 60%);
+    border-radius: 3px;
+    box-shadow: inset 0 0 12px rgb(60 175 255 / 12%);
+  }
+  :is(#sidebar, #chat-notifications) #chat-message .editor-content { color: #f2fcff; }
+  :is(#sidebar, #chat-notifications) #chat-message .editor-container { background: transparent; }
+  :is(#sidebar, #chat-notifications) #chat-message .editor-content::before,
+  :is(#sidebar, #chat-notifications) #chat-message .editor-content p.empty-node::before { color: #9cc4da; }
+  :is(#sidebar, #chat-notifications) #chat-message .editor-menu {
+    color: #e6f8ff;
+    background: rgb(22 73 118 / 92%);
+    border-bottom: 1px solid rgb(131 223 255 / 40%);
+  }
+  :is(#sidebar, #chat-notifications) #chat-message .editor-menu :is(button, .pm-dropdown) { color: #e6f8ff; background: transparent; }
+  :is(#sidebar, #chat-notifications) #chat-message .editor-menu :is(button:hover, button.active) { color: #8cfff6; }
+  :is(#sidebar, #chat-notifications) #chat-message .editor-menu ul { color: #f2fcff; background: #123a63; border: 1px solid #66dfff; }
+  #sidebar #chat-controls :is(button, .ui-control) {
+    color: #ffffff;
+    background: #164976;
+    border: 1px solid #83dfff;
+    border-radius: 3px;
+    box-shadow: inset 0 0 8px rgb(80 190 255 / 15%);
+  }
+  #sidebar #chat-controls :is(button, .ui-control):hover,
+  #sidebar #chat-controls :is(button, .ui-control)[aria-pressed='true'] {
+    background: linear-gradient(180deg, #318fda, #216baf);
+    border-color: #8cfff6;
+    box-shadow: inset 0 -2px #8cfff6;
+  }
 
   /* Combat tracker (docked or popped out). */
   :is(#sidebar, .sidebar-popout) .combat-tracker-header { border-bottom: 1px solid rgb(131 223 255 / 40%); }

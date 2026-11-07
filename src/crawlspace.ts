@@ -39,6 +39,7 @@ import { migrateShieldLoss } from './rules/repair'
 import { actionRowsOf, runAction } from './apps/actions-config'
 import { attackWithRow, findAttackRow } from './actors/attacks'
 import { registerHotlistUpkeep } from './rules/hotlist-upkeep'
+import { registerHandRules } from './rules/hands-upkeep'
 
 const TEMPLATES = [
   'chat/card-footer',
@@ -203,6 +204,7 @@ Hooks.once('init', () => {
   registerUpkeep()
   registerLootTools()
   registerHotlistUpkeep()
+  registerHandRules()
 
   game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, calibrateGrid, useAttack: useAttackRow, useAction: useActionRow, declareAttack: () => game.combat && promptDeclaration(game.combat) }
 })
@@ -274,26 +276,44 @@ async function createItemMacro(data: any, slot: number) {
   game.user.assignHotbarMacro(macro, slot)
 }
 
-/** Actors directory gets "Build a crawler" and "Import CrawlSpace character" buttons. */
+/**
+ * The Create Actor dialog gets a "Build a crawler" button; the actors directory gets "Import". Players who can't
+ * create actors still get "Build a crawler" in the directory (the GM's client creates the crawler for them).
+ */
 Hooks.on('renderActorDirectory', (_app: any, html: HTMLElement) => {
   groupActorDirectory(html)
-  // Every user may build a crawler; a player without actor creation sends it to the GM.
-  if (!html.querySelector('.crawlspace-builder')) {
-    const build = document.createElement('button')
-    build.type = 'button'
-    build.className = 'crawlspace-builder'
-    build.innerHTML = `<i class="fa-solid fa-user-plus"></i> ${game.i18n.localize('CRAWLSPACE.Builder.Button')}`
-    build.addEventListener('click', () => openBuilder())
-    html.querySelector('.header-actions')?.append(build)
+  const actions = html.querySelector('.header-actions')
+  if (!game.user.can('ACTOR_CREATE')) {
+    if (!html.querySelector('.crawlspace-builder')) actions?.append(builderButton())
+    return
   }
-  if (!game.user.can('ACTOR_CREATE') || html.querySelector('.crawlspace-import')) return
+  if (html.querySelector('.crawlspace-import')) return
   const button = document.createElement('button')
   button.type = 'button'
   button.className = 'crawlspace-import'
   button.innerHTML = `<i class="fa-solid fa-file-import"></i> ${game.i18n.localize('CRAWLSPACE.Import.Character')}`
+  button.dataset.tooltip = game.i18n.localize('CRAWLSPACE.Import.CharacterHint')
   button.addEventListener('click', () => pickCharacterFile())
-  html.querySelector('.header-actions')?.append(button)
+  actions?.append(button)
 })
+
+Hooks.on('renderDialogV2', (app: any, html: HTMLElement) => {
+  if (!app.options.classes?.includes('crawl-create-actor') || html.querySelector('.crawlspace-builder')) return
+  const button = builderButton(() => app.close())
+  html.querySelector('.form-footer')?.prepend(button)
+})
+
+function builderButton(before?: () => unknown) {
+  const build = document.createElement('button')
+  build.type = 'button'
+  build.className = 'crawlspace-builder'
+  build.innerHTML = `<i class="fa-solid fa-user-plus"></i> ${game.i18n.localize('CRAWLSPACE.Builder.Button')}`
+  build.addEventListener('click', () => {
+    before?.()
+    openBuilder()
+  })
+  return build
+}
 
 function pickCharacterFile() {
   const input = document.createElement('input')

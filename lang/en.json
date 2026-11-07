@@ -535,7 +535,8 @@
       "Declined": "The GM declined your {action}."
     },
     "Import": {
-      "Character": "Import CrawlSpace character",
+      "Character": "Import",
+      "CharacterHint": "Import a CrawlSpace character backup (.json)",
       "Done": "Imported {count} characters.",
       "Failed": "Import failed: {error}"
     },
@@ -1210,7 +1211,7 @@
       },
       "Detriment": "Detriment",
       "Replace": "Replace {old} with {new}? The abilities that came with {old} are removed.",
-      "Added": "{name} added with {count} abilities.",
+      "Added": "{name} added with {count} abilities and {skills} new skills and spells.",
       "Browse": "Browse the compendium (drag one onto the sheet)",
       "Kindrace": "race",
       "Kindclass": "class",
@@ -1401,7 +1402,15 @@
       "legs": "Legs",
       "feet": "Feet",
       "accessories": "Accessories",
-      "accessoryHint": "Drop an accessory here to wear it"
+      "accessoryHint": "Drop an accessory here to wear it",
+      "Title": "Equipment",
+      "Open": "Equipment",
+      "OpenHint": "Open the paper doll: drop gear on a slot to wear it"
+    },
+    "Hands": {
+      "PutAway": "{names} put away to free your hands for {name}.",
+      "NotHeld": "Only weapons and shields go in a hand.",
+      "HeldOnly": "Weapons and shields are held: drop them on a hand."
     }
   }
 }

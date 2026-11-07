@@ -3,6 +3,7 @@ import { handEquipmentConflict, type WornItem } from '../crawlspace-shared/share
 import { openLootBoxes } from '../loot/boxes'
 import { buildEffect, effectDuration, stableId } from '../import/convert'
 import { BUILD_EFFECT_FIELDS } from '../data/items'
+import { isHandItem } from '../rules/hands'
 import { itemCooldown, withCooldowns } from '../effects/cooldowns'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage, type Modifier } from '../dice/rolls'
 import { STATS, statKeyFromCode } from '../config'
@@ -226,6 +227,8 @@ export class CrawlItem extends Item {
     if ((await super._preUpdate(changed, options, user)) === false) return false
     const equipping = foundry.utils.getProperty(changed, 'system.equipped') === true
     if (!equipping || !this.actor) return
+    // Weapons and shields take a hand, putting away what no longer fits (rules/hands-upkeep.ts).
+    if (isHandItem(this)) return
     // A two-handed weapon takes both hands (equipmentSlots.ts handEquipmentConflict).
     const worn = this.actor.items.contents.map((item: any) => wornItem(item, item.id === this.id ? changed : null))
     const conflict = handEquipmentConflict(worn, this.id)
@@ -236,7 +239,7 @@ export class CrawlItem extends Item {
     if (this.type !== 'equipment') return
     const slot = foundry.utils.getProperty(changed, 'system.slot') ?? this.system.slot
     const occupied = this.actor.items.filter(
-      (item: any) => item.id !== this.id && item.type === 'equipment' && item.system.equipped && item.system.slot === slot,
+      (item: any) => item.id !== this.id && item.type === 'equipment' && item.system.equipped && !item.system.isShield && item.system.slot === slot,
     )
     const limit = slot === 'accessory' ? 10 : 1
     if (occupied.length >= limit) {

@@ -188,6 +188,8 @@ export class WeaponData extends foundry.abstract.TypeDataModel {
       weaponType: new fields.StringField({ required: true, initial: 'melee', choices: ['melee', 'ranged', 'thrown', 'ammunition', 'other'] }),
       hands: text(),
       twoHanded: new fields.BooleanField(),
+      /** The hand it is held in while equipped (rules/hands.ts). */
+      hand: new fields.StringField({ required: true, blank: true, initial: '', choices: ['', 'main', 'off'] }),
       /** Name of the skill used to attack with this weapon. */
       skill: text(),
       ammunition: text(),
@@ -206,6 +208,8 @@ export class EquipmentData extends foundry.abstract.TypeDataModel {
       slot: new fields.StringField({ required: true, initial: 'torso', choices: Object.keys(GEAR_SLOTS) }),
       armorDr: integer(0),
       isShield: new fields.BooleanField(),
+      /** A shield is held in the off hand (rules/hands.ts). */
+      hand: new fields.StringField({ required: true, blank: true, initial: '', choices: ['', 'main', 'off'] }),
       /** DR a shield has lost to failed Shield Blocks; Repair restores it. */
       drLost: integer(0, { min: 0 }),
     }

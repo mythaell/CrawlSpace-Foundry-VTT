@@ -10,7 +10,9 @@ let index: Map<string, { pack: any; id: string }> | null = null
 async function compendiumIndex() {
   if (index) return index
   index = new Map()
-  for (const pack of game.packs.filter((pack: any) => pack.documentName === 'Item')) {
+  // Official content first, then homebrew and the rest.
+  const packs = game.packs.filter((pack: any) => pack.documentName === 'Item').sort((a: any, b: any) => Number(b.collection.startsWith('crawlspace-content.')) - Number(a.collection.startsWith('crawlspace-content.')))
+  for (const pack of packs) {
     const entries = await pack.getIndex({ fields: ['type'] })
     for (const entry of entries) {
       if (entry.type !== 'skill' && entry.type !== 'spell') continue
@@ -19,6 +21,12 @@ async function compendiumIndex() {
     }
   }
   return index
+}
+
+/** The compendium skill or spell with this name (official packs first), as a document. */
+export async function findCompendiumEntry(type: 'skill' | 'spell', name: string) {
+  const found = (await compendiumIndex()).get(`${type}:${name.trim().toLowerCase()}`)
+  return found ? found.pack.getDocument(found.id) : null
 }
 
 const missingDamage = (system: any) => !String(system?.damage?.formula ?? '').trim() && DAMAGE_KEYS.every((key) => !String(system?.upgrades?.[key] ?? '').trim())
