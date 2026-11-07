@@ -13,7 +13,7 @@ import { consumableFamily } from '../crawlspace-shared/shared/lootPotions'
 import { consumableSpellKind } from '../crawlspace-shared/shared/lootSpells'
 import { finalizeLootItem, type InventoryItem } from '../crawlspace-shared/shared/inventoryItems'
 import { boxSummary, contextFor, foundryItemData } from '../loot/database'
-import { crawlerLootTypes, normalizeAutoLoot, type AutoLootSettings as Settings } from '../rules/auto-loot'
+import { autoLootTick, crawlerLootTypes, normalizeAutoLoot, type AutoLootSettings as Settings } from '../rules/auto-loot'
 
 const t = (key: string, data?: Record<string, unknown>) => (data ? game.i18n.format(`CRAWLSPACE.AutoLoot.${key}`, data) : game.i18n.localize(`CRAWLSPACE.AutoLoot.${key}`))
 const esc = (value: unknown) => foundry.utils.escapeHTML(String(value ?? ''))
@@ -114,6 +114,11 @@ export async function openAutoLoot(actors: any[]) {
         .join('')}</div>
     </section>
     <section class="auto-loot-section">
+      <h4>${t('Timer')}</h4>
+      <label class="auto-loot-timer"><input type="checkbox" name="timerEnabled" ${saved.timer.enabled ? 'checked' : ''}><span>${t('TimerEvery')}</span><input type="number" name="timerMinutes" min="1" max="1440" step="1" value="${saved.timer.minutes}"><span>${t('TimerMinutes')}</span></label>
+      <p class="hint">${t('TimerHint', { names: partyCrawlers().map((actor: any) => esc(actor.name)).join(', ') || '—' })}${saved.timer.enabled ? ` ${t('TimerNext', { minutes: Math.max(0, Math.ceil((saved.timer.minutes * 60 - playtime()) / 60)) })}` : ''}</p>
+    </section>
+    <section class="auto-loot-section">
       <h4>${t('Types')}</h4>
       <p class="hint">${t('TypesHint')}</p>
       <div class="auto-loot-table"><table>
@@ -121,35 +126,38 @@ export async function openAutoLoot(actors: any[]) {
         <tbody>${rows}</tbody>
       </table></div>
     </section>`
-  const settings = await foundry.applications.api.DialogV2.prompt({
+  const read = (form: HTMLFormElement) => {
+    const number = (name: string) => Math.max(0, Math.floor(Number((form.elements as any)[name]?.value) || 0))
+    const ticked = (selector: string) => [...form.querySelectorAll<HTMLInputElement>(selector)].map((input) => input.value as LootType)
+    const allTypes = ticked('[data-loot-all]:checked')
+    // Other crawlers' own types stay as they were; these crawlers' are what's ticked beyond the shared ones.
+    const crawlerTypes = { ...saved.crawlerTypes }
+    for (const actor of actors) crawlerTypes[actor.id] = ticked(`[data-loot-crawler="${actor.id}"]:checked`).filter((type) => !allTypes.includes(type))
+    const timer = { enabled: !!(form.elements as any).timerEnabled?.checked, minutes: number('timerMinutes') || 60 }
+    return normalizeAutoLoot<LootTier, LootType>(
+      { chancePercent: Math.min(100, number('chance')), weights: Object.fromEntries(lootTiers.map((tier) => [tier, number(`weight-${tier}`)])), allTypes, crawlerTypes, timer },
+      AUTO_LOOT_TYPES,
+      lootTiers,
+    )
+  }
+  const answer: any = await foundry.applications.api.DialogV2.wait({
     classes: ['crawlspace', 'auto-loot-dialog'],
     position: { width: Math.min(window.innerWidth - 40, 420 + actors.length * 110) },
     window: { title: t('Title'), resizable: true },
     content,
     rejectClose: false,
     render: (_event: Event, dialog: any) => bindAutoLoot(dialog.element as HTMLElement),
-    ok: {
-      label: t('Roll'),
-      icon: 'fa-solid fa-dice',
-      callback: (_event: Event, button: any) => {
-        const form = button.form as HTMLFormElement
-        const number = (name: string) => Math.max(0, Math.floor(Number((form.elements as any)[name]?.value) || 0))
-        const ticked = (selector: string) => [...form.querySelectorAll<HTMLInputElement>(selector)].map((input) => input.value as LootType)
-        const allTypes = ticked('[data-loot-all]:checked')
-        // Other crawlers' own types stay as they were; these crawlers' are what's ticked beyond the shared ones.
-        const crawlerTypes = { ...saved.crawlerTypes }
-        for (const actor of actors) crawlerTypes[actor.id] = ticked(`[data-loot-crawler="${actor.id}"]:checked`).filter((type) => !allTypes.includes(type))
-        return normalizeAutoLoot<LootTier, LootType>(
-          { chancePercent: Math.min(100, number('chance')), weights: Object.fromEntries(lootTiers.map((tier) => [tier, number(`weight-${tier}`)])), allTypes, crawlerTypes },
-          AUTO_LOOT_TYPES,
-          lootTiers,
-        )
-      },
-    },
+    buttons: [
+      { action: 'roll', label: t('Roll'), icon: 'fa-solid fa-dice', default: true, callback: (_event: Event, button: any) => ({ roll: true, settings: read(button.form) }) },
+      { action: 'save', label: t('Save'), icon: 'fa-solid fa-floppy-disk', callback: (_event: Event, button: any) => ({ roll: false, settings: read(button.form) }) },
+    ],
   })
-  if (!settings) return
-  await game.settings.set('crawlspace', 'autoLoot', settings)
-  await runAutoLoot(actors, settings)
+  if (!answer?.settings) return
+  const before = savedSettings()
+  await game.settings.set('crawlspace', 'autoLoot', answer.settings)
+  // Turning the timer on (or changing its length) starts the count over.
+  if (answer.settings.timer.enabled && (!before.timer.enabled || before.timer.minutes !== answer.settings.timer.minutes)) await game.settings.set('crawlspace', 'autoLootPlaytime', 0)
+  if (answer.roll) await runAutoLoot(actors, answer.settings)
 }
 
 /** The Auto-loot dialog's live parts: the chance slider, tier shares, and the box type table. */
@@ -318,8 +326,39 @@ export function openItemGenerator() {
   return new ItemGenerator().render({ force: true })
 }
 
+/** The party: crawlers a player owns, or every crawler while no player owns one (as the frames show it). */
+function partyCrawlers() {
+  const crawlers = game.actors.filter((actor: any) => actor.type === 'crawler')
+  const owned = crawlers.filter((actor: any) => actor.hasPlayerOwner)
+  return owned.length ? owned : crawlers
+}
+
+/** Seconds of play counted toward the next timed auto-loot roll. */
+const playtime = () => Math.max(0, Number(game.settings.get('crawlspace', 'autoLootPlaytime')) || 0)
+
+/**
+ * The auto-loot timer: the active GM counts play time a minute at a time while at least one player is online,
+ * and rolls for the party when it comes due. The count is saved, so it carries across sessions.
+ */
+function startAutoLootTimer() {
+  const STEP = 60
+  setInterval(async () => {
+    if (!game.user?.isActiveGM) return
+    const settings = savedSettings()
+    if (!settings.timer.enabled) return
+    const online = game.users.some((user: any) => user.active && !user.isGM)
+    const { counted, due } = autoLootTick(playtime(), STEP, settings, online)
+    if (counted !== playtime()) await game.settings.set('crawlspace', 'autoLootPlaytime', counted)
+    if (!due) return
+    const party = partyCrawlers()
+    if (party.length) await runAutoLoot(party, settings).catch((error) => console.error('CrawlSpace | auto-loot timer', error))
+  }, STEP * 1000)
+}
+
 export function registerLootTools() {
   game.settings.register('crawlspace', 'autoLoot', { scope: 'world', config: false, type: Object, default: {} })
+  game.settings.register('crawlspace', 'autoLootPlaytime', { scope: 'world', config: false, type: Number, default: 0 })
+  Hooks.once('ready', startAutoLootTimer)
   // The generator also sits at the foot of the Items directory.
   Hooks.on('renderItemDirectory', (_app: any, html: HTMLElement) => {
     if (!game.user.isGM || html.querySelector('[data-crawl-generator]')) return

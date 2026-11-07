@@ -153,7 +153,7 @@ export async function rollCheck(actor: any, options: CheckOptions) {
     details: options.details ?? '',
   })
   await roll.toMessage(
-    { speaker: ChatMessage.getSpeaker({ actor }), flavor, flags: { crawlspace: { kind: 'check', outcome, ...options.flags } } },
+    { speaker: ChatMessage.getSpeaker({ actor }), flavor, flags: { crawlspace: { kind: 'check', outcome, sources: options.sources ?? [], ...options.flags } } },
     { messageMode: messageMode() },
   )
   await afterAction(actor)
@@ -232,6 +232,7 @@ export async function rollAttack(actor: any, attack: AttackSource, options: { fa
           subtitle: attack.subtitle ?? '',
           img: attack.img ?? '',
           targets: rows,
+          sources: attack.sources,
         },
       },
     },
@@ -268,6 +269,8 @@ export async function rollDamage(
     blocked?: string[]
     /** HTML under the title: a healing spell's description and conditions. */
     details?: string
+    /** The attack's skills, spells and weapon (for triggered rules). */
+    sources?: string[]
   } = {},
 ) {
   const floor = damage.floor ?? (Number(actor?.system?.details?.floor ?? actor?.system?.floor) || 0)
@@ -315,6 +318,9 @@ export async function rollDamage(
           damageKind: damage.kind ?? null,
           magicBase,
           killingBlowSpell: damage.killingBlowSpell,
+          tier: options.tier ?? null,
+          attacker: actor?.uuid ?? '',
+          sources: options.sources ?? [],
           targets: options.targets ?? [],
           blocked: options.blocked ?? [],
         },

@@ -66,6 +66,66 @@ async function promptTimer(timer?: Countdown) {
   await game.settings.set('crawlspace', 'timers', timers)
 }
 
+/** To the right of the scene navigation's buttons. */
+function timerHudDefault() {
+  const scenes = [...document.querySelectorAll('#scene-navigation li.scene')].map((entry) => entry.getBoundingClientRect()).filter((rect) => rect.width > 0)
+  const right = scenes.length ? Math.max(...scenes.map((rect) => rect.right)) : 274
+  const top = scenes.length ? Math.min(...scenes.map((rect) => rect.top)) : 48
+  return { left: Math.floor(right + 12), top: Math.floor(top) }
+}
+
+function placeTimerHud(hud: HTMLElement) {
+  const saved = game.settings.get('crawlspace', 'timerHudPosition') as { left: number; top: number } | null
+  const position = saved && Number.isFinite(saved.left) && Number.isFinite(saved.top) ? saved : timerHudDefault()
+  const left = Math.clamp(position.left, 0, Math.max(0, window.innerWidth - 60))
+  const top = Math.clamp(position.top, 0, Math.max(0, window.innerHeight - 40))
+  Object.assign(hud.style, { left: `${left}px`, top: `${top}px` })
+}
+
+/**
+ * Drag the timers anywhere (each user's spot is remembered); a click without dragging opens the clock panel,
+ * and a double-click puts them back beside the scene navigation.
+ */
+function bindTimerDrag(hud: HTMLElement) {
+  let moved = false
+  hud.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return
+    const start = { x: event.clientX, y: event.clientY, left: hud.offsetLeft, top: hud.offsetTop }
+    moved = false
+    const move = (step: PointerEvent) => {
+      const dx = step.clientX - start.x
+      const dy = step.clientY - start.y
+      if (!moved && Math.hypot(dx, dy) < 5) return
+      if (!moved) hud.setPointerCapture(event.pointerId)
+      moved = true
+      const left = Math.clamp(start.left + dx, 0, window.innerWidth - 60)
+      const top = Math.clamp(start.top + dy, 0, window.innerHeight - 40)
+      Object.assign(hud.style, { left: `${left}px`, top: `${top}px` })
+    }
+    const up = () => {
+      hud.removeEventListener('pointermove', move)
+      hud.removeEventListener('pointerup', up)
+      hud.removeEventListener('pointercancel', up)
+      if (moved) game.settings.set('crawlspace', 'timerHudPosition', { left: hud.offsetLeft, top: hud.offsetTop })
+    }
+    hud.addEventListener('pointermove', move)
+    hud.addEventListener('pointerup', up)
+    hud.addEventListener('pointercancel', up)
+  })
+  // The click that ends a drag doesn't open the panel.
+  hud.addEventListener('click', (event) => {
+    if (moved) {
+      moved = false
+      event.stopPropagation()
+      return
+    }
+    if (!(event.target as HTMLElement).closest('[data-set-floor]')) openTime()
+  })
+  hud.addEventListener('dblclick', () => {
+    game.settings.set('crawlspace', 'timerHudPosition', null).then(() => placeTimerHud(hud))
+  })
+}
+
 /** A persistent table display keeps the floor clock visible even when the control panel is closed. */
 function renderTimerHud() {
   if (!game.ready) return
@@ -74,9 +134,10 @@ function renderTimerHud() {
     hud = document.createElement('aside')
     hud.id = 'crawlspace-timers'
     hud.className = 'crawlspace'
-    hud.addEventListener('click', openTime)
+    bindTimerDrag(hud)
     document.body.append(hud)
   }
+  placeTimerHud(hud)
   const timers: Countdown[] = game.settings.get('crawlspace', 'timers')
   const visible = timers.filter((timer) => game.user.isGM || timer.visible).sort((a, b) => Number(b.floor) - Number(a.floor))
   hud.replaceChildren()
@@ -95,7 +156,8 @@ function renderTimerHud() {
   if (!visible.length && game.user.isGM) {
     const button = document.createElement('button')
     button.textContent = game.i18n.localize('CRAWLSPACE.Time.SetFloor')
-    button.addEventListener('click', (event) => { event.stopPropagation(); void promptTimer() })
+    button.dataset.setFloor = ''
+    button.addEventListener('click', () => void promptTimer())
     hud.append(button)
   }
 }
@@ -211,6 +273,7 @@ export function registerClock() {
     renderTimerHud()
   }
   game.settings.register('crawlspace', 'timers', { scope: 'world', config: false, type: Array, default: [], onChange: refresh })
+  game.settings.register('crawlspace', 'timerHudPosition', { scope: 'client', config: false, type: Object, default: null })
   game.settings.register('crawlspace', 'clockRunning', { scope: 'world', config: false, type: Boolean, default: false, onChange: refresh })
   Hooks.on('updateWorldTime', async () => {
     renderTimerHud()

@@ -132,3 +132,13 @@ test('auto-loot box types: every crawler gets the shared ones plus their own; ol
   assert.deepEqual(old.crawlerTypes, {})
   assert.deepEqual(normalizeAutoLoot({}, types, tiers).allTypes, types)
 })
+
+test('auto-loot timer counts play time only with players online', async () => {
+  const { autoLootTick, normalizeAutoLoot } = await import('../src/rules/auto-loot.ts')
+  const settings = normalizeAutoLoot({ timer: { enabled: true, minutes: 2 } }, ['Bronze Box'], ['Bronze'])
+  assert.deepEqual(settings.timer, { enabled: true, minutes: 2 })
+  assert.deepEqual(autoLootTick(60, 60, settings, false), { counted: 60, due: false })
+  assert.deepEqual(autoLootTick(60, 60, settings, true), { counted: 0, due: true })
+  assert.deepEqual(autoLootTick(0, 60, settings, true), { counted: 60, due: false })
+  assert.deepEqual(autoLootTick(0, 600, normalizeAutoLoot({}, [], []), true), { counted: 0, due: false })
+})

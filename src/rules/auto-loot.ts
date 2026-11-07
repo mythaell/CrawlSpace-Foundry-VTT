@@ -11,6 +11,8 @@ export type AutoLootSettings<Tier extends string = string, Type extends string =
   allTypes: Type[]
   /** Extra box types per crawler, by actor id. A crawler gets `allTypes` plus these. */
   crawlerTypes: Record<string, Type[]>
+  /** Roll for the party on its own every so many minutes of play. */
+  timer: { enabled: boolean; minutes: number }
 }
 
 export const DEFAULT_TIER_WEIGHTS: Record<string, number> = { Bronze: 60, Silver: 25, Gold: 10, Platinum: 4, Legendary: 1, Celestial: 0 }
@@ -39,7 +41,22 @@ export function normalizeAutoLoot<Tier extends string, Type extends string>(
         .map(([id, types]) => [id, typeList(types) ?? []] as const)
         .filter(([, types]) => types.length),
     ),
+    timer: {
+      enabled: !!source.timer?.enabled,
+      minutes: bounded(source.timer?.minutes, 1, 1440, 60),
+    },
   }
+}
+
+/**
+ * Play time only counts while the GM and at least one player are online. Given the seconds counted so far
+ * and the seconds just played, returns the new count and whether a roll is due (the count starts over).
+ */
+export function autoLootTick(counted: number, seconds: number, settings: { timer: { enabled: boolean; minutes: number } }, playersOnline: boolean) {
+  if (!settings.timer.enabled || !playersOnline) return { counted, due: false }
+  const total = Math.max(0, counted) + Math.max(0, seconds)
+  const interval = settings.timer.minutes * 60
+  return total >= interval ? { counted: total - interval, due: true } : { counted: total, due: false }
 }
 
 /** The box types one crawler can receive, in catalog order. */

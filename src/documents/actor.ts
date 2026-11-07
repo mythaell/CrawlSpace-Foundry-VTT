@@ -8,6 +8,7 @@ import { applySlotDamage, dyingAfterHealthChange, type ConditionShield } from '.
 import { debuffById } from '../rules/debuffs'
 import { CUSTOM_CHANGE_TYPES } from '../effects/mapping'
 import { capsMagicDamage, halvesAreaDamage, hasRegen, regenAdvance } from '../effects/specials'
+import { afterHit, fireEvent } from '../effects/triggers'
 
 export type DamageOptions = {
   types?: string[]
@@ -25,6 +26,10 @@ export type DamageOptions = {
   /** Post a health-change card with an Undo button. */
   chat?: boolean
   source?: string
+  /** From a hit's damage card: its tier, the attacker's UUID and the attack's sources (triggered rules). */
+  tier?: string
+  attacker?: string
+  sources?: string[]
 }
 
 export class CrawlActor extends Actor {
@@ -156,9 +161,11 @@ export class CrawlActor extends Actor {
       await this.update({ 'system.health.value': health, 'system.shield.slots': result.shieldStates })
       if (result.slotsLost > 0) await endConditionsOn(this, 'damaged')
       await this.#updateConditionShields(shields, result.conditionShields)
+      const wasDying = this.statuses.has('dying')
       await this.#syncDying(before.health, health)
       if (before.health > 0 && health <= 0) await creditKillingBlow(options.killingBlowSpell)
       const summary = this.#describe(result, types, incoming)
+      await this.#afterDamage(result.slotsLost, !wasDying && this.statuses.has('dying'), options)
       return this.#postHealthCard(`${this.name} lost ${result.slotsLost} health slot${result.slotsLost === 1 ? '' : 's'}. ${summary}`, before, options)
     }
 
@@ -180,6 +187,7 @@ export class CrawlActor extends Actor {
     if (result.slotsLost >= remaining) await this.#markDefeated()
     if (remaining > 0 && result.slotsLost >= remaining) await creditKillingBlow(options.killingBlowSpell)
     const summary = this.#describe(result, types, incoming)
+    await this.#afterDamage(result.slotsLost, false, options)
     return this.#postHealthCard(`${this.name} lost ${result.slotsLost} health slot${result.slotsLost === 1 ? '' : 's'}. ${summary}`, before, options)
   }
 
@@ -204,7 +212,8 @@ export class CrawlActor extends Actor {
     const mana = this.system.mana
     if (result.mana > 0 && mana && Number(mana.value) < Number(mana.max))
       update['system.mana.value'] = Math.min(Number(mana.max) || 0, (Number(mana.value) || 0) + result.mana)
-    await this.update(update)
+    // The counter changes every clock tick; only a mana change is worth redrawing the sheet for.
+    await this.update(update, { render: 'system.mana.value' in update })
     const hurt = this.type === 'crawler' ? this.system.health.value < HEALTH_MAX : Number(this.system.slotsLost) > 0
     if (result.slots > 0 && hurt) await this.applyHealing(result.slots, { source: game.i18n.localize('CRAWLSPACE.Effect.Regeneration') })
   }
@@ -225,12 +234,14 @@ export class CrawlActor extends Actor {
       await this.update({ 'system.health.value': health, 'system.health.dyingCountdown': null })
       await this.#syncDying(before.health, health)
       if (healed > 0) await expireActorEvent('healed', [this])
+      if (healed > 0) await fireEvent(this, 'healed')
       return this.#postHealthCard(`${this.name} healed ${healed} health slot${healed === 1 ? '' : 's'}.`, before, options)
     }
     const before = { slotsLost: system.slotsLost }
     const slotsLost = Math.max(0, system.slotsLost - count)
     await this.update({ 'system.slotsLost': slotsLost })
     if (system.slotsLost > slotsLost) await expireActorEvent('healed', [this])
+    if (system.slotsLost > slotsLost) await fireEvent(this, 'healed')
     return this.#postHealthCard(`${this.name} healed ${system.slotsLost - slotsLost} health slots.`, before, options)
   }
 
@@ -249,6 +260,17 @@ export class CrawlActor extends Actor {
       if (!next || next.remaining === shield.remaining) continue
       if (next.remaining <= 0) await shield.effect.delete()
       else await shield.effect.update({ 'system.shield.remaining': next.remaining })
+    }
+  }
+
+  /** Triggered rules: the hit's "after" half, Damaged, and Dying. */
+  async #afterDamage(slotsLost: number, nowDying: boolean, options: DamageOptions) {
+    try {
+      await afterHit(this, options)
+      if (slotsLost > 0) await fireEvent(this, 'damaged')
+      if (nowDying) await fireEvent(this, 'dying')
+    } catch (error) {
+      console.error('CrawlSpace | triggers', error)
     }
   }
 

@@ -634,7 +634,20 @@
         "perSlot": "Damage per slot",
         "blocks": "Blocks",
         "formula": "Formula",
-        "damageTypes": "Damage types"
+        "damageTypes": "Damage types",
+        "amount": "Amount (number, stat or %)",
+        "interval": "Every",
+        "fastInterval": "Faster every",
+        "fastStat": "Faster once Rank reaches",
+        "scope": "Covers",
+        "armorPiercing": "Armor piercing",
+        "from": "From",
+        "cap": "Rank cap",
+        "condition": "Condition",
+        "stacks": "Stacks",
+        "text": "Text",
+        "when": "When",
+        "timing": "Timing"
       },
       "RollKind": {
         "attackMode": "Attack rolls",
@@ -668,10 +681,19 @@
         "inherentSpell": "Inherent Spell",
         "lightOrb": "Light",
         "raiseMinion": "Raise as Minion",
-        "special": "Special",
+        "special": "Special (other)",
         "custom": "Custom",
         "conditionShield": "Condition Shield",
-        "cleanupDamage": "Clean Up Damage"
+        "cleanupDamage": "Clean Up Damage",
+        "armorPiercing": "Armor Piercing",
+        "damageBonus": "Damage Bonus",
+        "magicDamageCap": "Magic Damage Cap",
+        "areaDamageHalf": "Half Area Damage",
+        "manaPerRound": "Mana Regeneration",
+        "regenPerRound": "Health Regeneration",
+        "rankCap": "Rank Cap",
+        "applyCondition": "Apply Condition",
+        "note": "Note"
       },
       "ShieldScope": {
         "all": "All damage",
@@ -692,6 +714,64 @@
         "shield": "Shield",
         "lightOrb": "Light orb",
         "raiseMinion": "Raise minion"
+      },
+      "Category": {
+        "stats": "Stats",
+        "skills": "Skills",
+        "spells": "Spells",
+        "attacks": "Attacks",
+        "damageResponse": "Damage response",
+        "health": "Health",
+        "mana": "Mana",
+        "special": "Special"
+      },
+      "TriggerGroup": {
+        "roll": "Your roll",
+        "defense": "An attack against you",
+        "other": "Other"
+      },
+      "Trigger": {
+        "always": "Always (no trigger)",
+        "rollCritSuccess": "Critical Success",
+        "rollAmazing": "Amazing Success",
+        "rollSuccess": "Success",
+        "rollAnySuccess": "Any success",
+        "rollFail": "Fail",
+        "rollMajorFail": "Major Fail",
+        "rollCritFail": "Critical Fail",
+        "rollAnyFail": "Any fail",
+        "targeted": "You are targeted",
+        "hitAny": "You are hit (any)",
+        "hit": "You are hit",
+        "hitAmazing": "You are amazingly hit",
+        "hitCrit": "You are critically hit",
+        "missAny": "It misses you (any)",
+        "miss": "It misses you",
+        "missMajor": "It majorly misses you",
+        "missCrit": "It critically misses you",
+        "damaged": "You take health slot damage",
+        "healed": "You are healed",
+        "dying": "You start Dying",
+        "cleanUp": "Each Clean Up"
+      },
+      "Timing": {
+        "before": "Before it resolves (at the roll)",
+        "after": "After it resolves (damage applied)"
+      },
+      "ApplyTarget": {
+        "self": "Yourself",
+        "other": "The other side (target or attacker)"
+      },
+      "DamageScope": {
+        "named": "Named attacks only",
+        "weapon": "Weapon attacks",
+        "skills": "Skill attacks",
+        "spells": "Spell attacks"
+      },
+      "MagicKind": {
+        "any": "Skills and spells",
+        "Skills": "Skills",
+        "Spells": "Spells"
       }
     },
     "Table": {
@@ -1160,7 +1240,13 @@
       "BoxType": "Box type",
       "AllCrawlers": "All crawlers",
       "ColumnAllHint": "Tick or untick every box type for all crawlers",
-      "ColumnHint": "Tick or untick every box type for {name}"
+      "ColumnHint": "Tick or untick every box type for {name}",
+      "Timer": "Timer",
+      "TimerEvery": "Roll automatically every",
+      "TimerMinutes": "minutes of play",
+      "TimerHint": "Play time counts while you and at least one player are online, and the roll covers the whole party ({names}).",
+      "TimerNext": "Next roll in about {minutes} min.",
+      "Save": "Save"
     },
     "Generator": {
       "Title": "Item Generator",

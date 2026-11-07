@@ -26,13 +26,11 @@ const healthAt = (clientX: number, track: HTMLElement) => {
 
 const healthColor = (pct: number) => `hsl(${Math.floor((pct / 100) * 120)} 68% 42%)`
 
-/** Under the floor timer, beside the scene controls. */
+/** Under the scene navigation, beside the scene controls. */
 function defaultPosition() {
-  const timers = document.getElementById('crawlspace-timers')?.getBoundingClientRect()
   const column = document.getElementById('ui-left-column-2')?.getBoundingClientRect()
   const left = Math.floor(column && column.left > 0 && column.left < window.innerWidth ? column.left : 115)
-  const top = Math.floor(timers && timers.height ? timers.bottom + 30 : 190)
-  return { left, top }
+  return { left, top: 190 }
 }
 
 /** A condition badge. */
@@ -234,8 +232,13 @@ export function registerFrames() {
   })
   const refresh = foundry.utils.debounce(() => frames?.rendered && frames.render(), 100)
   const changed = (actor: any) => actor?.documentName === 'Actor' && refresh()
+  // Bookkeeping flags (the regeneration counter ticks every second) don't change what a frame shows.
+  const quiet = (changes: any) => {
+    const keys = Object.keys(foundry.utils.flattenObject(changes ?? {})).filter((key) => key !== '_id')
+    return keys.length > 0 && keys.every((key) => key.startsWith('flags.crawlspace.regen'))
+  }
   Hooks.on('createActor', changed)
-  Hooks.on('updateActor', changed)
+  Hooks.on('updateActor', (actor: any, changes: any) => !quiet(changes) && changed(actor))
   Hooks.on('deleteActor', changed)
   for (const hook of ['createActiveEffect', 'updateActiveEffect', 'deleteActiveEffect']) Hooks.on(hook, (effect: any) => changed(effect.parent))
   // Item changes (equipping armor, raising INT) move Evade, DR and Mana.

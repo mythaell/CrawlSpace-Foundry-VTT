@@ -7,6 +7,10 @@
  * emanation, and an "aura" Region behavior hands the item's conditions to the tokens inside that it targets
  * (allies, enemies or everyone, the caster only if it includes them), taking them away again as they leave.
  * A placed area goes when its spell's duration runs out, or with the combat for "end of combat" durations.
+ *
+ * The caster of an aura or dread carries a marker condition for it (its icon shows on the token and the frames),
+ * timed by the spell's Duration. The two go together: when the marker ends or is removed, so is the Region, and
+ * removing the Region removes the marker.
  */
 import {
   normalizeAbilityTemplate,
@@ -204,6 +208,7 @@ export function createAuraBehavior() {
         const condition: any = conditionData(effect)
         // Inside the aura it lasts; leaving takes it away.
         delete condition.duration
+        condition.showIcon = CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS
         foundry.utils.setProperty(condition, 'flags.crawlspace.aura', { behavior: marker, effect: effect.uuid })
         return condition
       })
@@ -238,6 +243,36 @@ export function createAuraBehavior() {
   }
 }
 
+/** World actors and the scenes' unlinked token actors (a mob's marker sits on its token). */
+function markerActors() {
+  const actors = new Map<string, any>()
+  for (const actor of game.actors) actors.set(actor.uuid, actor)
+  for (const scene of game.scenes) for (const token of scene.tokens) if (!token.actorLink && token.actor) actors.set(token.actor.uuid, token.actor)
+  return [...actors.values()]
+}
+
+/** The caster gets "<Spell> (Aura)" or "(Dread)" with the spell's icon, lasting the spell's Duration. */
+async function addAuraMarker(region: any) {
+  const area = region.flags.crawlspace.area
+  const caster: any = area.source ? fromUuidSync(area.source) : null
+  const actor = caster?.actor ?? (region.attachment?.token?.actor || null)
+  if (!actor) return
+  const item: any = area.item ? fromUuidSync(area.item) : null
+  const kind = game.i18n.localize(`CRAWLSPACE.Aura.Kind.${area.aura.kind}`)
+  // An aura riding on the token lasts the spell's Duration; a placed one already ends with its Region.
+  const durationText = region.attachment?.token ? String(item?.system?.duration ?? '') : ''
+  await actor.createEmbeddedDocuments('ActiveEffect', [
+    {
+      name: `${item?.name ?? region.name} (${kind})`,
+      img: item?.img ?? (area.aura.kind === 'dread' ? 'icons/svg/terror.svg' : 'icons/svg/aura.svg'),
+      origin: item?.uuid,
+      showIcon: CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS,
+      system: { conditionType: 'buff', durationText },
+      flags: { crawlspace: { auraRegion: region.uuid } },
+    },
+  ])
+}
+
 /** Every aura behavior on the scene. */
 const auraBehaviors = (scene: any) =>
   (scene?.regions?.contents ?? []).flatMap((region: any) => region.behaviors.filter((behavior: any) => behavior.type === 'aura' && !behavior.disabled))
@@ -256,6 +291,24 @@ export function registerAreas() {
         },
       ])
       .catch((error: any) => console.error('CrawlSpace | aura behavior', error))
+  })
+
+  // The caster's marker for an aura or dread area, and the Region and marker ending together.
+  Hooks.on('createRegion', (region: any) => {
+    if (game.user.isActiveGM && region.flags?.crawlspace?.area?.aura) void addAuraMarker(region).catch((error: any) => console.error('CrawlSpace | aura marker', error))
+  })
+  Hooks.on('deleteRegion', (region: any) => {
+    if (!game.user.isActiveGM || !region.flags?.crawlspace?.area?.aura) return
+    for (const actor of markerActors()) {
+      const ids = actor.effects.filter((effect: any) => effect.flags?.crawlspace?.auraRegion === region.uuid).map((effect: any) => effect.id)
+      if (ids.length) actor.deleteEmbeddedDocuments('ActiveEffect', ids)
+    }
+  })
+  Hooks.on('deleteActiveEffect', (effect: any) => {
+    const uuid = effect.flags?.crawlspace?.auraRegion
+    if (!game.user.isActiveGM || !uuid) return
+    const region: any = fromUuidSync(uuid)
+    if (region) region.delete()
   })
 
   // Sides change (a mob raised as a minion, a token turned hostile) or a target dies: who's in the aura changes.

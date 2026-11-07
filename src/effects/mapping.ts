@@ -42,6 +42,8 @@ export const CUSTOM_CHANGE_TYPES = {
   modLoss: 'crawlspace.modLoss',
   rollMode: 'crawlspace.rollMode',
   special: 'crawlspace.special',
+  /** A rule that waits for a trigger (trigger-events.ts). */
+  triggered: 'crawlspace.triggered',
 } as const
 
 /** Returns the changes for one effect property, or null when it carries no mechanics. */

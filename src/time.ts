@@ -3,6 +3,7 @@ import { expireKillingBlows } from './effects/killing-blows'
 import { regenAdvance, hasRegen } from './effects/specials'
 import { effectDuration } from './import/convert'
 import { cooldownLabel } from './effects/cooldowns'
+import { fireEvent } from './effects/triggers'
 import { endConditionsOn, type EndTrigger } from './effects/end-triggers'
 
 let updates: Promise<any> = Promise.resolve()
@@ -22,6 +23,8 @@ export async function expireActorEvent(event: string, actors: any[]) {
   await foundry.documents.ActiveEffect.registry.refresh(event, { actors: new Set(actors), combat: game.combat })
   // Conditions whose duration text names the event end too (special durations).
   for (const actor of actors) await endConditionsOn(actor, event as EndTrigger)
+  // Rules triggered each Clean Up.
+  if (event === 'cleanUp') for (const actor of actors) await fireEvent(actor, 'cleanUp')
 }
 
 /** Standard conditions can end at combat's end OR their time limit (debuffs.ts). */

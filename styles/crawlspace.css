@@ -2138,6 +2138,10 @@
     gap: 2px;
     font-size: 11px;
   }
+  .crawlspace .rule-block.triggered { border-color: var(--hud-cyan, #8cfff6); }
+  .crawlspace .rule-field:has(textarea) { grid-column: 1 / -1; }
+  .crawlspace .rule-field textarea { min-height: 3em; resize: vertical; font-size: 12px; }
+  .crawlspace .crawl-trigger-notes p, .crawl-trigger-notes p { margin: 4px 0 0; padding: 3px 6px; border-left: 3px solid #e0a020; background: rgb(224 160 32 / 12%); }
   .crawlspace .rule-new {
     display: flex;
     gap: 6px;
@@ -2546,7 +2550,7 @@
 @layer system {
   .crawlspace .time-fields { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .crawlspace .time-fields label { display: grid; gap: 4px; }
-  #crawlspace-timers.crawlspace { position: fixed; top: 70px; left: 115px; z-index: 30; display: grid; gap: 4px; max-width: min(520px, 45vw); pointer-events: auto; }
+  #crawlspace-timers.crawlspace { position: fixed; top: 48px; left: 286px; z-index: 30; cursor: grab; touch-action: none; display: grid; gap: 4px; max-width: min(520px, 45vw); pointer-events: auto; }
   #crawlspace-timers.crawlspace button { display: grid; gap: 3px; padding: 7px 12px; height: auto; background: var(--btn-bg); border: 1px solid var(--crawl-border); color: var(--color-text-light-highlight); }
   #crawlspace-timers.crawlspace .floor-timer { border-color: var(--hud-cyan); }
   #crawlspace-timers.crawlspace span { font-variant-numeric: tabular-nums; font-size: 13px; }
@@ -3064,6 +3068,10 @@
   .crawlspace.auto-loot-dialog .auto-loot-section h4 { display: flex; align-items: center; margin: 0 0 6px; font-size: 13px; border: none; }
   .crawlspace.auto-loot-dialog .auto-loot-all { margin-left: auto; font-size: 12px; font-weight: normal; }
   .crawlspace.auto-loot-dialog .auto-loot-all a { cursor: pointer; text-decoration: underline; }
+  .crawlspace.auto-loot-dialog .auto-loot-timer { display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 6px; margin: 0; text-align: left; }
+  .crawlspace.auto-loot-dialog .auto-loot-timer span { flex: none; }
+  .crawlspace.auto-loot-dialog .auto-loot-timer input[type="number"] { width: 64px; flex: none; text-align: center; }
+  .crawlspace.auto-loot-dialog .auto-loot-timer input[type="checkbox"] { flex: none; margin: 0; }
   .crawlspace.auto-loot-dialog .auto-loot-chance { display: flex; align-items: center; gap: 8px; }
   .crawlspace.auto-loot-dialog .auto-loot-chance input[type="range"] { flex: 1; }
   .crawlspace.auto-loot-dialog .auto-loot-chance input[type="number"] { width: 64px; flex: none; text-align: center; }

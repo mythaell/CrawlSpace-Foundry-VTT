@@ -152,7 +152,11 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       itemId: owner?.id ?? '',
       changes: (effect.system?.changes ?? []).length,
     })
-    const all = this.actor.effects.map((effect: any) => ({ ...rows(effect), cooldown: !!effect.flags?.crawlspace?.cooldownKey }))
+    const all = this.actor.effects.map((effect: any) => {
+      const cooldown = !!effect.flags?.crawlspace?.cooldownKey
+      // A cooldown shows the time left; the clock updates it in place each tick.
+      return { ...rows(effect), cooldown, ...(cooldown ? { duration: cooldownLabel(effect) } : {}) }
+    })
     const actorEffects = all.filter((effect: any) => !effect.cooldown)
     const fromItems = (types: string[]) =>
       [...this.actor.items]

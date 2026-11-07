@@ -1,7 +1,7 @@
 {{!-- One ActiveEffect's changes as rule blocks. Context: effectId, rules, ruleTypes, editable. --}}
 <div class="rules-list" data-rules-effect="{{effectId}}">
   {{#each rules as |rule|}}
-  <section class="rule-block" data-rule-index="{{rule.index}}" data-rule-type="{{rule.id}}">
+  <section class="rule-block {{#if rule.triggered}}triggered{{/if}}" data-rule-index="{{rule.index}}" data-rule-type="{{rule.id}}">
     <header class="rule-header">
       <i class="fa-solid fa-bars"></i>
       <h4>{{rule.label}}</h4>
@@ -14,7 +14,9 @@
       {{#each rule.fields as |field|}}
       <label class="rule-field">
         <span>{{field.label}}</span>
-        {{#if field.options}}
+        {{#if field.groups}}
+        <select data-rule-field="{{field.name}}">{{#each field.groups as |group|}}{{#if group.label}}<optgroup label="{{group.label}}">{{/if}}{{#each group.options}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}{{#if group.label}}</optgroup>{{/if}}{{/each}}</select>
+        {{else if field.options}}
         <select data-rule-field="{{field.name}}">{{#each field.options}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
         {{else if field.named}}
         <span class="rule-named">
@@ -23,6 +25,8 @@
         </span>
         {{else if field.duration}}
         <span class="time-input"><input type="text" data-rule-field="{{field.name}}" value="{{field.value}}"><a class="time-picker" data-time-picker data-tooltip="{{localize 'CRAWLSPACE.Time.PickDuration'}}"><i class="fa-solid fa-clock"></i></a></span>
+        {{else if field.textarea}}
+        <textarea data-rule-field="{{field.name}}" rows="2">{{field.value}}</textarea>
         {{else if field.damageTypes}}
         <span class="time-input"><input type="text" data-rule-field="{{field.name}}" value="{{field.value}}"><a class="time-picker" data-rule-damage-types data-tooltip="{{localize 'CRAWLSPACE.Rules.PickDamageTypes'}}"><i class="fa-solid fa-list-check"></i></a></span>
         {{else}}
@@ -38,7 +42,7 @@
   {{#each datalists}}<datalist id="{{id}}">{{#each names}}<option value="{{this}}"></option>{{/each}}</datalist>{{/each}}
   {{#if editable}}
   <div class="rule-new">
-    <select data-rule-new>{{#each ruleTypes}}<option value="{{value}}">{{label}}</option>{{/each}}</select>
+    <select data-rule-new>{{#each ruleTypes as |group|}}<optgroup label="{{group.label}}">{{#each group.rules}}<option value="{{value}}">{{label}}</option>{{/each}}</optgroup>{{/each}}</select>
     <button type="button" data-rule-action="add"><i class="fa-solid fa-plus"></i> {{localize "CRAWLSPACE.Rules.New"}}</button>
   </div>
   {{/if}}

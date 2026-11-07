@@ -4,6 +4,7 @@
  */
 import { statKeyFromCode } from '../config'
 import { CUSTOM_CHANGE_TYPES } from './mapping'
+import { unwrapTriggered } from './trigger-events'
 
 type Handler = (target: any, change: any, options: { replacementData?: Record<string, unknown> }) => void
 
@@ -64,6 +65,27 @@ export const CHANGE_TYPE_HANDLERS: Record<string, { label: string; defaultPriori
     handler: (actor, change) => {
       const [kind, target = 'All'] = String(change.key).split(':')
       actor.system?.rollModes?.push({ kind, target, value: String(change.value), source: change.effect?.name ?? '' })
+    },
+  },
+  [CUSTOM_CHANGE_TYPES.triggered]: {
+    label: 'CrawlSpace Triggered Rule (value: trigger and rule)',
+    defaultPriority: 20,
+    // Doesn't apply now: listed for triggers.ts to carry out when its trigger happens.
+    handler: (actor, change) => {
+      const triggered = unwrapTriggered(change)
+      const effect = change.effect
+      if (!triggered || !actor.system?.triggers) return
+      const item = effect?.parent?.documentName === 'Item' ? effect.parent : null
+      const index = (effect?.system?.changes ?? []).findIndex((entry: any) => entry.type === change.type && entry.value === change.value)
+      actor.system.triggers.push({
+        ...triggered,
+        source: effect?.name ?? item?.name ?? '',
+        effectId: effect?.id ?? '',
+        itemId: item?.id ?? '',
+        itemName: item?.name ?? '',
+        itemType: item?.type ?? '',
+        index: Math.max(0, index),
+      })
     },
   },
   [CUSTOM_CHANGE_TYPES.special]: {

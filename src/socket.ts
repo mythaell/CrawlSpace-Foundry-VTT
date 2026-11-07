@@ -1,6 +1,7 @@
 import { performUpkeep, postUpkeepRequest } from './apps/upkeep'
 import { createBuiltCrawler, type Draft } from './apps/builder'
 import { giveCondition, mayGive } from './effects/use-conditions'
+import { triggerRequest } from './effects/triggers'
 /**
  * GM relay. Players can't update actors or combats they don't own, so those requests travel over the system
  * socket and the active GM's client performs them. Only whitelisted methods can be called this way.
@@ -18,6 +19,7 @@ type Request =
   | { type: 'builderError'; userId: string; error: string }
   | { type: 'condition'; effectUuid: string; targetUuid: string; userId: string }
   | { type: 'upkeepRequest'; uuids: string[]; kind: string; hours: number; userId: string }
+  | { type: 'trigger'; actorUuid: string; events: string[]; timing: string; afterPhase: boolean; otherUuid: string; sources: string[]; messageId: string }
 
 async function perform(request: Request) {
   if (request.type === 'buildCrawler') {
@@ -39,6 +41,7 @@ async function perform(request: Request) {
     await giveCondition(effect, target)
     return
   }
+  if (request.type === 'trigger') return triggerRequest(request)
   if (request.type === 'upkeepRequest') {
     // A player's ask: the GMs see a card to approve or decline it.
     const user = game.users.get(request.userId)

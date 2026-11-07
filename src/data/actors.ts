@@ -52,6 +52,7 @@ abstract class CrawlActorData extends foundry.abstract.TypeDataModel {
     this.bonuses = { skillRanks: {}, spellRanks: {}, baseSkillRanks: {}, baseSpellRanks: {}, healthSlots: {} }
     this.rollModes = []
     this.specials = []
+    this.triggers = []
     this.mana ??= {}
     this.mana.bonus = 0
     this.dr ??= {}

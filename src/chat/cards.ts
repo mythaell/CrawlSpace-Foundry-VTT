@@ -48,7 +48,7 @@ async function onAction(message: any, button: HTMLElement) {
       if (!speaker?.isOwner) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Warn.NotYours'))
       const tier = button.dataset.tier as 'normal' | 'amazing' | 'critical'
       const targets = (flags.targets ?? []).filter((target: any) => target.success).map((target: any) => target.uuid)
-      return rollDamage(speaker, flags.damage, { label: flags.label, subtitle: flags.subtitle, img: flags.img, tier, targets })
+      return rollDamage(speaker, flags.damage, { label: flags.label, subtitle: flags.subtitle, img: flags.img, tier, targets, sources: flags.sources })
     }
     case 'apply-damage': {
       const multiplier = Number(button.dataset.multiplier) || 1
@@ -68,6 +68,9 @@ async function onAction(message: any, button: HTMLElement) {
           magicBase: flags.magicBase ?? undefined,
           killingBlowSpell: flags.killingBlowSpell,
           shieldBlock,
+          tier: flags.tier ?? undefined,
+          attacker: flags.attacker || undefined,
+          sources: flags.sources ?? [],
         })
       }
       return

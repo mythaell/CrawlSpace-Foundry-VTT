@@ -8,6 +8,7 @@ import { openTime, registerClock, registerTimePickers } from './apps/time'
 import { registerFrames } from './apps/frames'
 import { registerCooldownIcons } from './effects/cooldowns'
 import { registerConditionDrops } from './effects/use-conditions'
+import { registerTriggers } from './effects/triggers'
 import { createTokenHUD } from './effects/stacks'
 import { advanceTime, settleTime, registerTime } from './time'
 import * as config from './config'
@@ -189,6 +190,7 @@ Hooks.once('init', () => {
   registerFrames()
   registerCooldownIcons()
   registerConditionDrops()
+  registerTriggers()
   registerAreas()
   registerUpkeep()
   registerLootTools()
@@ -196,7 +198,26 @@ Hooks.once('init', () => {
   game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
 })
 
+/** A new crawler's tokens are linked to it unless the creator said otherwise. */
+Hooks.on('preCreateActor', (actor: any, data: any) => {
+  if (actor.type === 'crawler' && data.prototypeToken?.actorLink === undefined) actor.updateSource({ 'prototypeToken.actorLink': true })
+})
+
+/** Equipping gear turns its effects back on for that actor (they may have been switched off while unequipped). */
+Hooks.on('updateItem', (item: any, changes: any) => {
+  const actor = item.actor
+  const off: string[] = actor?.flags?.crawlspace?.offEffects ?? []
+  if (!actor?.isOwner || foundry.utils.getProperty(changes, 'system.equipped') !== true || !off.length) return
+  const kept = off.filter((key) => !key.startsWith(`${item.id}.`))
+  if (kept.length !== off.length) actor.setFlag('crawlspace', 'offEffects', kept)
+})
+
 Hooks.once('ready', () => {
+  // Crawlers made before the link default: link their prototype tokens (placed tokens keep their own setting).
+  if (game.user.isActiveGM) {
+    const unlinked = game.actors.filter((actor: any) => actor.type === 'crawler' && !actor.prototypeToken.actorLink)
+    for (const actor of unlinked) actor.update({ 'prototypeToken.actorLink': true })
+  }
   registerSocket()
   registerTime()
   registerImmunity()
