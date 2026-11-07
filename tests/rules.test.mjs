@@ -142,3 +142,32 @@ test('auto-loot timer counts play time only with players online', async () => {
   assert.deepEqual(autoLootTick(0, 60, settings, true), { counted: 60, due: false })
   assert.deepEqual(autoLootTick(0, 600, normalizeAutoLoot({}, [], []), true), { counted: 0, due: false })
 })
+
+test('grid calibration: scale the map to the grid and put the anchor on an intersection', async () => {
+  const { calibrationUpdate, gridIntersection, referencePoint, cellFromMeasure } = await import('../src/rules/grid-calibration.ts')
+  // Printed squares of 50 px on a 100 px grid: the map doubles, and the anchor lands on a grid line.
+  const update = calibrationUpdate({
+    width: 1000, height: 800, gridSize: 100,
+    sceneRect: { x: 0, y: 0, width: 1000, height: 800 }, image: { x: 0, y: 0, width: 1000, height: 800 },
+    anchor: { x: 125, y: 130 }, cellX: 50, cellY: 40,
+    dimensionsX: () => 0, dimensionsY: () => 0,
+  })
+  assert.equal(update.width, 2000)
+  assert.equal(update.height, 2000)
+  // After scaling the anchor sits at (250, 325); shifting the scene by the shift lands it on the grid.
+  assert.equal((250 - update.shiftX) % 100, 0)
+  assert.equal((325 - update.shiftY) % 100, 0)
+  // With padding the scene starts further in; the result still lands on the grid.
+  const padded = calibrationUpdate({
+    width: 1000, height: 800, gridSize: 100,
+    sceneRect: { x: 300, y: 200, width: 1000, height: 800 }, image: { x: 310, y: 200, width: 1000, height: 800 },
+    anchor: { x: 437, y: 263 }, cellX: 70, cellY: 70,
+    dimensionsX: (w) => Math.ceil((w * 0.25) / 100) * 100, dimensionsY: (h) => Math.ceil((h * 0.25) / 100) * 100,
+  })
+  const k = padded.width / 1000
+  const left = Math.ceil((padded.width * 0.25) / 100) * 100 - padded.shiftX + padded.width / 2 + 10 - (1000 * k) / 2
+  assert.ok(Math.abs(((left + (437 - 310) * k) % 100 + 100) % 100) < 1 || Math.abs(((left + (437 - 310) * k) % 100 + 100) % 100 - 100) < 1)
+  assert.deepEqual(gridIntersection({ x: 148, y: 52 }, 50, 50, { x: 0, y: 0 }), { x: 150, y: 50 })
+  assert.deepEqual(referencePoint({ x: 10, y: 10 }, { x: 160, y: 14 }, 'x'), { x: 160, y: 10 })
+  assert.equal(cellFromMeasure({ x: 0, y: 0 }, { x: 150, y: 0 }), 50)
+})

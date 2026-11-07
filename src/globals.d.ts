@@ -6,6 +6,7 @@ declare const CONST: any
 declare const Hooks: any
 declare const ui: any
 declare const canvas: any
+declare const PIXI: any
 declare const Roll: any
 declare const ChatMessage: any
 declare const Actor: any

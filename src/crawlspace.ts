@@ -6,6 +6,7 @@ import { openAwards } from './apps/awards'
 import { registerImmunity } from './effects/immunity'
 import { openTime, registerClock, registerTimePickers } from './apps/time'
 import { registerFrames } from './apps/frames'
+import { calibrateGrid, registerGridCalibration } from './apps/grid-calibration'
 import { registerCooldownIcons } from './effects/cooldowns'
 import { registerConditionDrops } from './effects/use-conditions'
 import { registerTriggers } from './effects/triggers'
@@ -191,11 +192,12 @@ Hooks.once('init', () => {
   registerCooldownIcons()
   registerConditionDrops()
   registerTriggers()
+  registerGridCalibration()
   registerAreas()
   registerUpkeep()
   registerLootTools()
 
-  game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, declareAttack: () => game.combat && promptDeclaration(game.combat) }
+  game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, calibrateGrid, declareAttack: () => game.combat && promptDeclaration(game.combat) }
 })
 
 /** A new crawler's tokens are linked to it unless the creator said otherwise. */
