@@ -6,6 +6,7 @@ import { actorAction, combatAction } from '../socket'
 import { applyCondition, mayGive } from '../effects/use-conditions'
 import { debuffByName } from '../rules/debuffs'
 import { shieldBlockAllowed, shieldBlockFor } from '../rules/shield-block'
+import { promptRepair } from '../rules/repair'
 
 /** A row's own target, or (the "Selected tokens" row) the controlled tokens, then the card's recorded targets. */
 async function rowActors(button: HTMLElement, fallbackUuids: string[] = []) {
@@ -32,6 +33,11 @@ async function onAction(message: any, button: HTMLElement) {
   const action = button.dataset.crawlAction
   const total = Number(message.rolls?.[0]?.total) || 0
   switch (action) {
+    case 'repair-item': {
+      const actor = ChatMessage.getSpeakerActor(message.speaker)
+      if (!actor?.isOwner) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Warn.NotYours'))
+      return promptRepair(actor, message)
+    }
     case 'place-area': {
       const item = await fromUuid(button.dataset.itemUuid ?? '')
       if (item) await placeArea(item, message.speaker?.scene === canvas.scene?.id ? (message.speaker?.token ?? '') : '')
@@ -161,6 +167,7 @@ async function renderFooter(message: any) {
 export function registerChatHandlers() {
   Hooks.on('renderChatMessageHTML', (message: any, html: HTMLElement) => {
     if (message.flags?.crawlspace?.answered) html.querySelectorAll('[data-crawl-action^="upkeep-"]').forEach((button) => button.setAttribute('disabled', ''))
+    if (message.flags?.crawlspace?.repaired) html.querySelector('[data-crawl-action="repair-item"]')?.setAttribute('disabled', '')
     if (message.flags?.crawlspace?.undone) html.querySelector('[data-crawl-action="undo"], [data-crawl-action="undo-award"]')?.setAttribute('disabled', '')
     // One delegated listener, so buttons added below (the footer) work too.
     html.addEventListener('click', (event) => {

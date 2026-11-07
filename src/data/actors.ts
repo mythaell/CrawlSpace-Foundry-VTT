@@ -228,16 +228,20 @@ export class CrawlerData extends CrawlActorData {
     this.mana.pct = this.mana.max > 0 ? Math.clamp((this.mana.value / this.mana.max) * 100, 0, 100) : 0
 
     // DR = armor (base + equipped armor DR) + current Shield DR + DR buffs (App.tsx automaticDrTotal).
+    // Each shield keeps its own lost DR (drLost); `shieldDr.lost` is older data, moved onto the shield on ready.
     let equippedArmor = 0
     let shieldMax = 0
+    let shieldLeft = 0
     for (const item of items) {
       if (item.type !== 'equipment' || !item.system?.equipped) continue
       const dr = Number(item.system.armorDr) || 0
-      if (item.system.isShield) shieldMax += dr
-      else equippedArmor += dr
+      if (item.system.isShield) {
+        shieldMax += dr
+        shieldLeft += Math.max(0, dr - (Number(item.system.drLost) || 0))
+      } else equippedArmor += dr
     }
     this.shieldDr.max = shieldMax
-    this.shieldDr.value = Math.clamp(shieldMax - this.shieldDr.lost, 0, shieldMax)
+    this.shieldDr.value = Math.clamp(shieldLeft - this.shieldDr.lost, 0, shieldMax)
     this.dr.armorTotal = Math.floor(this.dr.armor + equippedArmor)
     this.dr.total = Math.floor(this.dr.override ?? this.dr.armorTotal + this.shieldDr.value + this.dr.buff + this.dr.bonus)
 

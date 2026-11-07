@@ -157,6 +157,8 @@ const physical = () => {
     ...common(),
     quantity: integer(1, { min: 0 }),
     equipped: new fields.BooleanField(),
+    /** Broken gear: a broken shield can't Shield Block. The Repair skill (or the sheet) mends it. */
+    broken: new fields.BooleanField(),
     tags: stringList(),
   }
 }
@@ -188,6 +190,8 @@ export class EquipmentData extends foundry.abstract.TypeDataModel {
       slot: new fields.StringField({ required: true, initial: 'torso', choices: Object.keys(GEAR_SLOTS) }),
       armorDr: integer(0),
       isShield: new fields.BooleanField(),
+      /** DR a shield has lost to failed Shield Blocks; Repair restores it. */
+      drLost: integer(0, { min: 0 }),
     }
   }
 }

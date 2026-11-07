@@ -26,14 +26,13 @@
       <b>{{system.dr.total}}</b>
       <span>{{localize "CRAWLSPACE.Stat.DR"}}</span>
     </div>
-    <div class="defense-badge shield-dr {{#unless hasShield}}empty{{/unless}}" data-tooltip="{{localize 'CRAWLSPACE.Stat.ShieldDrHint'}}">
+    <div class="defense-badge shield-dr {{#unless hasShield}}empty{{/unless}} {{#if shieldBroken}}broken{{/if}}" data-tooltip="{{localize 'CRAWLSPACE.Stat.ShieldDrHint'}}">
       <svg viewBox="0 0 40 44" aria-hidden="true"><path d="M20 2C26 6 32 7 37 7V20C37 31 29 38 20 42C11 38 3 31 3 20V7C8 7 14 6 20 2Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
       <b>{{#if hasShield}}{{system.shieldDr.value}}<small>/{{system.shieldDr.max}}</small>{{else}}—{{/if}}</b>
       <span>{{localize "CRAWLSPACE.Stat.ShieldDrShort"}}</span>
       {{#if (and hasShield @root.editable)}}
       <span class="shield-dr-buttons">
-        <a data-action="shieldDr" data-delta="-1" data-tooltip="{{localize 'CRAWLSPACE.Stat.ShieldDrLose'}}"><i class="fa-solid fa-minus"></i></a>
-        <a data-action="shieldDr" data-delta="1" data-tooltip="{{localize 'CRAWLSPACE.Stat.ShieldDrRestore'}}"><i class="fa-solid fa-plus"></i></a>
+        <a data-action="repairShield" data-tooltip="{{localize 'CRAWLSPACE.Stat.ShieldRepair'}}"><i class="fa-solid fa-plus"></i></a>
       </span>
       {{/if}}
     </div>

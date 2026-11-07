@@ -1621,6 +1621,9 @@
   .crawlspace .defense-badge.empty {
     opacity: 0.55;
   }
+  .crawlspace .defense-badge.shield-dr.broken {
+    color: #ff6b6b;
+  }
   .crawlspace .defense-badge > .shield-dr-buttons {
     position: absolute;
     top: 0;
@@ -1938,9 +1941,20 @@
   .crawlspace.pf-sheet .window-content > .pf-summary {
     grid-column: 1;
     grid-row: 3;
-    align-self: start;
+    align-self: stretch;
     max-height: 100%;
     overflow: auto;
+  }
+  /* The broken toggle sits at the bottom of the summary column. */
+  .crawlspace .pf-summary .pf-broken {
+    margin-top: auto;
+    padding-top: 6px;
+    border-top: 1px solid var(--crawl-border);
+    gap: 4px;
+  }
+  .crawlspace .pf-summary .pf-broken.is-broken {
+    color: #ff6b6b;
+    font-weight: 700;
   }
   .crawlspace.pf-sheet .window-content > .tab {
     grid-column: 2;
@@ -3143,4 +3157,14 @@
   .crawl-calibration .calibration-help { font-size: 11px; line-height: 1.6; color: #b7ccdc; }
   .crawl-calibration .calibration-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
   .application.crawlspace .tab[data-tab="grid"] > [data-crawl-calibrate], .tab[data-tab="grid"] > [data-crawl-calibrate] { margin-bottom: 8px; }
+}
+
+@layer system {
+  /* Repair: pick the broken item. */
+  .crawlspace.repair-dialog .repair-list { display: grid; gap: 4px; max-height: 320px; overflow: auto; }
+  .crawlspace.repair-dialog .repair-list .repair-choice { display: flex; flex-direction: row; justify-content: flex-start; align-items: center; text-align: left; gap: 8px; padding: 4px 6px; border: 1px solid var(--crawl-border); cursor: pointer; }
+  .crawlspace.repair-dialog .repair-choice:has(input:checked) { border-color: var(--dcc-blue-light); background: rgba(113, 201, 255, 0.12); }
+  .crawlspace.repair-dialog .repair-list .repair-choice img { flex: 0 0 28px; width: 28px; height: 28px; border: 0; }
+  .crawlspace.repair-dialog .repair-list .repair-choice input { flex: 0 0 auto; margin: 0; }
+  .crawl-shield-wear p { margin: 0; }
 }

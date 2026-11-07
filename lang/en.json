@@ -106,9 +106,8 @@
       "ManaOverride": "Max mana override",
       "ShieldDr": "Shield DR",
       "ShieldDrShort": "Shield",
-      "ShieldDrHint": "Shield DR from your equipped shield. Use − when it absorbs damage and + to restore it.",
-      "ShieldDrLose": "Lose 1 shield DR",
-      "ShieldDrRestore": "Restore 1 shield DR"
+      "ShieldDrHint": "Shield DR from your equipped shield. A Shield Block that Major Fails costs it 1 DR, a Critical Fail 2; with none left it breaks.",
+      "ShieldRepair": "Repair your equipped shields: restore their DR and mend them"
     },
     "Trait": {
       "Resist": "Resist",
@@ -176,6 +175,8 @@
       "Equip": "Equip",
       "Unequip": "Unequip",
       "Equipped": "Equipped",
+      "Broken": "Broken",
+      "BrokenHint": "Broken gear. A broken shield can't Shield Block. A successful Repair check (or the shield's repair button on the sheet) mends it.",
       "Rank": "Rank",
       "RankHint": "Base rank; the arrow shows the rank after effects.",
       "RankOverride": "Rank override",
@@ -1261,6 +1262,20 @@
       "Directory": "the Items directory",
       "Create": "Create",
       "Created": "{name} added to {where}."
+    },
+    "Repair": {
+      "Button": "Repair Item",
+      "Title": "Repair an item",
+      "Pick": "Choose the broken item to repair.",
+      "None": "{name} has nothing broken to repair.",
+      "Done": "{name} repaired {item}.",
+      "Used": "Already used to repair {item}.",
+      "ShieldsDone": "{name}'s shields are repaired.",
+      "Missing": "{dr} DR missing"
+    },
+    "ShieldWear": {
+      "Lost": "{name}'s {shield} loses {loss} DR from the failed Shield Block ({left}/{max} left).",
+      "Broke": "{name}'s {shield} loses {loss} DR from the failed Shield Block and breaks."
     },
     "Calibrate": {
       "Title": "Map grid calibration",

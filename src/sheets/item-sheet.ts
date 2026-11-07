@@ -212,7 +212,9 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
           row('CRAWLSPACE.Item.Healing', system.healing?.formula)
           row('CRAWLSPACE.Item.ManaRestore', system.manaRestore)
         }
-        if (item.type === 'equipment') row('CRAWLSPACE.Item.ArmorDr', system.armorDr)
+        // A shield shows the DR it has left after failed blocks.
+        if (item.type === 'equipment')
+          row('CRAWLSPACE.Item.ArmorDr', system.isShield && Number(system.drLost) > 0 ? `${Math.max(0, system.armorDr - system.drLost)} / ${system.armorDr}` : system.armorDr)
         if (item.type === 'weapon') {
           row('CRAWLSPACE.Item.Skill', system.skill)
           row('CRAWLSPACE.Item.Ammunition', system.ammunition)

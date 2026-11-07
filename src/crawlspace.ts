@@ -35,6 +35,7 @@ import { registerChatHandlers } from './chat/cards'
 import { characterToActor } from './import/convert'
 import { fillActorDamage, fillDamageData } from './import/fill-damage'
 import { registerUpkeep, openUpkeep, rest, performUpkeep } from './apps/upkeep'
+import { migrateShieldLoss } from './rules/repair'
 
 const TEMPLATES = [
   'chat/card-footer',
@@ -219,6 +220,7 @@ Hooks.once('ready', () => {
   if (game.user.isActiveGM) {
     const unlinked = game.actors.filter((actor: any) => actor.type === 'crawler' && !actor.prototypeToken.actorLink)
     for (const actor of unlinked) actor.update({ 'prototypeToken.actorLink': true })
+    void migrateShieldLoss().catch((error) => console.error('CrawlSpace | shield DR migration', error))
   }
   registerSocket()
   registerTime()

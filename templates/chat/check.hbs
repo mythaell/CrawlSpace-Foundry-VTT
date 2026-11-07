@@ -5,4 +5,5 @@
   <p class="outcome {{#if success}}success{{else}}failure{{/if}}">{{outcome}}{{#if difficulty}} <small>(DC {{difficulty}})</small>{{/if}}</p>
   {{/if}}
   {{#if details}}<div class="card-details">{{{details}}}</div>{{/if}}
+  {{#if repair}}<div class="card-buttons"><button type="button" data-crawl-action="repair-item"><i class="fa-solid fa-hammer"></i> {{localize "CRAWLSPACE.Repair.Button"}}</button></div>{{/if}}
 </div>

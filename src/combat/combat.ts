@@ -7,6 +7,7 @@ import { debuffById } from '../rules/debuffs'
 import { naturalD20, penaltyModifiers, rollD20, rollDamage } from '../dice/rolls'
 import { combatAction } from '../socket'
 import { shieldBlockAllowed, shieldBlockFor, shieldBlockSkill } from '../rules/shield-block'
+import { wearShields } from '../rules/repair'
 
 export type DefenseKind = 'evade' | 'tank' | 'block' | 'clap'
 export type DeclarationTarget = {
@@ -239,6 +240,8 @@ export class CrawlCombat extends Combat {
       total = result.roll.total
       natural = naturalD20(result.roll)
       await result.roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: await defenseFlavor(label, result.mode) }, { messageMode: game.settings.get('core', 'messageMode') })
+      // A Shield Block that Major or Critically Fails against the attack wears the shield down.
+      if (kind === 'block' && declaration.attack.toHit !== null) await wearShields(actor, attackOutcome(total ?? 0, declaration.attack.toHit, natural))
     }
     return combatAction(this, 'respondToDeclaration', declarationId, combatantId, kind, total ?? null, natural ?? null)
   }

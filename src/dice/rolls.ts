@@ -2,6 +2,8 @@ import { endConditionsOn } from '../effects/end-triggers'
 import { floorCheckDc } from '../rules/floor-checks'
 import { attackOutcome, doubleDice, outcomeLabel, resolveFormulaTokens, SUCCESS_OUTCOMES, type AttackOutcome } from '../rules/core'
 import { debuffById } from '../rules/debuffs'
+import { isRepairSkill, shieldBlockSkill } from '../rules/shield-block'
+import { wearShields } from '../rules/repair'
 import type { AttackDamage } from '../actors/attacks'
 
 export type RollModeName = 'normal' | 'advantage' | 'disadvantage'
@@ -143,19 +145,26 @@ export async function rollCheck(actor: any, options: CheckOptions) {
   if (options.pay && !(await options.pay())) return null
   const { roll, mode } = result
   const outcome = options.difficulty != null ? outcomeFor(roll, options.difficulty) : null
+  const success = outcome ? SUCCESS_OUTCOMES.includes(outcome) : null
+  // A successful Repair check can mend one broken item from its card.
+  const repair = !!success && (options.sources ?? []).some((name) => isRepairSkill(name))
   const flavor = await foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/chat/check.hbs', {
     label: options.label,
     flavor: options.flavor,
     mode: mode === 'normal' ? '' : game.i18n.localize(`CRAWLSPACE.Roll.Mode.${mode}`),
     outcome: outcome ? outcomeLabel(outcome, options.kind !== 'attack') : null,
-    success: outcome ? SUCCESS_OUTCOMES.includes(outcome) : null,
+    success,
     difficulty: options.difficulty,
     details: options.details ?? '',
+    repair,
   })
   await roll.toMessage(
     { speaker: ChatMessage.getSpeaker({ actor }), flavor, flags: { crawlspace: { kind: 'check', outcome, sources: options.sources ?? [], ...options.flags } } },
     { messageMode: messageMode() },
   )
+  // A Shield Block check that Major or Critically Fails wears the shield down.
+  const blockSkill = shieldBlockSkill(actor)
+  if (blockSkill && (options.sources ?? []).includes(blockSkill.name)) await wearShields(actor, outcome)
   await afterAction(actor)
   return { roll, outcome }
 }

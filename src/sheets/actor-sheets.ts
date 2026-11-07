@@ -1,4 +1,6 @@
 import { actorTurnedOff, itemEffectKey } from '../data/effect'
+import { repairShields } from '../rules/repair'
+import { equippedShields } from '../rules/shield-block'
 import { cooldownFor, cooldownLabel } from '../effects/cooldowns'
 import { CHECK_TYPES, CREATURE_SIZES, CREATURE_TYPES, DAMAGE_TYPES, GEAR_SLOTS, STATS, STAT_KEYS } from '../config'
 import { DEBUFFS } from '../rules/debuffs'
@@ -482,7 +484,7 @@ export class CrawlerSheet extends CrawlActorSheet {
       slot: CrawlerSheet.#onHealthSlot,
       shield: CrawlerSheet.#onShieldSlot,
       shieldPrompt: CrawlerSheet.#onShieldPrompt,
-      shieldDr: CrawlerSheet.#onShieldDr,
+      repairShield: CrawlerSheet.#onRepairShield,
       upkeep: CrawlerSheet.#onUpkeep,
       levelUp: CrawlerSheet.#onLevelUp,
       openEffects: CrawlerSheet.#onOpenEffects,
@@ -552,6 +554,7 @@ export class CrawlerSheet extends CrawlActorSheet {
         context.evadeTooltip = `DEX MOD (${system.attributes.dex.mod}) + ${game.i18n.localize('CRAWLSPACE.Stat.EvadeBuffs')} (${evadeBuffs}) = ${system.evade.total}`
         context.drTooltip = `${game.i18n.localize('CRAWLSPACE.Stat.ArmorBase')} (${system.dr.armorTotal}) + ${game.i18n.localize('CRAWLSPACE.Stat.ShieldDr')} (${system.shieldDr.value}) + ${game.i18n.localize('CRAWLSPACE.Stat.DrBuffs')} (${drBuffs}) = ${system.dr.total}`
         context.hasShield = system.shieldDr.max > 0
+        context.shieldBroken = equippedShields(this.actor).some((item: any) => item.system.broken)
         context.traitSections = TRAIT_SECTIONS.map((key) => ({
           key,
           label: game.i18n.localize(`CRAWLSPACE.Sheet.${key}`),
@@ -874,12 +877,9 @@ export class CrawlerSheet extends CrawlActorSheet {
 
   // ---- Sidebar ----
 
-  static async #onShieldDr(this: CrawlerSheet, _event: PointerEvent, target: HTMLElement) {
-    const { max, lost } = this.actor.system.shieldDr
-    if (!max) return
-    // + restores one point (less lost), − spends one.
-    const next = Math.clamp(lost - Number(target.dataset.delta ?? 0), 0, max)
-    await this.actor.update({ 'system.shieldDr.lost': next })
+  /** The shield badge's +: mend the equipped shields and restore their DR. */
+  static async #onRepairShield(this: CrawlerSheet) {
+    if (this.actor.system.shieldDr.max) await repairShields(this.actor)
   }
 
   /** Fill skill and spell damage the CrawlSpace backup left out, from the compendium entries with the same name. */

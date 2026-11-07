@@ -9,4 +9,7 @@
   {{#if (or systemSource.source.book systemSource.source.pages)}}
   <p class="pf-source">{{systemSource.source.book}} {{systemSource.source.pages}}</p>
   {{/if}}
+  {{#if isPhysical}}
+  <label class="check pf-broken {{#if systemSource.broken}}is-broken{{/if}}" data-tooltip="{{localize 'CRAWLSPACE.Item.BrokenHint'}}"><input type="checkbox" name="system.broken" {{checked systemSource.broken}}> <i class="fa-solid fa-heart-crack"></i> {{localize "CRAWLSPACE.Item.Broken"}}</label>
+  {{/if}}
 </aside>
