@@ -34,7 +34,7 @@ async function onAction(message: any, button: HTMLElement) {
   switch (action) {
     case 'place-area': {
       const item = await fromUuid(button.dataset.itemUuid ?? '')
-      if (item) await placeArea(item)
+      if (item) await placeArea(item, message.speaker?.scene === canvas.scene?.id ? (message.speaker?.token ?? '') : '')
       return
     }
     case 'apply-condition': {

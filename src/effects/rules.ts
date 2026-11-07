@@ -148,7 +148,7 @@ const SPLIT_SPECIALS: RuleType[] = [
   regenRule('regenPerRound'),
   specialRule(
     'rankCap',
-    [field('target', 'skill', 'skillOrSpell'), field('value', 'cap', 'number')],
+    [field('target', 'skillOrSpell', 'skillOrSpell'), field('value', 'cap', 'number')],
     (d) => ({ target: d.target ?? '', value: d.value ?? 20 }),
     (v) => ({ target: String(v.target ?? '').trim(), value: String(num(v.value) || 20) }),
   ),
@@ -169,9 +169,8 @@ const ALWAYS_TRIGGERED: Record<string, string> = { applyCondition: 'rollAmazing'
 /** Rule categories, in the order the New Rule list shows them. */
 const CATEGORIES: { id: string; rules: string[] }[] = [
   { id: 'stats', rules: ['statBonus', 'baseStatBonus', 'statModifier', 'statPercent', 'modLoss', 'evade', 'move', 'step'] },
-  { id: 'skills', rules: ['skillRank', 'baseSkillRank', 'rankCap'] },
-  { id: 'spells', rules: ['spellRank', 'baseSpellRank', 'inherentSpell'] },
-  { id: 'attacks', rules: ['damageBonus', 'armorPiercing', 'rollMode'] },
+  { id: 'skillsSpells', rules: ['skillRank', 'baseSkillRank', 'spellRank', 'baseSpellRank', 'rankCap', 'rollMode', 'inherentSpell'] },
+  { id: 'attacks', rules: ['damageBonus', 'armorPiercing'] },
   { id: 'damageResponse', rules: ['dr', 'resistance', 'vulnerability', 'immunity', 'conditionImmunity', 'magicDamageCap', 'areaDamageHalf'] },
   { id: 'health', rules: ['healthBonus', 'conditionShield', 'regenPerRound'] },
   { id: 'mana', rules: ['mana', 'manaPerRound'] },

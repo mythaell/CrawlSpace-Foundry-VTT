@@ -347,7 +347,7 @@
     padding: 4px;
     font-size: 0.85rem;
   }
-  .crawlspace .effect-row.disabled,
+  .crawlspace .effect-row.effect-off,
   .crawlspace .effect-row.suppressed {
     opacity: 0.5;
   }
@@ -2078,7 +2078,7 @@
     background: var(--panel-bg);
     border: 1px solid var(--dcc-blue-light);
   }
-  .crawlspace .effect-block.disabled {
+  .crawlspace .effect-block.effect-off {
     opacity: 0.6;
   }
   .crawlspace .effect-block-header {

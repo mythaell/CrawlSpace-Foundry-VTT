@@ -9,7 +9,7 @@
   {{/if}}
 
   {{#*inline "effectRow"}}
-  <li class="effect-row draggable {{#if effect.disabled}}disabled{{/if}} {{#if effect.suppressed}}suppressed{{/if}}" data-effect-id="{{effect.id}}" {{#if effect.itemId}}data-item-id="{{effect.itemId}}"{{/if}}>
+  <li class="effect-row draggable {{#if effect.disabled}}effect-off{{/if}} {{#if effect.suppressed}}suppressed{{/if}}" data-effect-id="{{effect.id}}" {{#if effect.itemId}}data-item-id="{{effect.itemId}}"{{/if}}>
     <img class="item-img" src="{{effect.img}}" alt="">
     <a class="item-name" data-action="editEffect">{{effect.name}}{{#if effect.source}} <small>({{effect.source}})</small>{{/if}}</a>
     {{#if effect.stackable}}

@@ -3,7 +3,7 @@
   {{> "systems/crawlspace/templates/sheets/ids.hbs" ids=ids}}
   <h3 class="pf-section">{{localize "CRAWLSPACE.Effect.Title"}}</h3>
   {{#each effects as |effect|}}
-  <section class="effect-block {{#if effect.disabled}}disabled{{/if}}" data-effect-id="{{effect.id}}">
+  <section class="effect-block {{#if effect.disabled}}effect-off{{/if}}" data-effect-id="{{effect.id}}">
     <header class="effect-block-header">
       <img src="{{effect.img}}" alt="">
       <a class="effect-name" data-action="editEffect" data-tooltip="{{localize 'CRAWLSPACE.Effect.Edit'}}">{{effect.name}}</a>

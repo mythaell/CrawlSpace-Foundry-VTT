@@ -88,10 +88,9 @@ function areaExpiry(item: any) {
 }
 
 /** The Region for one of the item's areas. */
-function regionData(item: any, area: AbilityTemplateArea, token: any = null) {
+function regionData(item: any, area: AbilityTemplateArea, token: any = null, caster: any = token) {
   const aura = area.aura ?? null
   const color = aura ? COLORS[aura.kind] : area.label === 'Splash' ? COLORS.splash : COLORS.area
-  const caster = item.actor?.getActiveTokens?.(false, true)?.[0] ?? null
   return {
     name: area.label ? `${item.name} (${area.label})` : item.name,
     color,
@@ -115,11 +114,35 @@ function regionData(item: any, area: AbilityTemplateArea, token: any = null) {
   }
 }
 
+/**
+ * The caster's token on the viewed scene. An actor can have several (a linked crawler placed twice): the card's
+ * selected one comes first, then the card's speaker, preferring tokens inside the map over ones out in the padding
+ * (Foundry picks the speaker as the first token, which can be one left off the map).
+ */
+function casterToken(item: any, speakerToken = '') {
+  const tokens: any[] = (item.actor?.getActiveTokens?.(false, true) ?? []).filter((entry: any) => entry.parent === canvas.scene)
+  const rect = canvas.dimensions.sceneRect
+  const onMap = (token: any) => {
+    const x = token.x + (token.width * canvas.grid.sizeX) / 2
+    const y = token.y + (token.height * canvas.grid.sizeY) / 2
+    return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height
+  }
+  const speaker = tokens.find((token) => token.id === speakerToken)
+  return (
+    tokens.find((token) => token.object?.controlled) ??
+    (speaker && onMap(speaker) ? speaker : null) ??
+    tokens.find(onMap) ??
+    speaker ??
+    tokens[0] ??
+    null
+  )
+}
+
 /** Place the item's area from its card: auras go on the caster's token; the rest are placed by hand. */
-export async function placeArea(item: any) {
+export async function placeArea(item: any, speakerToken = '') {
   const area = itemArea(item)
   if (!area || !canvas.ready) return
-  const token = item.actor?.getActiveTokens?.(false, true)?.find((entry: any) => entry.parent === canvas.scene) ?? null
+  const token = casterToken(item, speakerToken)
   const onToken = area.areas.filter((entry) => entry.aura && entry.type === 'circle' && token)
   const placed = area.areas.filter((entry) => !onToken.includes(entry))
   if (onToken.length) {
@@ -130,7 +153,7 @@ export async function placeArea(item: any) {
   }
   if (placed.length) {
     ui.notifications.info(game.i18n.localize('CRAWLSPACE.Area.PlaceHint'))
-    await canvas.regions.placeRegions(placed.map((entry) => regionData(item, entry)))
+    await canvas.regions.placeRegions(placed.map((entry) => regionData(item, entry, null, token)))
   }
 }
 
