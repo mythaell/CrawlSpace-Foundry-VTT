@@ -1,5 +1,4 @@
 import { applyCastEffects } from '../effects/use-conditions'
-import { handEquipmentConflict, type WornItem } from '../crawlspace-shared/shared/equipmentSlots'
 import { openLootBoxes } from '../loot/boxes'
 import { buildEffect, effectDuration, stableId } from '../import/convert'
 import { BUILD_EFFECT_FIELDS } from '../data/items'
@@ -222,20 +221,14 @@ export class CrawlItem extends Item {
     return ChatMessage.create({ content, speaker: ChatMessage.getSpeaker({ actor: this.actor }), flags: { crawlspace: { kind: 'item', itemUuid: this.uuid } } })
   }
 
-  /** Enforce one item per body slot, ten accessories, and two hands when equipping. */
+  /** Enforce one item per body slot and ten accessories when equipping (hands: rules/hands-upkeep.ts). */
   async _preUpdate(changed: any, options: any, user: any) {
     if ((await super._preUpdate(changed, options, user)) === false) return false
     const equipping = foundry.utils.getProperty(changed, 'system.equipped') === true
     if (!equipping || !this.actor) return
     // Weapons and shields take a hand, putting away what no longer fits (rules/hands-upkeep.ts).
     if (isHandItem(this)) return
-    // A two-handed weapon takes both hands (equipmentSlots.ts handEquipmentConflict).
-    const worn = this.actor.items.contents.map((item: any) => wornItem(item, item.id === this.id ? changed : null))
-    const conflict = handEquipmentConflict(worn, this.id)
-    if (conflict) {
-      ui.notifications.warn(conflict)
-      return false
-    }
+    // Gloves (the Hands slot) are worn, so they go with any weapon, two-handed included.
     if (this.type !== 'equipment') return
     const slot = foundry.utils.getProperty(changed, 'system.slot') ?? this.system.slot
     const occupied = this.actor.items.filter(
@@ -264,22 +257,6 @@ export class CrawlItem extends Item {
     if (!wanted) return current?.delete()
     if (current) return current.update({ 'system.changes': wanted.system.changes, 'flags.crawlspace.build': true })
     return this.createEmbeddedDocuments('ActiveEffect', [wanted])
-  }
-}
-
-/** An owned item as the app's hand-slot rules see it; `changed` is a pending update to it. */
-function wornItem(item: any, changed: any): WornItem {
-  const get = (path: string) => (changed && foundry.utils.hasProperty(changed, path) ? foundry.utils.getProperty(changed, path) : foundry.utils.getProperty(item, path))
-  const twoHanded = !!get('system.twoHanded') || String(get('system.hands') ?? '').trim() === '2'
-  return {
-    id: item.id,
-    name: item.name,
-    equipped: !!get('system.equipped'),
-    properties: {
-      itemType: item.type,
-      equipment: { slot: item.type === 'equipment' && get('system.slot') === 'hands' ? 'Hands' : String(get('system.slot') ?? '') },
-      ...(item.type === 'weapon' ? { weapon: { twoHanded } } : {}),
-    },
   }
 }
 
