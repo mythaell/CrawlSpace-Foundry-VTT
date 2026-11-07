@@ -233,7 +233,8 @@ export class CrawlerData extends CrawlActorData {
     let shieldMax = 0
     let shieldLeft = 0
     for (const item of items) {
-      if (item.type !== 'equipment' || !item.system?.equipped) continue
+      // Broken armor and shields give no DR until repaired.
+      if (item.type !== 'equipment' || !item.system?.equipped || item.system.broken) continue
       const dr = Number(item.system.armorDr) || 0
       if (item.system.isShield) {
         shieldMax += dr

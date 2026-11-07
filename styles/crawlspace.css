@@ -3167,4 +3167,9 @@
   .crawlspace.repair-dialog .repair-list .repair-choice img { flex: 0 0 28px; width: 28px; height: 28px; border: 0; }
   .crawlspace.repair-dialog .repair-list .repair-choice input { flex: 0 0 auto; margin: 0; }
   .crawl-shield-wear p { margin: 0; }
+  .crawlspace .row-name .row-broken { color: #ff6b6b; }
+  /* A damage effect skill: the attack skills it modifies. */
+  .crawlspace .details-grid > .damage-effect { grid-column: 1 / -1; display: grid; gap: 6px; }
+  .crawlspace .damage-effect .damage-effect-links { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .crawlspace .damage-effect label.check { flex-direction: row; align-items: center; gap: 4px; }
 }

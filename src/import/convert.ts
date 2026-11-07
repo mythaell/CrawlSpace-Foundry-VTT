@@ -166,6 +166,16 @@ export function rankedSystem(data: Record<string, any>, kind: 'skill' | 'spell')
     ...(kind === 'spell' ? { killingBlowStacking: !!data.killingBlowStacking, killingBlowStacks: int(data.killingBlowStacks), killingBlowAt: data.killingBlowAt ?? null, killingBlowGameClock: data.killingBlowGameClock ?? null, killingBlowFloor: str(data.killingBlowFloor) } : {}),
     isAttack: !!(kind === 'skill' ? data.isAttackSkill : data.isAttackSpell),
     isUnarmed: !!data.isUnarmed,
+    ...(kind === 'skill'
+      ? {
+          damageEffect: {
+            enabled: !!data.isDamageEffectSkill,
+            skills: Array.isArray(data.damageEffectSkills) ? data.damageEffectSkills.map(str).filter(Boolean) : [],
+            addRank: typeof data.damageEffectAddRankToAttack === 'boolean' ? data.damageEffectAddRankToAttack : null,
+            mode: ['normal', 'advantage', 'disadvantage'].includes(data.damageEffectAttackMode) ? data.damageEffectAttackMode : '',
+          },
+        }
+      : {}),
     damage: {
       formula: str(data.damageFormula),
       types: types(data.damageTypes),

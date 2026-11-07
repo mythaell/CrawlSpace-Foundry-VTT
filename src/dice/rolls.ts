@@ -3,11 +3,22 @@ import { floorCheckDc } from '../rules/floor-checks'
 import { attackOutcome, doubleDice, outcomeLabel, resolveFormulaTokens, SUCCESS_OUTCOMES, type AttackOutcome } from '../rules/core'
 import { debuffById } from '../rules/debuffs'
 import { isRepairSkill, shieldBlockSkill } from '../rules/shield-block'
+import { toggledRollMode } from '../rules/damage-effects'
 import { wearShields } from '../rules/repair'
 import type { AttackDamage } from '../actors/attacks'
 
 export type RollModeName = 'normal' | 'advantage' | 'disadvantage'
-export type Modifier = { label: string; value: number; enabled?: boolean }
+export type Modifier = {
+  label: string
+  value: number
+  enabled?: boolean
+  /** A damage effect skill's option: when ticked, the roll mode it sets and the damage it adds to the attack. */
+  rollMode?: RollModeName
+  damage?: string
+  undoubled?: string
+  /** Shown beside the option in the roll dialog. */
+  detail?: string
+}
 
 export type CheckOptions = {
   label: string
@@ -97,7 +108,7 @@ async function promptCheck(options: CheckOptions, mode: RollModeName) {
 /** Roll a d20 check with toggled modifiers. Returns the evaluated Roll and the chosen mode. */
 export async function rollD20(actor: any, options: CheckOptions) {
   let mode = effectRollMode(actor, options.kind, options.sources, options.targets)
-  let modifiers = options.modifiers.filter((modifier) => modifier.value !== 0 || modifier.enabled === false)
+  let modifiers = options.modifiers.filter((modifier) => modifier.value !== 0 || modifier.enabled === false || modifier.detail)
   if (!options.fast) {
     const answer = await promptCheck({ ...options, modifiers }, mode)
     if (!answer) return null
@@ -105,8 +116,10 @@ export async function rollD20(actor: any, options: CheckOptions) {
     if (answer.extra) modifiers.push({ label: answer.extraLabel, value: answer.extra })
     mode = answer.mode
     options.difficulty = answer.difficulty
-  }
-  const terms = modifiers.map((modifier) => `${modifier.value >= 0 ? '+' : '-'} ${Math.abs(modifier.value)}[${modifier.label.replace(/[[\]]/g, '')}]`)
+  } else modifiers = modifiers.filter((modifier) => modifier.enabled !== false)
+  // Ticked damage effects can set the roll mode (Aiming: keep lower).
+  mode = toggledRollMode(mode, modifiers)
+  const terms = modifiers.filter((modifier) => modifier.value !== 0).map((modifier) => `${modifier.value >= 0 ? '+' : '-'} ${Math.abs(modifier.value)}[${modifier.label.replace(/[[\]]/g, '')}]`)
   const roll = Roll.create(`${MODE_FORMULA[mode]} ${terms.join(' ')}`.trim())
   await roll.evaluate()
   return { roll, mode, modifiers }
@@ -206,6 +219,17 @@ export async function rollAttack(actor: any, attack: AttackSource, options: { fa
   if (!result) return null
   if (attack.pay && !(await attack.pay())) return null
   const { roll, mode } = result
+  // Damage effects ticked in the dialog add their damage: the base doubles on a Critical Hit, Rank dice don't.
+  const ticked = result.modifiers.filter((modifier) => modifier.damage || modifier.undoubled)
+  if (ticked.length)
+    attack = {
+      ...attack,
+      damage: {
+        ...attack.damage,
+        formula: joinParts(attack.damage.formula, ...ticked.map((modifier) => modifier.damage ?? '')),
+        undoubled: joinParts(attack.damage.undoubled ?? '', ...ticked.map((modifier) => modifier.undoubled ?? '')),
+      },
+    }
   const natural = naturalD20(roll)
   const floor = Number(actor?.system?.details?.floor ?? actor?.system?.floor) || 0
   const rows = targets.map((target) => {

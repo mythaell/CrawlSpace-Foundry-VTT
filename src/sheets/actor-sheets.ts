@@ -686,7 +686,14 @@ export class CrawlerSheet extends CrawlActorSheet {
           img: attack.img,
           saved: index >= 0,
           toHit: Handlebars.helpers.crawlSigned(attack.toHit),
-          modifiers: attack.modifiers.map((modifier) => `${modifier.label} ${Handlebars.helpers.crawlSigned(modifier.value)}`).join('<br>'),
+          // Damage effect options (off until ticked when rolling) are listed in italics.
+          modifiers: attack.modifiers
+            .map((modifier) =>
+              modifier.enabled === false
+                ? `<i>${foundry.utils.escapeHTML(modifier.label)} (${game.i18n.localize('CRAWLSPACE.DamageEffect.Optional')}): ${foundry.utils.escapeHTML(modifier.detail ?? '')}</i>`
+                : `${modifier.label} ${Handlebars.helpers.crawlSigned(modifier.value)}`,
+            )
+            .join('<br>'),
           damage: displayFormula(actor, attack.damage.formula),
           types: attack.damage.types.join(', '),
           tags: [...attack.damage.types, ...(attack.ranged ? [game.i18n.localize('CRAWLSPACE.Item.Ranged')] : []), ...(attack.damage.magic ? [game.i18n.localize('CRAWLSPACE.Item.Magic')] : []), ...(attack.damage.armorPiercing ? [game.i18n.localize('CRAWLSPACE.Item.ArmorPiercing')] : [])],

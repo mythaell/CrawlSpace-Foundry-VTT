@@ -176,7 +176,7 @@
       "Unequip": "Unequip",
       "Equipped": "Equipped",
       "Broken": "Broken",
-      "BrokenHint": "Broken gear. A broken shield can't Shield Block. A successful Repair check (or the shield's repair button on the sheet) mends it.",
+      "BrokenHint": "Broken gear does nothing until repaired: no effects, no DR, it can't be used or attacked with, and a shield can't Shield Block. A successful Repair check (or the shield's repair button on the sheet) mends it.",
       "Rank": "Rank",
       "RankHint": "Base rank; the arrow shows the rank after effects.",
       "RankOverride": "Rank override",
@@ -301,6 +301,7 @@
       "FromAchievements": "From achievements",
       "Suppressed": {
         "expired": "Expired",
+        "broken": "Broken",
         "unequipped": "Not equipped",
         "rank": "Rank too low",
         "off": "Off",
@@ -546,6 +547,7 @@
       "SlotFull": "The {slot} slot is full ({limit}).",
       "Tainted": "{name} has The Taint and can't be healed.",
       "NoActor": "No actor selected.",
+      "Broken": "{name} is broken. Repair it before using it.",
       "HotlistFull": "The hotlist is full ({capacity}).",
       "NoDamage": "{name} has no damage formula.",
       "NoPack": "No matching compendium is installed.",
@@ -1262,6 +1264,20 @@
       "Directory": "the Items directory",
       "Create": "Create",
       "Created": "{name} added to {where}."
+    },
+    "DamageEffect": {
+      "Toggle": "Damage effect skill",
+      "Hint": "This skill changes attacks made with other skills. On those attacks it is an option you can tick in the roll dialog.",
+      "Modifies": "Modifies attacks with",
+      "ModifiesHint": "Tick the attack skills this one modifies. Its damage at its current Rank is added when you tick it on the attack.",
+      "Add": "Add a skill",
+      "AddHint": "Choose or type a skill name",
+      "AddRank": "Add this skill's Rank to the attack roll",
+      "Mode": "Attack roll",
+      "Option": "{name}: {parts}",
+      "Damage": "+{formula} damage",
+      "RankToHit": "+{rank} to hit",
+      "Optional": "option"
     },
     "Repair": {
       "Button": "Repair Item",

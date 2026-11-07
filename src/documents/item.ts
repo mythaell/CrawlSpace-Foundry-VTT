@@ -82,6 +82,8 @@ export class CrawlItem extends Item {
   async use(options: { fast?: boolean } = {}) {
     const actor = this.actor
     if (!actor) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Warn.NoActor'))
+    // Broken gear can't be used until it is repaired.
+    if (this.system?.broken) return ui.notifications.warn(game.i18n.format('CRAWLSPACE.Warn.Broken', { name: this.name }))
     switch (this.type) {
       case 'skill':
       case 'spell':

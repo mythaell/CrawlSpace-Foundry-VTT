@@ -9,6 +9,7 @@ import { itemCooldown, withCooldowns } from '../effects/cooldowns'
 import { penaltyModifiers, rollAttack, rollDamage, type AttackSource, type Modifier } from '../dice/rolls'
 import { resolveFormulaTokens } from '../rules/core'
 import { damageBonuses, piercesArmor, type DamageKind } from '../effects/specials'
+import { automaticAttackItems, linkedDamageEffects } from '../rules/damage-effects'
 
 export type AttackRow = {
   id: string
@@ -84,12 +85,18 @@ export function unarmedRow(): AttackRow {
   return { id: UNARMED_ID, name: game.i18n.localize('CRAWLSPACE.Attack.Unarmed'), img: 'icons/skills/melee/unarmed-punch-fist.webp', damage: '1d4', damageTypes: ['Bludgeoning'] }
 }
 
-/** Saved rows, then items that attack but have no row yet, then Unarmed. */
+/**
+ * Saved rows, then items that attack but have no row yet, then Unarmed. A weapon is listed only while equipped,
+ * unbroken and linked to a skill in its details, and then stands in for that skill (automaticAttackItems).
+ */
 export function attackRows(actor: any): AttackRow[] {
-  const saved: AttackRow[] = actor.system.attacks ?? []
-  const used = new Set(saved.map((row) => row.sourceId).filter(Boolean))
-  const automatic = [...actor.items]
-    .filter((item: any) => (item.type === 'weapon' && item.system.equipped) || (item.type === 'consumable' && item.system.consumableType === 'explosives') || ((item.type === 'skill' || item.type === 'spell') && item.system.isAttack))
+  const usable = (row: AttackRow) => {
+    const source = row.sourceId ? actor.items.get(row.sourceId) : null
+    return !source || (!source.system?.broken && (source.type !== 'weapon' || source.system.equipped))
+  }
+  const saved: AttackRow[] = (actor.system.attacks ?? []).filter(usable)
+  const used = new Set((actor.system.attacks ?? []).map((row: AttackRow) => row.sourceId).filter(Boolean))
+  const automatic = automaticAttackItems([...actor.items], (item: any) => item.weaponSkill())
     .filter((item: any) => !used.has(item.id))
     .sort((a: any, b: any) => (a.sort || 0) - (b.sort || 0))
     .map(rowForItem)
@@ -106,6 +113,30 @@ export function findAttackRow(actor: any, id: string): AttackRow | null {
   return attackRows(actor).find((row) => row.id === id) ?? null
 }
 
+/**
+ * The actor's damage effect skills that modify attacks made with `attackSkill`, as roll dialog options (off until
+ * ticked).
+ */
+function damageEffectModifiers(actor: any, attackSkill: string): Modifier[] {
+  const skills = [...actor.items]
+    .filter((item: any) => item.type === 'skill' && item.system.damageEffect?.enabled)
+    .map((item: any) => ({
+      name: item.name,
+      rank: Number(item.system.rank?.total) || 0,
+      effect: item.system.damageEffect,
+      damage: { base: skillBase(item) ?? '', dice: item.system.damage?.atRank ? (item.system.damage.rankDice ?? '') : '' },
+    }))
+  const t = (key: string, data: Record<string, unknown>) => game.i18n.format(`CRAWLSPACE.DamageEffect.${key}`, data)
+  return linkedDamageEffects(skills, attackSkill).map((option) => {
+    const parts = [
+      ...(option.value ? [t('RankToHit', { rank: option.value })] : []),
+      ...(option.rollMode ? [game.i18n.localize(`CRAWLSPACE.Roll.Mode.${option.rollMode}`)] : []),
+      ...(option.damage || option.undoubled ? [t('Damage', { formula: [option.damage, option.undoubled].filter(Boolean).join('+') })] : []),
+    ]
+    return { ...option, detail: parts.join(', ') }
+  })
+}
+
 /** Turn a row into what the dice code needs: modifiers, damage, and how to pay (mana, ammunition, uses). */
 export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHit: number; img: string } {
   const items = actor.items
@@ -120,6 +151,7 @@ export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHi
     ? skill.checkModifiers()
     : [{ label: statLabel, value: actor.system.statMod?.(ranged ? 'DEX' : 'STR') ?? 0 }, ...penaltyModifiers(actor)]
   if (row.hitBonus) modifiers.push({ label: game.i18n.localize('CRAWLSPACE.Attack.HitBonus'), value: Number(row.hitBonus) })
+  modifiers.push(...damageEffectModifiers(actor, skill?.name ?? ''))
 
   const spell = source?.type === 'spell' ? source : skill?.type === 'spell' ? skill : null
   const weapon = !source || source.type === 'weapon'
@@ -157,7 +189,7 @@ export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHi
     subtitle: skill && skill.name !== row.name ? skill.name : '',
     img: row.img || source?.img || 'icons/svg/sword.svg',
     modifiers,
-    toHit: modifiers.reduce((total, modifier) => total + (Number(modifier.value) || 0), 0),
+    toHit: modifiers.filter((modifier) => modifier.enabled !== false).reduce((total, modifier) => total + (Number(modifier.value) || 0), 0),
     sources: [...(weapon ? ['Weapon'] : []), row.name, ...(source ? [source.name] : []), ...(skill ? [skill.name] : []), ...(row.id === UNARMED_ID ? ['Unarmed'] : [])],
     ranged,
     damage: withEffectBonuses(
@@ -198,6 +230,7 @@ export function displayFormula(actor: any, formula: string) {
 
 export async function attackWithRow(actor: any, row: AttackRow, options: { fast?: boolean } = {}) {
   const source = actor.items.get(row.sourceId)
+  if (source?.system?.broken) return ui.notifications.warn(game.i18n.format('CRAWLSPACE.Warn.Broken', { name: source.name }))
   const skill = actor.items.get(row.skillId) ?? (['weapon', 'consumable'].includes(source?.type) ? source.weaponSkill() : null)
   const uses = [source, skill].filter((item) => item && ['skill', 'spell'].includes(item.type)).map(itemCooldown)
   return withCooldowns(actor, uses, async () => {

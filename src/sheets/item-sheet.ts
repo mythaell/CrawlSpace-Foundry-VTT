@@ -10,6 +10,8 @@ import { documentIds } from './ids'
 const { HandlebarsApplicationMixin } = foundry.applications.api
 const { ItemSheetV2 } = foundry.applications.sheets
 
+import { damageEffectSettings } from '../rules/damage-effects'
+
 const PHYSICAL = ['weapon', 'equipment', 'consumable', 'tattoo', 'loot']
 
 /** Array fields edited row by row on the sheet; the form sends them as index-keyed objects. */
@@ -96,7 +98,7 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     const system = item.system
     const actorItems = item.actor ? [...item.actor.items].sort((a: any, b: any) => a.name.localeCompare(b.name)) : []
     // Skill and spell names from the compendiums, offered while typing a background's or build's skills.
-    const rows = ['background', 'race', 'class'].includes(item.type) ? await databaseRows() : []
+    const rows = ['background', 'race', 'class', 'skill'].includes(item.type) ? await databaseRows() : []
     const names = (type: string) => [...new Set(rows.filter((row) => row.content_type === type).map((row) => row.name))].sort()
     Object.assign(context, {
       item,
@@ -104,6 +106,7 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       isGM: game.user.isGM,
       skillNames: names('skill'),
       spellNames: names('spell'),
+      damageEffect: item.type === 'skill' ? this.#damageEffectContext(names('skill')) : null,
       lootSummary: item.type === 'lootBox' && system.loot ? boxSummary(system.loot) : [],
       systemSource: item._source.system,
       systemFields: system.schema.fields,
@@ -276,8 +279,43 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
   }
 
   /** Comma-separated damage types become an array. */
+  /** Skills a damage effect skill can link to: the owner's attack skills and whatever it already links. */
+  #effectCandidates: string[] = []
+
+  #damageEffectContext(compendiumSkills: string[]) {
+    const source = this.item._source.system.damageEffect ?? {}
+    const linked: string[] = source.skills ?? []
+    const owned = this.item.actor ? [...this.item.actor.items].filter((other: any) => other.type === 'skill' && other.id !== this.item.id) : []
+    const attackSkills = owned.filter((other: any) => other.system.isAttack || other.system.isUnarmed).map((other: any) => other.name)
+    const lower = (name: string) => name.trim().toLowerCase()
+    const candidates: string[] = []
+    for (const name of [...attackSkills, ...linked]) if (!candidates.some((entry) => lower(entry) === lower(name))) candidates.push(name)
+    this.#effectCandidates = candidates
+    const settings = damageEffectSettings({ name: this.item.name, addRank: source.addRank, mode: source.mode })
+    return {
+      enabled: !!source.enabled,
+      links: candidates.map((name, index) => ({ index, name, checked: linked.some((entry) => lower(entry) === lower(name)) })),
+      suggestions: [...new Set([...owned.map((other: any) => other.name), ...compendiumSkills])].sort(),
+      addRank: settings.addRank,
+      mode: settings.mode,
+      modes: { normal: 'CRAWLSPACE.Roll.Mode.normal', advantage: 'CRAWLSPACE.Roll.Mode.advantage', disadvantage: 'CRAWLSPACE.Roll.Mode.disadvantage' },
+    }
+  }
+
   _processFormData(event: any, form: any, formData: any) {
     const data = super._processFormData(event, form, formData)
+    // A damage effect skill's links: the ticked candidates, plus one typed in.
+    if ('damageEffectLink' in data || 'damageEffectAdd' in data) {
+      const ticked = Object.entries(data.damageEffectLink ?? {})
+        .filter(([, on]) => on)
+        .map(([index]) => this.#effectCandidates[Number(index)])
+        .filter(Boolean)
+      const added = String(data.damageEffectAdd ?? '').trim()
+      const skills = [...ticked, ...(added && !ticked.some((name) => name.toLowerCase() === added.toLowerCase()) ? [added] : [])]
+      foundry.utils.setProperty(data, 'system.damageEffect.skills', skills)
+      delete data.damageEffectLink
+      delete data.damageEffectAdd
+    }
     const types = data.system?.damage?.typesText
     if (typeof types === 'string') {
       data.system.damage.types = types.split(',').map((type: string) => type.trim()).filter(Boolean)

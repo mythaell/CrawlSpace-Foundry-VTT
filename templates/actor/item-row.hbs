@@ -3,7 +3,7 @@
     data-filter-row data-f-name="{{crawlLower item.name}}" data-f-stat="{{item.system.stat}}" data-f-check="{{item.system.checkType}}" data-f-category="{{item.category}}" data-f-subtype="{{item.subtype}}">
   <div class="row-main">
     <img class="row-img" src="{{item.img}}" alt="" data-action="useItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Use'}}">
-    <a class="row-name" data-action="toggleExpand">{{item.name}}{{#if (eq mode "hotlist")}} <small>{{item.typeLabel}}</small>{{/if}}</a>
+    <a class="row-name" data-action="toggleExpand">{{#if item.system.broken}}<i class="fa-solid fa-heart-crack row-broken" data-tooltip="{{localize 'CRAWLSPACE.Item.Broken'}}"></i> {{/if}}{{item.name}}{{#if (eq mode "hotlist")}} <small>{{item.typeLabel}}</small>{{/if}}</a>
 
     {{#if (or (eq mode "skill") (eq mode "spell"))}}
       <span class="col">{{#if @root.editable}}<input type="number" min="0" value="{{item.system.rank.value}}" data-item-field="system.rank.value" aria-label="{{localize 'CRAWLSPACE.Table.Base'}}">{{else}}{{item.system.rank.value}}{{/if}}</span>

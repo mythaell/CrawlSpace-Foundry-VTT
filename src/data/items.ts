@@ -110,7 +110,21 @@ function prepareRanked(model: any, kind: 'skill' | 'spell') {
 export class SkillData extends foundry.abstract.TypeDataModel {
   [key: string]: any
   static defineSchema() {
-    return rankedSchema()
+    const fields = f()
+    return {
+      ...rankedSchema(),
+      /**
+       * A damage effect skill (damageEffectSkills.ts): an optional toggle on attacks made with the skills it names,
+       * adding its damage at its Rank, and its Rank to the attack roll or a roll mode. Null/blank use the defaults
+       * (Aiming: its Rank, keep lower).
+       */
+      damageEffect: new fields.SchemaField({
+        enabled: new fields.BooleanField(),
+        skills: stringList(),
+        addRank: new fields.BooleanField({ required: false, nullable: true, initial: null }),
+        mode: new fields.StringField({ required: true, blank: true, initial: '', choices: ['', 'normal', 'advantage', 'disadvantage'] }),
+      }),
+    }
   }
   prepareDerivedData() {
     prepareRanked(this, 'skill')

@@ -15,6 +15,22 @@
     {{/if}}
     <label class="check"><input type="checkbox" name="system.isAttack" {{checked systemSource.isAttack}}> {{localize "CRAWLSPACE.Item.IsAttack"}}</label>
     <label class="check"><input type="checkbox" name="system.marked" {{checked systemSource.marked}}> {{localize "CRAWLSPACE.Item.Marked"}}</label>
+    {{#if damageEffect}}
+    <label class="check" data-tooltip="{{localize 'CRAWLSPACE.DamageEffect.Hint'}}"><input type="checkbox" name="system.damageEffect.enabled" {{checked damageEffect.enabled}}> {{localize "CRAWLSPACE.DamageEffect.Toggle"}}</label>
+    {{#if damageEffect.enabled}}
+    <fieldset class="wide damage-effect">
+      <legend>{{localize "CRAWLSPACE.DamageEffect.Modifies"}}</legend>
+      <p class="hint">{{localize "CRAWLSPACE.DamageEffect.ModifiesHint"}}</p>
+      <div class="damage-effect-links">
+        {{#each damageEffect.links}}<label class="check"><input type="checkbox" name="damageEffectLink.{{index}}" {{checked checked}}> {{name}}</label>{{/each}}
+      </div>
+      <label>{{localize "CRAWLSPACE.DamageEffect.Add"}}<input type="text" name="damageEffectAdd" value="" list="damage-effect-skills-{{item.id}}" placeholder="{{localize 'CRAWLSPACE.DamageEffect.AddHint'}}"></label>
+      <datalist id="damage-effect-skills-{{item.id}}">{{#each damageEffect.suggestions}}<option value="{{this}}"></option>{{/each}}</datalist>
+      <label class="check"><input type="checkbox" name="system.damageEffect.addRank" {{checked damageEffect.addRank}}> {{localize "CRAWLSPACE.DamageEffect.AddRank"}}</label>
+      <label>{{localize "CRAWLSPACE.DamageEffect.Mode"}}<select name="system.damageEffect.mode">{{selectOptions damageEffect.modes selected=damageEffect.mode localize=true}}</select></label>
+    </fieldset>
+    {{/if}}
+    {{/if}}
   {{/if}}
 
   {{#if (eq type "weapon")}}
