@@ -188,6 +188,8 @@
       "Marked": "Marked for advancement",
       "Cooldown": "Cooldown",
       "IsAttack": "Is an attack",
+      "IsUnarmed": "Unarmed attack",
+      "IsUnarmedHint": "Needs no weapon, so it gets its own row on the attacks table. Other attack skills only appear through a weapon that names them. Pugilism, Unarmed Combat and the other unarmed skills count already.",
       "Range": "Range",
       "Duration": "Duration",
       "Usage": "Usage",
@@ -220,6 +222,7 @@
       "Damage": "Damage",
       "Formula": "Formula",
       "DamageTypes": "Damage types",
+      "DamageTypesHint": "Pick one or more. Damage of several types is split evenly between them (rounded down), and each part meets the target's resistances on its own.",
       "ArmorPiercing": "Armor piercing",
       "Magic": "Magic",
       "Area": "Area",
@@ -311,6 +314,7 @@
       "Cooldowns": "Cooldowns"
     },
     "Attack": {
+      "SkillRank": "{name} Rank {rank}",
       "Unarmed": "Unarmed strike",
       "Add": "Add Attack",
       "Attack": "Attack",
@@ -1269,7 +1273,7 @@
       "Toggle": "Damage effect skill",
       "Hint": "This skill changes attacks made with other skills. On those attacks it is an option you can tick in the roll dialog.",
       "Modifies": "Modifies attacks with",
-      "ModifiesHint": "Tick the attack skills this one modifies. Its damage at its current Rank is added when you tick it on the attack.",
+      "ModifiesHint": "Add the attack skills this one modifies. Untick one to remove it. Its damage at its current Rank is added when you tick it on the attack.",
       "Add": "Add a skill",
       "AddHint": "Choose or type a skill name",
       "AddRank": "Add this skill's Rank to the attack roll",

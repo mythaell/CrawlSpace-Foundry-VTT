@@ -14,6 +14,7 @@
     <label>{{localize "CRAWLSPACE.Item.Usage"}}<select name="system.usage">{{selectOptions usageChoices selected=systemSource.usage localize=true}}</select></label>
     {{/if}}
     <label class="check"><input type="checkbox" name="system.isAttack" {{checked systemSource.isAttack}}> {{localize "CRAWLSPACE.Item.IsAttack"}}</label>
+    {{#if (eq type "skill")}}<label class="check" data-tooltip="{{localize 'CRAWLSPACE.Item.IsUnarmedHint'}}"><input type="checkbox" name="system.isUnarmed" {{checked systemSource.isUnarmed}}> {{localize "CRAWLSPACE.Item.IsUnarmed"}}</label>{{/if}}
     <label class="check"><input type="checkbox" name="system.marked" {{checked systemSource.marked}}> {{localize "CRAWLSPACE.Item.Marked"}}</label>
     {{#if damageEffect}}
     <label class="check" data-tooltip="{{localize 'CRAWLSPACE.DamageEffect.Hint'}}"><input type="checkbox" name="system.damageEffect.enabled" {{checked damageEffect.enabled}}> {{localize "CRAWLSPACE.DamageEffect.Toggle"}}</label>
@@ -128,7 +129,7 @@
     <legend>{{localize damageLegend}}</legend>
     <div class="details-grid">
       <label>{{localize "CRAWLSPACE.Item.Formula"}}<input type="text" name="system.damage.formula" value="{{systemSource.damage.formula}}" placeholder="{{#if (eq type 'weapon')}}+2{{else}}1d6+F{{/if}}"></label>
-      <label>{{localize "CRAWLSPACE.Item.DamageTypes"}}<input type="text" name="system.damage.typesText" value="{{damageTypesText}}" data-tooltip="{{damageTypeList}}"></label>
+      <label class="damage-types" data-tooltip="{{localize 'CRAWLSPACE.Item.DamageTypesHint'}}">{{localize "CRAWLSPACE.Item.DamageTypes"}}<multi-select name="system.damage.types">{{selectOptions damageTypeChoices selected=systemSource.damage.types}}</multi-select></label>
       <label class="check"><input type="checkbox" name="system.damage.armorPiercing" {{checked systemSource.damage.armorPiercing}}> {{localize "CRAWLSPACE.Item.ArmorPiercing"}}</label>
       <label class="check"><input type="checkbox" name="system.damage.magic" {{checked systemSource.damage.magic}}> {{localize "CRAWLSPACE.Item.Magic"}}</label>
       <label class="check" data-tooltip="{{localize 'CRAWLSPACE.Item.AreaHint'}}"><input type="checkbox" name="system.damage.area" {{checked systemSource.damage.area}}> {{localize "CRAWLSPACE.Item.Area"}}</label>

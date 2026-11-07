@@ -278,18 +278,16 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       }
   }
 
-  /** Comma-separated damage types become an array. */
-  /** Skills a damage effect skill can link to: the owner's attack skills and whatever it already links. */
+  /** The skills a damage effect skill links to, as listed (ticked) on the sheet; unticking one removes it. */
   #effectCandidates: string[] = []
 
   #damageEffectContext(compendiumSkills: string[]) {
     const source = this.item._source.system.damageEffect ?? {}
     const linked: string[] = source.skills ?? []
     const owned = this.item.actor ? [...this.item.actor.items].filter((other: any) => other.type === 'skill' && other.id !== this.item.id) : []
-    const attackSkills = owned.filter((other: any) => other.system.isAttack || other.system.isUnarmed).map((other: any) => other.name)
     const lower = (name: string) => name.trim().toLowerCase()
     const candidates: string[] = []
-    for (const name of [...attackSkills, ...linked]) if (!candidates.some((entry) => lower(entry) === lower(name))) candidates.push(name)
+    for (const name of linked) if (!candidates.some((entry) => lower(entry) === lower(name))) candidates.push(name)
     this.#effectCandidates = candidates
     const settings = damageEffectSettings({ name: this.item.name, addRank: source.addRank, mode: source.mode })
     return {
@@ -302,6 +300,7 @@ export class CrawlItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     }
   }
 
+  /** Damage types come from a multi-select; older sheets sent them as comma-separated text. */
   _processFormData(event: any, form: any, formData: any) {
     const data = super._processFormData(event, form, formData)
     // A damage effect skill's links: the ticked candidates, plus one typed in.

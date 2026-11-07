@@ -9,7 +9,7 @@ import { itemCooldown, withCooldowns } from '../effects/cooldowns'
 import { penaltyModifiers, rollAttack, rollDamage, type AttackSource, type Modifier } from '../dice/rolls'
 import { resolveFormulaTokens } from '../rules/core'
 import { damageBonuses, piercesArmor, type DamageKind } from '../effects/specials'
-import { automaticAttackItems, linkedDamageEffects } from '../rules/damage-effects'
+import { automaticAttackItems, joinFormula, linkedDamageEffects, usableAlone } from '../rules/damage-effects'
 
 export type AttackRow = {
   id: string
@@ -31,13 +31,6 @@ export type AttackRow = {
 
 export const UNARMED_ID = 'unarmed'
 
-const joinFormula = (...parts: (string | undefined)[]) =>
-  parts
-    .map((part) => String(part ?? '').trim())
-    .filter(Boolean)
-    .join('+')
-    .replace(/\+\s*-/g, '-')
-    .replace(/\+\+/g, '+')
 
 export type AttackDamage = {
   formula: string
@@ -90,9 +83,14 @@ export function unarmedRow(): AttackRow {
  * unbroken and linked to a skill in its details, and then stands in for that skill (automaticAttackItems).
  */
 export function attackRows(actor: any): AttackRow[] {
+  // Rows you saved follow the same rules: no broken or unequipped weapons, and a weapon skill only through its weapon.
   const usable = (row: AttackRow) => {
     const source = row.sourceId ? actor.items.get(row.sourceId) : null
-    return !source || (!source.system?.broken && (source.type !== 'weapon' || source.system.equipped))
+    if (!source) return true
+    if (source.system?.broken) return false
+    if (source.type === 'weapon') return !!source.system.equipped
+    if (source.type === 'skill') return usableAlone(source)
+    return true
   }
   const saved: AttackRow[] = (actor.system.attacks ?? []).filter(usable)
   const used = new Set((actor.system.attacks ?? []).map((row: AttackRow) => row.sourceId).filter(Boolean))
@@ -131,7 +129,7 @@ function damageEffectModifiers(actor: any, attackSkill: string): Modifier[] {
     const parts = [
       ...(option.value ? [t('RankToHit', { rank: option.value })] : []),
       ...(option.rollMode ? [game.i18n.localize(`CRAWLSPACE.Roll.Mode.${option.rollMode}`)] : []),
-      ...(option.damage || option.undoubled ? [t('Damage', { formula: [option.damage, option.undoubled].filter(Boolean).join('+') })] : []),
+      ...(option.damage || option.undoubled ? [t('Damage', { formula: joinFormula(option.damage, option.undoubled) })] : []),
     ]
     return { ...option, detail: parts.join(', ') }
   })
@@ -192,6 +190,7 @@ export function resolveAttack(actor: any, row: AttackRow): AttackSource & { toHi
     toHit: modifiers.filter((modifier) => modifier.enabled !== false).reduce((total, modifier) => total + (Number(modifier.value) || 0), 0),
     sources: [...(weapon ? ['Weapon'] : []), row.name, ...(source ? [source.name] : []), ...(skill ? [skill.name] : []), ...(row.id === UNARMED_ID ? ['Unarmed'] : [])],
     ranged,
+    skills: skill ? [{ name: skill.name, rank: Number(skill.system?.rank?.total) || 0 }] : [],
     damage: withEffectBonuses(
       actor,
       {

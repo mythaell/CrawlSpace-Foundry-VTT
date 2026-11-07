@@ -8,21 +8,56 @@ export type RollModeName = 'normal' | 'advantage' | 'disadvantage'
 
 const normalize = (name: unknown) => String(name ?? '').trim().replace(/\s+/g, ' ').toLowerCase()
 
+/** Unarmed attack skills by name (characterSheetRules.ts unarmedAttackSkillNames). */
+const UNARMED_SKILLS = new Set([
+  'backclaw',
+  'bite',
+  'sliceattack',
+  'footsoldier',
+  'nogginnocker',
+  'pugilism',
+  'unarmedcombat',
+  'wrasslin',
+  'rakingtalons',
+  'palmfighter',
+  'heelstriker',
+  'shouldercharger',
+  'grappleartist',
+])
+
+/**
+ * An attack that needs no weapon: an attack spell, or an unarmed skill (flagged, or named like one). Any other
+ * attack skill is a weapon skill and is only used through a weapon.
+ */
+export function usableAlone(item: { type: string; name: string; system: any }) {
+  if (item.type === 'spell') return true
+  return !!item.system?.isUnarmed || UNARMED_SKILLS.has(String(item.name ?? '').toLowerCase().replace(/[^a-z]/g, ''))
+}
+
 /**
  * Items that get an automatic attack row. A weapon needs to be equipped, unbroken and to name its skill in its
- * details; it then stands in for that skill, whose own row goes. Broken items never attack.
+ * details; it then stands in for that skill. A weapon skill never has a row of its own, only unarmed skills and
+ * attack spells do. Broken items never attack.
  */
-export function automaticAttackItems<T extends { id: string; type: string; system: any }>(items: T[], skillOf: (item: T) => { id: string } | null) {
+export function automaticAttackItems<T extends { id: string; type: string; name: string; system: any }>(items: T[], skillOf: (item: T) => { id: string } | null) {
   const weapons = items.filter((item) => item.type === 'weapon' && item.system.equipped && !item.system.broken && String(item.system.skill ?? '').trim())
   const replaced = new Set(weapons.map((weapon) => skillOf(weapon)?.id).filter(Boolean))
   return items.filter((item) => {
     if (item.system.broken) return false
     if (item.type === 'weapon') return weapons.includes(item)
     if (item.type === 'consumable') return item.system.consumableType === 'explosives'
-    if (item.type === 'skill' || item.type === 'spell') return !!item.system.isAttack && !replaced.has(item.id)
+    if (item.type === 'skill' || item.type === 'spell') return !!item.system.isAttack && usableAlone(item) && !replaced.has(item.id)
     return false
   })
 }
+
+/** Join formula parts with +, dropping empty parts and a part's own leading + ("+1d2" from a Rank upgrade). */
+export const joinFormula = (...parts: (string | undefined | null)[]) =>
+  parts
+    .map((part) => String(part ?? '').trim().replace(/^\+\s*/, ''))
+    .filter(Boolean)
+    .join('+')
+    .replace(/\+\s*-/g, '-')
 
 /** Explicit settings win; Aiming supplies its established defaults (its Rank on the roll, keep lower). */
 export function damageEffectSettings(skill: { name: string; addRank?: boolean | null; mode?: string | null }) {
@@ -58,6 +93,7 @@ export function linkedDamageEffects(skills: DamageEffectSkill[], attackSkill: st
         rollMode: settings.mode === 'normal' ? undefined : settings.mode,
         damage,
         undoubled,
+        skillRank: skill.rank,
       },
     ]
   })

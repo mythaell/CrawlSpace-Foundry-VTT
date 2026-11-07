@@ -6,7 +6,7 @@ import { BUILD_EFFECT_FIELDS } from '../data/items'
 import { itemCooldown, withCooldowns } from '../effects/cooldowns'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage, type Modifier } from '../dice/rolls'
 import { STATS, statKeyFromCode } from '../config'
-import { attackWithRow, rowForItem, withEffectBonuses } from '../actors/attacks'
+import { attackWithRow, resolveAttack, rowForItem, withEffectBonuses } from '../actors/attacks'
 import { conditionRows, itemCardDetails } from '../effects/use-conditions'
 
 /** Targeted tokens, or the user themself when nothing is targeted. */
@@ -113,29 +113,12 @@ export class CrawlItem extends Item {
     // One card per use: attacks show the roll and its buttons; other skills and spells add their description.
     const details = await itemCardDetails(this, { attack: system.isAttack })
     if (system.isAttack) {
+      // The same attack the attacks table makes (its saved row, if any): modifiers, damage effect options, ranks.
+      const saved = (this.actor.system.attacks ?? []).find((row: any) => row.sourceId === this.id)
+      const attack = resolveAttack(this.actor, saved ?? rowForItem(this))
       const attacked = await rollAttack(
         this.actor,
-        {
-          label: this.name,
-          img: this.img,
-          modifiers: this.checkModifiers(),
-          sources: [this.name, ...(this.type === 'spell' ? ['Spells'] : [])],
-          damage: withEffectBonuses(
-            this.actor,
-            {
-              formula: system.damage.atRank ? system.damage.baseAtRank || system.damage.atRank : system.damage.formula,
-              undoubled: system.damage.atRank ? system.damage.rankDice : '',
-              types: [...system.damage.types],
-              armorPiercing: system.damage.armorPiercing,
-              magic: this.type === 'spell' || system.damage.magic,
-              area: system.damage.area,
-              baseFormula: this.type === 'spell' ? system.damage.formula : '',
-            },
-            { names: [this.name], itemIds: [this.id], weapon: false, kind, rank: Number(system.rank?.total) || 0 },
-          ),
-          pay,
-          details,
-        },
+        { ...attack, sources: [...new Set([...attack.sources, ...(this.type === 'spell' ? ['Spells'] : [])])], details },
         options,
       )
       // An attack that also heals (Drain Life) heals its caster once the attack goes through.

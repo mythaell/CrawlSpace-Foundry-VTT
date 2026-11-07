@@ -3,7 +3,7 @@ import { floorCheckDc } from '../rules/floor-checks'
 import { attackOutcome, doubleDice, outcomeLabel, resolveFormulaTokens, SUCCESS_OUTCOMES, type AttackOutcome } from '../rules/core'
 import { debuffById } from '../rules/debuffs'
 import { isRepairSkill, shieldBlockSkill } from '../rules/shield-block'
-import { toggledRollMode } from '../rules/damage-effects'
+import { joinFormula, toggledRollMode } from '../rules/damage-effects'
 import { wearShields } from '../rules/repair'
 import type { AttackDamage } from '../actors/attacks'
 
@@ -16,6 +16,8 @@ export type Modifier = {
   rollMode?: RollModeName
   damage?: string
   undoubled?: string
+  /** A damage effect option's skill Rank, for the attack card's tags. */
+  skillRank?: number
   /** Shown beside the option in the roll dialog. */
   detail?: string
 }
@@ -88,6 +90,23 @@ async function promptCheck(options: CheckOptions, mode: RollModeName) {
     window: { title: options.label },
     content,
     rejectClose: false,
+    // Ticking a damage effect that sets the roll mode (Aiming) shows that mode at once; unticking it gives back
+    // the mode chosen before. Choosing a mode by hand makes that the one to give back.
+    render: (_event: Event, dialog: any) => {
+      const root = dialog.element as HTMLElement
+      const select = root.querySelector<HTMLSelectElement>('select[name="mode"]')
+      if (!select) return
+      let chosen = select.value as RollModeName
+      const sync = () => {
+        const ticked = options.modifiers.filter((modifier, index) => modifier.rollMode && root.querySelector<HTMLInputElement>(`[name="mod-${index}"]`)?.checked)
+        select.value = toggledRollMode(chosen, ticked)
+      }
+      select.addEventListener('change', () => {
+        chosen = select.value as RollModeName
+        sync()
+      })
+      root.querySelectorAll<HTMLInputElement>('input[name^="mod-"]').forEach((input) => input.addEventListener('change', sync))
+    },
     buttons: [
       {
         action: 'roll',
@@ -137,12 +156,7 @@ export function outcomeFor(roll: any, difficulty: number) {
 
 const messageMode = () => game.settings.get('core', 'messageMode')
 
-const joinParts = (...parts: string[]) =>
-  parts
-    .map((part) => String(part ?? '').trim())
-    .filter(Boolean)
-    .join('+')
-    .replace(/\+\s*-/g, '-')
+const joinParts = joinFormula
 
 /** "Once you make a Check" and "the end of the next Action you take" conditions end once the roll is made. */
 async function afterAction(actor: any) {
@@ -195,6 +209,8 @@ export type AttackSource = {
   ranged?: boolean
   /** HTML under the title (an attack's conditions). */
   details?: string
+  /** The skill or spell the attack is made with, and its Rank, for the card's tags. */
+  skills?: { name: string; rank: number }[]
 }
 
 /** Target defense used against an attack: Evade for everyone in CrawlSpace. */
@@ -244,13 +260,19 @@ export async function rollAttack(actor: any, attack: AttackSource, options: { fa
     }
   })
   const formula = resolveFormulaTokens(attack.damage.formula, { floor })
-  const shown = joinParts(formula, resolveFormulaTokens(attack.damage.undoubled ?? '', { floor }))
+  // The card's tags name the skills behind the attack and their Ranks (the attack skill, then each ticked damage
+  // effect), then the damage types and the rest. The damage itself is on the damage buttons.
+  const rankTag = (name: string, rank: number) => game.i18n.format('CRAWLSPACE.Attack.SkillRank', { name, rank })
+  const skillTags = [
+    ...(attack.skills ?? []).map((skill) => rankTag(skill.name, skill.rank)),
+    ...result.modifiers.filter((modifier) => modifier.skillRank !== undefined).map((modifier) => rankTag(modifier.label, modifier.skillRank ?? 0)),
+  ]
   const flavor = await foundry.applications.handlebars.renderTemplate('systems/crawlspace/templates/chat/attack.hbs', {
     label: attack.label,
     subtitle: attack.subtitle,
     img: attack.img,
     mode: mode === 'normal' ? '' : game.i18n.localize(`CRAWLSPACE.Roll.Mode.${mode}`),
-    tags: damageTags(attack.damage, shown),
+    tags: [...skillTags, ...damageTags(attack.damage)],
     details: attack.details ?? '',
   })
   await roll.toMessage(
