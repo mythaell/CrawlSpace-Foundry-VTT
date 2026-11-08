@@ -3484,3 +3484,52 @@
   /* Settings and other plain lists. */
   :is(#sidebar, .sidebar-popout) #settings :is(section, .info) { border-color: rgb(131 223 255 / 40%); }
 }
+
+@layer system {
+  /* ---------- Abilities tab: a feats-style list (sections with a title rule and Browse, nested grants) ---------- */
+  .crawlspace .tab.abilities { display: flex; flex-direction: column; gap: 18px; padding: 6px 4px 12px; }
+  .crawlspace .feature-section { display: flex; flex-direction: column; gap: 6px; }
+  .crawlspace .feature-head {
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 8px;
+    padding-bottom: 3px; border-bottom: 2px solid rgb(131 223 255 / 55%);
+    box-shadow: 0 1px 0 rgb(6 26 52 / 70%);
+  }
+  .crawlspace .feature-head h3 {
+    margin: 0; border: 0; font-size: 16px; font-weight: 700; letter-spacing: 0.02em;
+    color: #ffffff; text-shadow: 0 1px 2px #071b35, 0 0 8px rgb(102 223 255 / 35%);
+  }
+  .crawlspace .feature-head-controls { display: flex; gap: 4px; margin-bottom: 3px; }
+  .crawlspace .feature-head .feature-browse {
+    flex: 0 0 auto; width: auto; height: 22px; min-height: 0; padding: 0 8px; line-height: 20px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+    color: #ffffff; background: #164976; border: 1px solid #83dfff; border-radius: 2px;
+  }
+  .crawlspace .feature-head .feature-browse:hover { background: #246ca7; border-color: #8cfff6; }
+  .crawlspace .feature-list, .crawlspace .feature-children { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; }
+  .crawlspace .feature-list > .feature-row { background: rgb(13 52 99 / 45%); border: 1px solid rgb(131 223 255 / 22%); border-radius: 3px; }
+  .crawlspace .feature-list > .feature-row:nth-child(even) { background: rgb(13 52 99 / 28%); }
+  .crawlspace .feature-main {
+    display: grid; grid-template-columns: 28px 28px minmax(0, 1fr) auto; align-items: center; gap: 8px;
+    min-height: 36px; padding: 3px 8px;
+  }
+  .crawlspace .feature-main:hover { background: var(--row-bg-hover); }
+  .crawlspace .feature-badge { text-align: center; font-weight: 700; font-size: 13px; color: var(--hud-cyan); }
+  .crawlspace .feature-badge.detriment { color: #ff8a80; font-size: 16px; }
+  .crawlspace .feature-row .row-details { padding-left: 80px; }
+  .crawlspace .feature-empty { padding: 4px 8px; color: var(--crawl-muted); }
+  /* Granted abilities hang off their race or class on a dotted line. */
+  .crawlspace .feature-children { gap: 0; padding-bottom: 4px; }
+  .crawlspace .feature-children > .feature-row { position: relative; margin-left: 50px; }
+  .crawlspace .feature-children > .feature-row::before {
+    content: ''; position: absolute; left: -14px; top: -2px; height: 22px; width: 12px;
+    border-left: 2px dotted rgb(140 255 246 / 55%); border-bottom: 2px dotted rgb(140 255 246 / 55%);
+  }
+  .crawlspace .feature-children > .feature-row:not(:last-child)::after {
+    content: ''; position: absolute; left: -14px; top: 18px; bottom: 0;
+    border-left: 2px dotted rgb(140 255 246 / 55%);
+  }
+  .crawlspace .feature-children .feature-main { grid-template-columns: 28px minmax(0, 1fr) auto; padding-left: 0; }
+  .crawlspace .feature-children .feature-badge:empty { display: none; }
+  .crawlspace .feature-children .feature-badge:not(:empty) { position: absolute; left: -46px; top: 9px; width: 28px; }
+  .crawlspace .feature-children .row-details { padding-left: 36px; }
+}

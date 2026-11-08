@@ -637,17 +637,9 @@ export class CrawlerSheet extends CrawlActorSheet {
         context.packs = ITEM_PACKS
         break
       }
-      case 'abilities': {
-        const rows = await Promise.all(items.filter((i: any) => ['race', 'class', 'background', 'ability', 'achievement'].includes(i.type)).map((i: any) => this.itemRow(i)))
-        context.identity = rows.filter((row: any) => ['race', 'class', 'background'].includes(row.type))
-        context.abilityGroups = ['racial', 'class', 'other'].map((category) => ({
-          category,
-          label: game.i18n.localize(`CRAWLSPACE.Ability.${category}`),
-          items: rows.filter((row: any) => row.type === 'ability' && row.system.category === category),
-        }))
-        context.achievements = rows.filter((row: any) => row.type === 'achievement')
+      case 'abilities':
+        context.featureSections = await this.#featureSections(items)
         break
-      }
       case 'biography':
         context.enriched = {
           biography: await this.enrich(system.biography),
@@ -715,6 +707,56 @@ export class CrawlerSheet extends CrawlActorSheet {
       label: game.i18n.localize(`CRAWLSPACE.Actions.${kind}Plural`),
       rows: rows.filter((row: any) => row.kind === kind),
     }))
+  }
+
+  /**
+   * The abilities tab, laid out like a feats list: Race, Class, Backgrounds, Other Abilities and Achievements.
+   * Abilities a race or class granted sit under it; a detriment and a background's stage get a badge.
+   */
+  async #featureSections(items: any[]) {
+    const t = (key: string) => game.i18n.localize(`CRAWLSPACE.${key}`)
+    const row = async (item: any, children: any[] = []) => {
+      const base: any = await this.itemRow(item)
+      if (item.type === 'background') {
+        const stage = String(item.system.stage ?? '')
+        base.badge = stage.slice(0, 2).toUpperCase()
+        base.badgeHint = t(`Crawler.${stage.charAt(0).toUpperCase()}${stage.slice(1)}`)
+      } else if (item.flags?.crawlspace?.detriment || /detriment/i.test(String(item.system.notes ?? ''))) {
+        base.badge = '−'
+        base.badgeClass = 'detriment'
+        base.badgeHint = t('Build.Detriment')
+      }
+      base.children = children
+      return base
+    }
+    const abilities = items.filter((item: any) => item.type === 'ability')
+    const claimed = new Set<string>()
+    const build = async (type: 'race' | 'class', category: string) => {
+      const owners = items.filter((item: any) => item.type === type)
+      const rows: any[] = []
+      for (const owner of owners) {
+        const granted = abilities.filter((ability: any) => ability.flags?.crawlspace?.grantedBy === owner.name)
+        granted.forEach((ability: any) => claimed.add(ability.id))
+        rows.push(await row(owner, await Promise.all(granted.map((ability: any) => row(ability)))))
+      }
+      const loose = abilities.filter((ability: any) => !claimed.has(ability.id) && ability.system.category === category)
+      loose.forEach((ability: any) => claimed.add(ability.id))
+      rows.push(...(await Promise.all(loose.map((ability: any) => row(ability)))))
+      return rows
+    }
+    const race = await build('race', 'racial')
+    const cls = await build('class', 'class')
+    const stages = ['childhood', 'adolescence', 'career', 'hobby']
+    const backgrounds = items
+      .filter((item: any) => item.type === 'background')
+      .sort((a: any, b: any) => stages.indexOf(a.system.stage) - stages.indexOf(b.system.stage))
+    return [
+      { key: 'race', label: t('Feature.Race'), rows: race, browse: { kind: 'race' }, create: { type: 'ability', category: 'racial' } },
+      { key: 'class', label: t('Feature.Class'), rows: cls, browse: { kind: 'class' }, create: { type: 'ability', category: 'class' } },
+      { key: 'background', label: t('Feature.Backgrounds'), rows: await Promise.all(backgrounds.map((item: any) => row(item))), browse: { kind: 'background' }, create: { type: 'background' } },
+      { key: 'other', label: t('Feature.Other'), rows: await Promise.all(abilities.filter((ability: any) => !claimed.has(ability.id)).map((ability: any) => row(ability))), create: { type: 'ability', category: 'other' } },
+      { key: 'achievement', label: t('Feature.Achievements'), rows: await Promise.all(items.filter((item: any) => item.type === 'achievement').map((item: any) => row(item))), packs: 'crawlspace-content.achievements', create: { type: 'achievement' } },
+    ]
   }
 
   async #inherentContext() {

@@ -1,0 +1,22 @@
+{{!-- One race, class, background, ability or achievement on the abilities tab; abilities it granted nest under it. --}}
+<li class="feature-row draggable {{#if item.expanded}}expanded{{/if}}" data-item-id="{{item.id}}" data-uuid="{{item.uuid}}" data-expand-key="{{item.id}}">
+  <div class="feature-main">
+    <span class="feature-badge {{item.badgeClass}}" {{#if item.badgeHint}}data-tooltip="{{item.badgeHint}}"{{/if}}>{{item.badge}}</span>
+    <img class="row-img" src="{{item.img}}" alt="" data-action="useItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Use'}}">
+    <a class="row-name" data-action="toggleExpand">{{item.name}}</a>
+    <span class="row-controls">
+      <a data-action="itemToChat" data-tooltip="{{localize 'CRAWLSPACE.Item.ToChat'}}"><i class="fa-solid fa-comment"></i></a>
+      <a data-action="editItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Edit'}}"><i class="fa-solid fa-pen-to-square"></i></a>
+      {{#if @root.editable}}<a data-action="deleteItem" data-tooltip="{{localize 'CRAWLSPACE.Item.Delete'}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
+    </span>
+  </div>
+  <div class="row-details">
+    {{#if item.tags.length}}<div class="pf-tags">{{#each item.tags}}<span class="pf-tag">{{this}}</span>{{/each}}</div>{{/if}}
+    <div class="row-description">{{{item.details}}}</div>
+  </div>
+  {{#if item.children.length}}
+  <ol class="feature-children">
+    {{#each item.children as |child|}}{{> "systems/crawlspace/templates/actor/feature-row.hbs" item=child}}{{/each}}
+  </ol>
+  {{/if}}
+</li>

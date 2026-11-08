@@ -169,6 +169,14 @@
       "ItemEffects": "No effects.",
       "Inherent": "No inherent spells. Add an \"Inherent Spell\" rule to an effect, or set a spell's usage to Inherent."
     },
+    "Feature": {
+      "Race": "Race",
+      "Class": "Class",
+      "Backgrounds": "Backgrounds",
+      "Other": "Other Abilities",
+      "Achievements": "Achievements",
+      "Browse": "Browse"
+    },
     "Ability": {
       "racial": "Racial abilities",
       "class": "Class abilities",

@@ -58,6 +58,7 @@ const TEMPLATES = [
   'actor/effects',
   'actor/item-row',
   'actor/paper-doll',
+  'actor/feature-row',
   'actor/filter-bar',
   'actor/mob-sidebar',
   'actor/mob-header',

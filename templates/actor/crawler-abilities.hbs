@@ -1,25 +1,19 @@
 <section class="tab abilities {{tab.cssClass}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-  <div class="table-head plain-head">
-    <span class="head-name">{{localize "CRAWLSPACE.Section.Identity"}}</span>
-    <span class="head-controls">{{#if editable}}<a data-action="createItem" data-type="background" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
-  </div>
-  <ol class="table-rows">
-    {{#each identity as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="plain"}}{{else}}<li class="empty">{{localize "CRAWLSPACE.Empty.Identity"}}</li>{{/each}}
-  </ol>
-  {{#each abilityGroups as |group|}}
-  <div class="table-head plain-head">
-    <span class="head-name">{{group.label}}</span>
-    <span class="head-controls">{{#if @root.editable}}<a data-action="createItem" data-type="ability" data-category="{{group.category}}" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
-  </div>
-  <ol class="table-rows">
-    {{#each group.items as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="plain"}}{{/each}}
-  </ol>
+  {{#each featureSections as |section|}}
+  <section class="feature-section" data-feature-section="{{section.key}}">
+    <header class="feature-head">
+      <h3>{{section.label}}</h3>
+      {{#if @root.editable}}
+      <span class="feature-head-controls">
+        {{#if section.browse}}<button type="button" class="feature-browse" data-action="openBuildPack" data-kind="{{section.browse.kind}}" data-tooltip="{{localize 'CRAWLSPACE.Build.Browse'}}"><i class="fa-solid fa-magnifying-glass"></i> {{localize "CRAWLSPACE.Feature.Browse"}}</button>{{/if}}
+        {{#if section.packs}}<button type="button" class="feature-browse" data-action="openPack" data-packs="{{section.packs}}" data-tooltip="{{localize 'CRAWLSPACE.Table.AddFromDatabase'}}"><i class="fa-solid fa-magnifying-glass"></i> {{localize "CRAWLSPACE.Feature.Browse"}}</button>{{/if}}
+        <button type="button" class="feature-browse" data-action="createItem" data-type="{{section.create.type}}" {{#if section.create.category}}data-category="{{section.create.category}}"{{/if}} data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></button>
+      </span>
+      {{/if}}
+    </header>
+    <ol class="feature-list">
+      {{#each section.rows as |item|}}{{> "systems/crawlspace/templates/actor/feature-row.hbs" item=item}}{{else}}<li class="feature-empty">—</li>{{/each}}
+    </ol>
+  </section>
   {{/each}}
-  <div class="table-head plain-head">
-    <span class="head-name">{{localize "TYPES.Item.achievement"}}</span>
-    <span class="head-controls">{{#if editable}}<a data-action="createItem" data-type="achievement" data-tooltip="{{localize 'CRAWLSPACE.Item.Create'}}"><i class="fa-solid fa-plus"></i></a>{{/if}}</span>
-  </div>
-  <ol class="table-rows">
-    {{#each achievements as |item|}}{{> "systems/crawlspace/templates/actor/item-row.hbs" item=item mode="plain"}}{{/each}}
-  </ol>
 </section>
