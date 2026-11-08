@@ -169,6 +169,11 @@
       "ItemEffects": "No effects.",
       "Inherent": "No inherent spells. Add an \"Inherent Spell\" rule to an effect, or set a spell's usage to Inherent."
     },
+    "Flavor": {
+      "Label": "Flavor text",
+      "Placeholder": "What people notice at a glance",
+      "Hint": "Shown when someone holds Shift while hovering the token. Mobs and NPCs without it show their description."
+    },
     "Feature": {
       "Race": "Race",
       "Class": "Class",

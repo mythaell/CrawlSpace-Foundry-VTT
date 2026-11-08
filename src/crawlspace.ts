@@ -40,6 +40,7 @@ import { actionRowsOf, runAction } from './apps/actions-config'
 import { attackWithRow, findAttackRow } from './actors/attacks'
 import { registerHotlistUpkeep } from './rules/hotlist-upkeep'
 import { registerHandRules } from './rules/hands-upkeep'
+import { registerFlavorTooltip } from './canvas/flavor-tooltip'
 
 const TEMPLATES = [
   'chat/card-footer',
@@ -206,6 +207,7 @@ Hooks.once('init', () => {
   registerLootTools()
   registerHotlistUpkeep()
   registerHandRules()
+  registerFlavorTooltip()
 
   game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, calibrateGrid, useAttack: useAttackRow, useAction: useActionRow, declareAttack: () => game.combat && promptDeclaration(game.combat) }
 })

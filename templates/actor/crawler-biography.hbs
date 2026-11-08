@@ -2,6 +2,7 @@
   <div class="bio-grid">
     <label><span>{{localize "CRAWLSPACE.Crawler.PersonalSpace"}}</span><input type="text" name="system.personalSpace.tier" value="{{systemSource.personalSpace.tier}}"></label>
   </div>
+  <label class="flavor-field"><span>{{localize "CRAWLSPACE.Flavor.Label"}}</span><textarea name="system.flavor" rows="2" placeholder="{{localize 'CRAWLSPACE.Flavor.Placeholder'}}" {{#unless editable}}disabled{{/unless}}>{{systemSource.flavor}}</textarea><small class="hint">{{localize "CRAWLSPACE.Flavor.Hint"}}</small></label>
   <h3>{{localize "CRAWLSPACE.Crawler.Biography"}}</h3>
   {{#if editable}}<prose-mirror name="system.biography" value="{{systemSource.biography}}" toggled>{{{enriched.biography}}}</prose-mirror>{{else}}{{{enriched.biography}}}{{/if}}
   <h3>{{localize "CRAWLSPACE.Crawler.PastTrauma"}}</h3>

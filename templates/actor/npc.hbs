@@ -28,6 +28,7 @@
     </ol>
   </section>
 
+  <label class="flavor-field"><span>{{localize "CRAWLSPACE.Flavor.Label"}}</span><textarea name="system.flavor" rows="2" placeholder="{{localize 'CRAWLSPACE.Flavor.Placeholder'}}" {{#unless editable}}disabled{{/unless}}>{{systemSource.flavor}}</textarea><small class="hint">{{localize "CRAWLSPACE.Flavor.Hint"}}</small></label>
   <h3 class="pf-section">{{localize "CRAWLSPACE.Item.Description"}}</h3>
   {{#if editable}}<prose-mirror name="system.description" value="{{systemSource.description}}" toggled>{{{enriched.description}}}</prose-mirror>{{else}}{{{enriched.description}}}{{/if}}
 </section>

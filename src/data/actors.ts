@@ -216,6 +216,8 @@ export class CrawlerData extends CrawlActorData {
       }),
       traits: traitsSchema(),
       biography: html(),
+      /** Shown when someone Shift-hovers the token (rules/flavor.ts). */
+      flavor: text(),
       notes: html(),
     }
   }
@@ -354,6 +356,8 @@ export class MobData extends CrawlActorData {
       slotsLost: integer(0, { min: 0 }),
       attacks: new fields.ArrayField(mobAttackSchema()),
       traits: traitsSchema(),
+      /** Shown when someone Shift-hovers the token (rules/flavor.ts). */
+      flavor: text(),
       description: html(),
       notes: html(),
     }
@@ -451,6 +455,8 @@ export class NpcData extends CrawlActorData {
       traits: traitsSchema(),
       /** UUID of a Mob actor whose stat block this NPC fights with. */
       statBlock: new fields.StringField({ required: true, blank: true }),
+      /** Shown when someone Shift-hovers the token (rules/flavor.ts). */
+      flavor: text(),
       description: html(),
       notes: html(),
     }

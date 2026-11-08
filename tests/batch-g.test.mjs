@@ -75,3 +75,14 @@ test('damage responses read from race and class text', () => {
   assert.deepEqual(damageResponsesFromText('Vulnerability: Take double damage from Dogs and Beasts'), [])
   assert.deepEqual(damageResponsesFromText('Advantage on Checks to resist hunger and thirst'), [])
 })
+
+import { flavorText } from '../src/rules/flavor.ts'
+
+test('flavor text: its own field first, else the description as plain text, capped', () => {
+  assert.equal(flavorText({ flavor: ' Smells of wet dog. ', description: '<p>Long</p>' }), 'Smells of wet dog.')
+  assert.equal(flavorText({ flavor: '', description: '<p>A rat&nbsp;the size of a <b>pony</b>.</p><p>It hisses.</p>' }), 'A rat the size of a pony.\nIt hisses.')
+  assert.equal(flavorText({}), '')
+  const long = flavorText({ flavor: 'x'.repeat(700) })
+  assert.equal(long.length, 600)
+  assert.ok(long.endsWith('…'))
+})

@@ -3487,7 +3487,7 @@
 
 @layer system {
   /* ---------- Abilities tab: a feats-style list (sections with a title rule and Browse, nested grants) ---------- */
-  .crawlspace .tab.abilities { display: flex; flex-direction: column; gap: 18px; padding: 6px 4px 12px; }
+  .crawlspace .tab.abilities.active { display: flex; flex-direction: column; gap: 18px; padding: 6px 4px 12px; }
   .crawlspace .feature-section { display: flex; flex-direction: column; gap: 6px; }
   .crawlspace .feature-head {
     display: flex; align-items: flex-end; justify-content: space-between; gap: 8px;
@@ -3532,4 +3532,20 @@
   .crawlspace .feature-children .feature-badge:empty { display: none; }
   .crawlspace .feature-children .feature-badge:not(:empty) { position: absolute; left: -46px; top: 9px; width: 28px; }
   .crawlspace .feature-children .row-details { padding-left: 36px; }
+}
+
+@layer system {
+  /* Shift-hover flavor card over a token (canvas/flavor-tooltip.ts). */
+  .crawl-flavor-tip {
+    position: fixed; z-index: 1000; max-width: 300px; padding: 7px 10px; pointer-events: none;
+    color: #f2fcff; font-family: 'Quantico', var(--font-sans, sans-serif); font-size: 12px; line-height: 1.4;
+    background: linear-gradient(170deg, rgb(33 108 180 / 96%), rgb(17 50 92 / 97%));
+    border: 1px solid #66dfff; border-radius: 6px; corner-shape: bevel;
+    box-shadow: 0 0 0 1px rgb(155 255 251 / 25%), 0 0 14px rgb(45 188 255 / 35%), 0 4px 12px rgb(2 13 33 / 55%);
+  }
+  .crawl-flavor-tip strong { display: block; margin-bottom: 3px; color: #ffffff; font-size: 13px; text-shadow: 0 1px 2px #071b35; }
+  .crawl-flavor-tip p { margin: 0; font-style: italic; color: #e6f8ff; }
+  .crawlspace .flavor-field { display: flex; flex-direction: column; gap: 3px; margin: 6px 0 10px; }
+  .crawlspace .flavor-field > span { font-weight: 700; }
+  .crawlspace .flavor-field textarea { resize: vertical; min-height: 44px; }
 }
