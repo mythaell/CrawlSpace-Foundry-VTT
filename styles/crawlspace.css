@@ -3559,3 +3559,18 @@
   }
   .crawl-flavor-tip.crawler p { font-style: normal; color: inherit; }
 }
+
+/* Account import: one option per line. */
+.crawlspace.account-import-dialog .account-import-option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+  text-align: left;
+}
+.crawlspace.account-import-dialog .account-import-option input {
+  flex: none;
+  width: auto;
+  margin: 0;
+}

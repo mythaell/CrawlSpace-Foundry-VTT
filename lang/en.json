@@ -549,7 +549,7 @@
     },
     "Import": {
       "Character": "Import",
-      "CharacterHint": "Import a CrawlSpace character backup (.json)",
+      "CharacterHint": "Import a CrawlSpace character (.json), account export (.json or .zip) or party backup (.zip)",
       "Done": "Imported {count} characters.",
       "Failed": "Import failed: {error}"
     },
@@ -1424,6 +1424,27 @@
       "PutAway": "{names} put away to free your hands for {name}.",
       "NotHeld": "Only weapons and shields go in a hand.",
       "HeldOnly": "Weapons and shields are held: drop them on a hand."
+    },
+    "AccountImport": {
+      "Title": "Import from CrawlSpace",
+      "GMOnly": "Only a GM can import an account export or party.",
+      "From": "Export of {name}, {date}. Choose what to bring into this world:",
+      "Characters": "Characters ({count})",
+      "Homebrew": "Homebrew and adaptations ({count})",
+      "Macros": "Macros ({count})",
+      "Party": "Party: {name} ({scenes} scenes, {crawlers} crawlers)",
+      "NoImages": "This file has no images, so maps, tiles and portraits will be blank. Use the .zip from the email's download link to bring them in.",
+      "Start": "Import",
+      "Working": "Importing from CrawlSpace: {step}",
+      "StepImages": "uploading images",
+      "StepCharacters": "characters",
+      "StepHomebrew": "homebrew",
+      "StepMacros": "macros",
+      "StepParties": "parties and scenes",
+      "Folder": "CrawlSpace: {name}",
+      "HomebrewFolder": "Homebrew",
+      "BuffPack": "CrawlSpace buffs: {name}",
+      "Done": "Imported {images} images, {actors} actors, {items} items, {journals} journals, {scenes} scenes, {macros} macros and {effects} buffs. {skipped} could not be converted."
     }
   }
 }

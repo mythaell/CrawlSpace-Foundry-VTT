@@ -41,6 +41,8 @@ import { attackWithRow, findAttackRow } from './actors/attacks'
 import { registerHotlistUpkeep } from './rules/hotlist-upkeep'
 import { registerHandRules } from './rules/hands-upkeep'
 import { registerFlavorTooltip } from './canvas/flavor-tooltip'
+import { readImportFile } from './import/account-import'
+import { openAccountImport } from './apps/account-import'
 
 const TEMPLATES = [
   'chat/card-footer',
@@ -209,7 +211,7 @@ Hooks.once('init', () => {
   registerHandRules()
   registerFlavorTooltip()
 
-  game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, openUpkeep, fillActorDamage, calibrateGrid, useAttack: useAttackRow, useAction: useActionRow, declareAttack: () => game.combat && promptDeclaration(game.combat) }
+  game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, importFile, openUpkeep, fillActorDamage, calibrateGrid, useAttack: useAttackRow, useAction: useActionRow, declareAttack: () => game.combat && promptDeclaration(game.combat) }
 })
 
 /** A new crawler's tokens are linked to it unless the creator said otherwise. */
@@ -318,15 +320,21 @@ function builderButton(before?: () => unknown) {
   return build
 }
 
+/** A character backup, an account export (.json or .zip) or a party backup zip from the app. */
+export async function importFile(file: Blob | Uint8Array) {
+  const read = readImportFile(file instanceof Uint8Array ? file : new Uint8Array(await file.arrayBuffer()))
+  return read.kind === 'account' ? openAccountImport(read.bundle) : importCharacter(read.json)
+}
+
 function pickCharacterFile() {
   const input = document.createElement('input')
   input.type = 'file'
-  input.accept = '.json,application/json'
+  input.accept = '.json,.zip,application/json,application/zip'
   input.addEventListener('change', async () => {
     const file = input.files?.[0]
     if (!file) return
     try {
-      await importCharacter(JSON.parse(await file.text()))
+      await importFile(file)
     } catch (error: any) {
       ui.notifications.error(game.i18n.format('CRAWLSPACE.Import.Failed', { error: error.message }))
     }

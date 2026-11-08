@@ -870,6 +870,14 @@ export function convertRow(row: ContentRow, database: 'game' | 'homebrew'): Conv
 /*  Character backups                                                  */
 /* ------------------------------------------------------------------ */
 
+/** A portrait Foundry can show: a web or data URL, or a path in Foundry's data (an imported image). App-only links and unresolved export references can't. */
+export function portraitPath(value: unknown) {
+  if (typeof value !== 'string' || !value.trim()) return 'icons/svg/mystery-man.svg'
+  if (/^https?:|^data:image\//.test(value)) return value
+  if (/^(crawlspace-image:|\/api\/|\/)/.test(value) || /\s/.test(value)) return 'icons/svg/mystery-man.svg'
+  return value
+}
+
 /** A CrawlSpace character JSON export → crawler Actor data with embedded items and effects. */
 export function characterToActor(input: Record<string, any>) {
   const data = input.data ?? input
@@ -988,7 +996,7 @@ export function characterToActor(input: Record<string, any>) {
   return {
     name,
     type: 'crawler',
-    img: typeof data.portrait === 'string' && /^https?:|^data:/.test(data.portrait) ? data.portrait : 'icons/svg/mystery-man.svg',
+    img: portraitPath(data.portrait),
     system: {
       attributes,
       health: { value: Number.isFinite(health) ? Math.max(0, Math.min(110, Math.floor(health / 10) * 10)) : 110, overrides: {} },
