@@ -76,7 +76,7 @@ test('damage responses read from race and class text', () => {
   assert.deepEqual(damageResponsesFromText('Advantage on Checks to resist hunger and thirst'), [])
 })
 
-import { flavorText } from '../src/rules/flavor.ts'
+import { crawlerFlavorText, flavorText } from '../src/rules/flavor.ts'
 
 test('flavor text: its own field first, else the description as plain text, capped', () => {
   assert.equal(flavorText({ flavor: ' Smells of wet dog. ', description: '<p>Long</p>' }), 'Smells of wet dog.')
@@ -85,4 +85,13 @@ test('flavor text: its own field first, else the description as plain text, capp
   const long = flavorText({ flavor: 'x'.repeat(700) })
   assert.equal(long.length, 600)
   assert.ok(long.endsWith('…'))
+})
+
+test('a crawler card reads like the app: number, name, level, race, class (no periods)', () => {
+  assert.equal(
+    crawlerFlavorText({ crawlerNumber: '6125891', level: 5, race: 'Human', className: '' }, 'Heath'),
+    'Crawler #6,125,891 “Heath”\nLevel 5\nRace: Human\nClass: Not yet assigned',
+  )
+  assert.equal(crawlerFlavorText({}, ''), 'Crawler #???\nLevel ???\nRace: Not yet assigned\nClass: Not yet assigned')
+  assert.equal(crawlerFlavorText({ crawlerNumber: '#9,160,223', level: 3, race: 'Dwarf', className: 'Alchemist' }, 'Carl', 'Wears no pants.').split('\n').at(-1), 'Wears no pants.')
 })

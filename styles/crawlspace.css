@@ -3549,3 +3549,13 @@
   .crawlspace .flavor-field > span { font-weight: 700; }
   .crawlspace .flavor-field textarea { resize: vertical; min-height: 44px; }
 }
+
+@layer system {
+  /* A crawler's System card: the app's green tooltip, centered. */
+  .crawl-flavor-tip.crawler {
+    width: min(300px, calc(100vw - 16px)); padding: 8px; text-align: center;
+    color: #e6f4e9; background: #173a28; border: 1px solid #69b881; border-radius: 0; box-shadow: 0 2px 8px rgb(0 0 0 / 45%);
+    font: 14px/1.5 Arial, sans-serif;
+  }
+  .crawl-flavor-tip.crawler p { font-style: normal; color: inherit; }
+}

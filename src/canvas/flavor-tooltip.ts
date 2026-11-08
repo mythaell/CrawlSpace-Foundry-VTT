@@ -1,9 +1,9 @@
 /**
- * Hold Shift while hovering a token to read its actor's flavor text (the app's TokenFlavorTooltip): a card above
+ * Hold Shift while hovering a token to read its actor's flavor text (a crawler shows its System card) (the app's TokenFlavorTooltip): a card above
  * the token when it fits, otherwise below, always kept on screen. It sits on the page, not the canvas, so fog and
  * zoom can't hide or shrink it.
  */
-import { flavorText } from '../rules/flavor'
+import { crawlerFlavorText, flavorText } from '../rules/flavor'
 
 let hovered: any = null
 let shift = false
@@ -16,10 +16,15 @@ function hide() {
 
 function show() {
   const token = hovered
-  const text = token?.actor ? flavorText(token.actor.system) : ''
+  const actor = token?.actor
+  // A crawler's card is built from its sheet (number, name, level, race, class), like the app's.
+  const crawler = actor?.type === 'crawler'
+  const text = !actor ? '' : crawler ? crawlerFlavorText(actor.system.details, actor.name, actor.system.flavor) : flavorText(actor.system)
   if (!token || !shift || !text || !token.visible) return hide()
-  card ??= document.body.appendChild(Object.assign(document.createElement('div'), { id: 'crawl-flavor-tip', className: 'crawlspace crawl-flavor-tip' }))
-  card.innerHTML = `<strong>${foundry.utils.escapeHTML(token.document.name)}</strong><p>${foundry.utils.escapeHTML(text).replace(/\n/g, '<br>')}</p>`
+  card ??= document.body.appendChild(Object.assign(document.createElement('div'), { id: 'crawl-flavor-tip' }))
+  card.className = `crawlspace crawl-flavor-tip${crawler ? ' crawler' : ''}`
+  const body = foundry.utils.escapeHTML(text).replace(/\n/g, '<br>')
+  card.innerHTML = crawler ? `<p>${body}</p>` : `<strong>${foundry.utils.escapeHTML(token.document.name)}</strong><p>${body}</p>`
   const box = canvas.app.view.getBoundingClientRect()
   const top = canvas.clientCoordinatesFromCanvas({ x: token.center.x, y: token.document.y })
   const bottom = canvas.clientCoordinatesFromCanvas({ x: token.center.x, y: token.document.y + token.h })
