@@ -96,6 +96,6 @@
   "secondaryTokenAttribute": "mana",
   "socket": true,
   "initiative": "1d20",
-  "manifest": "",
-  "download": ""
+  "manifest": "https://github.com/mythaell/CrawlSpace-Foundry-VTT/releases/latest/download/system.json",
+  "download": "https://github.com/mythaell/CrawlSpace-Foundry-VTT/releases/download/v0.1.0/system.zip"
 }

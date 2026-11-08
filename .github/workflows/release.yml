@@ -1,0 +1,31 @@
+# Pushing a version tag (v0.1.0, matching system.json) builds the system and publishes a GitHub Release with
+# system.json and system.zip. Foundry and hosts install and update from those two files.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      # Homebrew and rules packs compile from the committed packs-src. The book-text content module is never built here.
+      - run: npm run packs:homebrew -- --offline
+      - run: npm run packs:actions
+      - run: npm run release -- "${{ github.ref_name }}"
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" release/system.json release/system.zip --title "CrawlSpace ${{ github.ref_name }}" --generate-notes

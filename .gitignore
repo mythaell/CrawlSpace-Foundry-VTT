@@ -7,3 +7,5 @@ build/
 .env
 *.log
 .DS_Store
+# Packaged releases (npm run release).
+release/
