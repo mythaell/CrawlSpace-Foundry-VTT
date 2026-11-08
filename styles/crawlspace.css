@@ -3389,6 +3389,8 @@
   .chat-popout .chat-message,
   #chat-notifications .chat-message {
     color: #f2fcff;
+    /* Core sets this on every .chat-message to its parchment, whose relative path breaks from this stylesheet. */
+    --chat-message-background: linear-gradient(160deg, rgb(19 70 122 / 92%), rgb(12 44 82 / 95%));
     background: var(--chat-message-background);
     border: 1px solid var(--chat-message-border-color);
     border-radius: 6px;
