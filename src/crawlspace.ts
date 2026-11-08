@@ -6,6 +6,7 @@ import { openAwards } from './apps/awards'
 import { registerImmunity } from './effects/immunity'
 import { openTime, registerClock, registerTimePickers } from './apps/time'
 import { registerFrames } from './apps/frames'
+import { markPartyInDirectory, registerParty } from './actors/party'
 import { calibrateGrid, registerGridCalibration } from './apps/grid-calibration'
 import { registerCooldownIcons } from './effects/cooldowns'
 import { registerConditionDrops } from './effects/use-conditions'
@@ -200,6 +201,7 @@ Hooks.once('init', () => {
   registerClock()
   registerTimePickers()
   registerFrames()
+  registerParty()
   registerCooldownIcons()
   registerConditionDrops()
   registerTriggers()
@@ -287,6 +289,7 @@ async function createItemMacro(data: any, slot: number) {
  */
 Hooks.on('renderActorDirectory', (_app: any, html: HTMLElement) => {
   groupActorDirectory(html)
+  markPartyInDirectory(html)
   const actions = html.querySelector('.header-actions')
   if (!game.user.can('ACTOR_CREATE')) {
     if (!html.querySelector('.crawlspace-builder')) actions?.append(builderButton())

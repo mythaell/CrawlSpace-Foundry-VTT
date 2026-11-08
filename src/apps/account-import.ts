@@ -249,7 +249,11 @@ async function importParty(
   const partyKey = (...parts: (string | number)[]) => importKey('party', party.id ?? `name-${name}`, ...parts)
   const partyFolder = async (type: string) => folder(name, type, await context.rootFolder(type))
   const actorFolder = await partyFolder('Actor')
-  for (const character of party.characters) if (!crawlers.has(character.id)) await context.createCrawler(character, actorFolder)
+  for (const character of party.characters) {
+    if (!crawlers.has(character.id)) await context.createCrawler(character, actorFolder)
+    const actor = game.actors.get(crawlers.get(character.id))
+    if (actor && actor.getFlag('crawlspace', 'inParty') === undefined) await actor.setFlag('crawlspace', 'inParty', true)
+  }
 
   // The party library: actors (mobs, NPCs, companions), items and journals.
   const directories = party.directories ?? {}

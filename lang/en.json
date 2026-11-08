@@ -1445,6 +1445,11 @@
       "HomebrewFolder": "Homebrew",
       "BuffPack": "CrawlSpace buffs: {name}",
       "Done": "Imported {images} images, {actors} actors, {items} items, {journals} journals, {scenes} scenes, {macros} macros and {effects} buffs. {skipped} could not be converted."
+    },
+    "Party": {
+      "Add": "Add to Party",
+      "Remove": "Remove from Party",
+      "Member": "In the party (shows a crawler frame)"
     }
   }
 }

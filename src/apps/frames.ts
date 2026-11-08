@@ -7,15 +7,9 @@
  */
 import { followerKind, followersOf } from '../actors/companions'
 import { clickCondition, isStackable } from '../effects/stacks'
+import { partyCrawlers } from '../actors/party'
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
-
-/** The party: crawlers that a player owns, or every crawler while no player owns one (a GM running them all). */
-function partyCrawlers() {
-  const crawlers = game.actors.contents.filter((actor: any) => actor.type === 'crawler' && actor.visible).sort((a: any, b: any) => a.name.localeCompare(b.name))
-  const owned = crawlers.filter((actor: any) => actor.hasPlayerOwner)
-  return owned.length ? owned : crawlers
-}
 
 /** Health in 10% steps at a point on the track (rounded down). */
 const healthAt = (clientX: number, track: HTMLElement) => {

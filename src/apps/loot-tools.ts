@@ -6,6 +6,7 @@
  * gets a box gets a sealed box of a weighted tier and a random type, with its contents rolled by the Awards
  * popup's rules. Slots the catalog can't fill are left out rather than losing the box.
  */
+import { partyCrawlers } from '../actors/party'
 import { lootTiers, lootTypes, tierRules, type LootTier, type LootType } from '../crawlspace-shared/shared/lootData'
 import { generateLootEntry, goldAllowed, rollLootGold, eligibleConsumables, eligibleSpells, consumableKey } from '../crawlspace-shared/shared/lootGenerator'
 import { gearObjects, generateLootItem, isGearKind, lootItemKinds, potionSubtypes, type LootItemKind } from '../crawlspace-shared/shared/lootItemGenerator'
@@ -324,13 +325,6 @@ export function openItemGenerator() {
   const open = foundry.applications.instances.get('crawl-item-generator')
   if (open) return open.render({ force: true })
   return new ItemGenerator().render({ force: true })
-}
-
-/** The party: crawlers a player owns, or every crawler while no player owns one (as the frames show it). */
-function partyCrawlers() {
-  const crawlers = game.actors.filter((actor: any) => actor.type === 'crawler')
-  const owned = crawlers.filter((actor: any) => actor.hasPlayerOwner)
-  return owned.length ? owned : crawlers
 }
 
 /** Seconds of play counted toward the next timed auto-loot roll. */
