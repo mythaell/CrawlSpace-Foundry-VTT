@@ -9,8 +9,10 @@ import {
   combatantToMob,
   convertScene,
   extensionFor,
+  importKey,
   journalToFoundry,
   macroToFoundry,
+  reimportUpdate,
   resolveImages,
   usedImageIds,
   type ExportParty,
@@ -18,7 +20,7 @@ import {
 } from '../import/account-import'
 
 // Document classes this module creates (not declared as globals in this project).
-const { Folder, JournalEntry, RollTable, Macro, Scene } = foundry.documents as any
+const { Folder } = foundry.documents as any
 
 const t = (key: string, data?: Record<string, unknown>) =>
   data ? game.i18n.format(`CRAWLSPACE.AccountImport.${key}`, data) : game.i18n.localize(`CRAWLSPACE.AccountImport.${key}`)
@@ -102,6 +104,29 @@ async function folder(name: string, type: string, parent?: any) {
   return existing ?? Folder.implementation.create({ name, type, folder: parent?.id ?? null })
 }
 
+const keyOf = (doc: any) => doc?.flags?.crawlspace?.importKey
+
+/**
+ * Create a document, or refresh the one an earlier import of the same export made (found by its
+ * import key): its content is replaced, its embedded documents recreated, its folder kept.
+ */
+async function upsert(documentName: string, key: string, data: Record<string, any>, options: { pack?: string; keepEmbeddedIds?: boolean } = {}) {
+  const cls = (foundry.documents as any)[documentName]
+  const source = foundry.utils.mergeObject(data, { flags: { crawlspace: { importKey: key } } }, { inplace: false })
+  const existing = options.pack
+    ? (await game.packs.get(options.pack).getDocuments()).find((doc: any) => keyOf(doc) === key)
+    : game.collections.get(documentName).find((doc: any) => keyOf(doc) === key)
+  if (!existing) return cls.implementation.create(source, options)
+  const { update, embedded } = reimportUpdate(documentName, source)
+  await existing.update(update)
+  for (const [name, documents] of Object.entries(embedded)) {
+    const old = existing.getEmbeddedCollection(name).map((doc: any) => doc.id)
+    if (old.length) await existing.deleteEmbeddedDocuments(name, old)
+    if (documents.length) await existing.createEmbeddedDocuments(name, documents, { keepId: true })
+  }
+  return existing
+}
+
 export async function importAccount(bundle: ImportBundle, choice: Choice) {
   const { manifest, files } = bundle
   const parties = choice.parties.map((index) => manifest.parties[index])
@@ -144,7 +169,7 @@ export async function importAccount(bundle: ImportBundle, choice: Choice) {
     await fillDamageData(data.items ?? [])
     data.folder = parent.id
     data.flags = foundry.utils.mergeObject(data.flags ?? {}, { crawlspace: { appCharacterId: character.id } })
-    const actor = await Actor.implementation.create(data, { keepEmbeddedIds: true })
+    const actor = await upsert('Actor', importKey('character', character.id), data, { keepEmbeddedIds: true })
     if (actor) {
       crawlers.set(character.id, actor.id)
       counts.actors++
@@ -167,37 +192,36 @@ export async function importAccount(bundle: ImportBundle, choice: Choice) {
         continue
       }
       const { _id, ...data } = converted.data
-      byType[converted.documentName].push(data)
+      byType[converted.documentName].push({ key: importKey('homebrew', entry.id), data })
+    }
+    const each = async (type: string, list: { key: string; data: any }[], folderId?: string, pack?: string) => {
+      let count = 0
+      for (const { key, data } of list) if (await upsert(type, key, folderId ? { ...data, folder: folderId } : data, pack ? { pack } : {})) count++
+      return count
     }
     const homebrewFolder = async (type: keyof typeof root) => folder(t('HomebrewFolder'), type, await rootFolder(type))
     if (byType.Item.length) {
       const parent = await homebrewFolder('Item')
-      await fillDamageData(byType.Item)
-      counts.items += (await Item.implementation.createDocuments(byType.Item.map((data) => ({ ...data, folder: parent.id })))).length
+      await fillDamageData(byType.Item.map((entry) => entry.data))
+      counts.items += await each('Item', byType.Item, parent.id)
     }
-    if (byType.Actor.length) {
-      const parent = await homebrewFolder('Actor')
-      counts.actors += (await Actor.implementation.createDocuments(byType.Actor.map((data) => ({ ...data, folder: parent.id })))).length
-    }
-    if (byType.JournalEntry.length) {
-      const parent = await homebrewFolder('JournalEntry')
-      counts.journals += (await JournalEntry.implementation.createDocuments(byType.JournalEntry.map((data) => ({ ...data, folder: parent.id })))).length
-    }
-    if (byType.RollTable.length) counts.journals += (await RollTable.implementation.createDocuments(byType.RollTable)).length
+    if (byType.Actor.length) counts.actors += await each('Actor', byType.Actor, (await homebrewFolder('Actor')).id)
+    if (byType.JournalEntry.length) counts.journals += await each('JournalEntry', byType.JournalEntry, (await homebrewFolder('JournalEntry')).id)
+    if (byType.RollTable.length) counts.journals += await each('RollTable', byType.RollTable)
     // Buffs aren't world documents; they go in a world compendium of effects.
     if (byType.ActiveEffect.length) {
       const name = `crawlspace-buffs-${slug(label)}`
       let pack = game.packs.get(`world.${name}`)
       pack ??= await foundry.documents.collections.CompendiumCollection.createCompendium({ type: 'ActiveEffect', label: t('BuffPack', { name: label }), name })
-      counts.effects += (await ActiveEffect.implementation.createDocuments(byType.ActiveEffect, { pack: pack.collection })).length
+      counts.effects += await each('ActiveEffect', byType.ActiveEffect, undefined, pack.collection)
     }
   }
 
   if (choice.macros) {
     step(0.55, 'StepMacros')
     const parent = await rootFolder('Macro')
-    const macros = manifest.macros.macros.map((macro) => ({ ...macroToFoundry(resolve(macro)), folder: parent.id }))
-    counts.macros += (await Macro.implementation.createDocuments(macros)).length
+    for (const [index, macro] of manifest.macros.macros.entries())
+      if (await upsert('Macro', importKey('macro', macro?.id ?? index), { ...macroToFoundry(resolve(macro)), folder: parent.id })) counts.macros++
   }
 
   for (const [index, party] of parties.entries()) {
@@ -222,6 +246,7 @@ async function importParty(
 ) {
   const { resolve, paths, crawlers, counts } = context
   const name = party.party?.name || 'Party'
+  const partyKey = (...parts: (string | number)[]) => importKey('party', party.id ?? `name-${name}`, ...parts)
   const partyFolder = async (type: string) => folder(name, type, await context.rootFolder(type))
   const actorFolder = await partyFolder('Actor')
   for (const character of party.characters) if (!crawlers.has(character.id)) await context.createCrawler(character, actorFolder)
@@ -238,7 +263,7 @@ async function importParty(
       continue
     }
     const { _id, ...data } = converted.data
-    const actor = await Actor.implementation.create({ ...data, folder: actorFolder.id })
+    const actor = await upsert('Actor', partyKey('actor', reference.localId ?? entry.id), { ...data, folder: actorFolder.id })
     if (actor) {
       libraryActors.set(reference.localId, actor.id)
       counts.actors++
@@ -246,17 +271,17 @@ async function importParty(
   }
   const items = (directories.items?.entries ?? []).map((entry) => {
     const content = resolve(entry.content)
-    return inventoryToItem(content, content.contentType ?? content.content_type ?? '')
+    return { key: partyKey('item', entry.id), data: inventoryToItem(content, content.contentType ?? content.content_type ?? '') as any }
   })
   if (items.length) {
     const parent = await partyFolder('Item')
-    await fillDamageData(items)
-    counts.items += (await Item.implementation.createDocuments(items.map((data: any) => ({ ...data, folder: parent.id })))).length
+    await fillDamageData(items.map((entry) => entry.data))
+    for (const { key, data } of items) if (await upsert('Item', key, { ...data, folder: parent.id })) counts.items++
   }
-  const journals = (directories.journals?.entries ?? []).map((entry) => journalToFoundry(resolve(entry.content)))
+  const journals = (directories.journals?.entries ?? []).map((entry) => ({ key: partyKey('journal', entry.id), data: journalToFoundry(resolve(entry.content)) }))
   if (journals.length) {
     const parent = await partyFolder('JournalEntry')
-    counts.journals += (await JournalEntry.implementation.createDocuments(journals.map((data) => ({ ...data, folder: parent.id })))).length
+    for (const { key, data } of journals) if (await upsert('JournalEntry', key, { ...data, folder: parent.id })) counts.journals++
   }
 
   // Mobs placed straight from an encounter get an actor from their token, one per kind.
@@ -271,7 +296,7 @@ async function importParty(
     const key = mobKey(token)
     if (libraryActors.has(key) || mobs.has(key)) continue
     const image = typeof token.image === 'string' ? resolve(token.image) || null : null
-    const actor = await Actor.implementation.create({ ...combatantToMob(resolve(token.combatant), image), folder: actorFolder.id })
+    const actor = await upsert('Actor', partyKey('mob', key), { ...combatantToMob(resolve(token.combatant), image), folder: actorFolder.id })
     if (actor) {
       mobs.set(key, actor.id)
       counts.actors++
@@ -290,14 +315,24 @@ async function importParty(
         return actorId ? { actorId } : null
       },
     })
-    const created = await Scene.implementation.create({ ...resolve(converted.scene), folder: sceneFolder.id })
+    const sceneKey = partyKey('scene', scene.id)
+    const created = await upsert('Scene', sceneKey, { ...resolve(converted.scene), folder: sceneFolder.id })
     if (!created) continue
     counts.scenes++
+    // A re-import replaces what the last import placed; walls or tokens the GM added stay.
+    for (const type of ['Wall', 'AmbientLight', 'Tile', 'Drawing', 'Note', 'Token']) {
+      const old = created.getEmbeddedCollection(type).filter((doc: any) => doc.flags?.crawlspace?.imported).map((doc: any) => doc.id)
+      if (old.length) await created.deleteEmbeddedDocuments(type, old)
+    }
     const { sceneX, sceneY } = created.dimensions ?? created.getDimensions()
     const at = <T extends { x: number; y: number }>(value: T) => ({ ...value, x: value.x + sceneX, y: value.y + sceneY })
     const notes: any[] = []
     for (const note of converted.notes) {
-      const journal = await JournalEntry.implementation.create({ ...resolve(note.journal), folder: journalFolder.id, ...(note.hidden ? { ownership: { default: 0 } } : {}) })
+      const journal = await upsert('JournalEntry', importKey(sceneKey, 'note', note.key), {
+        ...resolve(note.journal),
+        folder: journalFolder.id,
+        ...(note.hidden ? { ownership: { default: 0 } } : {}),
+      })
       if (!journal) continue
       counts.journals++
       notes.push(at({ entryId: journal.id, x: note.x, y: note.y, text: note.text, texture: { src: 'icons/svg/book.svg' }, iconSize: 40 }))
@@ -320,7 +355,8 @@ async function importParty(
           }),
       ],
     ]
-    for (const [type, documents] of embedded) if (documents.length) await created.createEmbeddedDocuments(type, documents)
+    const imported = (doc: any) => foundry.utils.mergeObject(doc, { flags: { crawlspace: { imported: true } } }, { inplace: false })
+    for (const [type, documents] of embedded) if (documents.length) await created.createEmbeddedDocuments(type, documents.map(imported))
     counts.skipped += converted.tokens.filter((token) => !token.actorId).length
   }
 }

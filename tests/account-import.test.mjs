@@ -4,8 +4,10 @@ import { zipSync, strToU8 } from 'fflate'
 import {
   combatantToMob,
   convertScene,
+  importKey,
   macroToFoundry,
   readImportFile,
+  reimportUpdate,
   resolveImages,
   sceneGeometry,
   wallToFoundry,
@@ -214,6 +216,8 @@ test('a scene converts with its map, grid, walls, lights, tiles, drawings, notes
   assert.equal(result.drawings[0].strokeColor, '#ff0000')
   assert.equal(result.notes[0].x, 500)
   assert.equal(result.notes[0].text, 'Hi')
+  // The pin's own id finds its journal again on a re-import.
+  assert.equal(result.notes[0].key, 'j1')
   assert.equal(result.notes[0].journal.name, 'Clue')
   assert.equal(result.notes[0].journal.pages[0].text.content, '<p>Look</p>')
   const [donut, goblin] = result.tokens
@@ -267,4 +271,28 @@ test('a crawler portrait can be an imported world image, but not an app link or 
   assert.equal(portraitPath('/api/characters/4/portrait/abc'), 'icons/svg/mystery-man.svg')
   assert.equal(portraitPath('crawlspace-image:abc'), 'icons/svg/mystery-man.svg')
   assert.equal(portraitPath(''), 'icons/svg/mystery-man.svg')
+})
+
+test('a re-import finds each document by a key made from its export ids', () => {
+  assert.equal(importKey('party', 4, 'scene', 's1'), 'party:4:scene:s1')
+  assert.equal(importKey('character', 7), 'character:7')
+})
+
+test('a re-import replaces content and embedded documents but keeps where the GM filed it and who sees it', () => {
+  const plan = reimportUpdate('Actor', {
+    _id: 'abc',
+    name: 'Carl',
+    folder: 'f1',
+    ownership: { default: 0 },
+    sort: 10,
+    system: { level: 3 },
+    items: [{ _id: 'i1', name: 'Kick' }],
+    effects: [{ name: 'Buff' }],
+    flags: { crawlspace: { importKey: 'character:7' } },
+  })
+  assert.deepEqual(plan.update, { name: 'Carl', system: { level: 3 }, flags: { crawlspace: { importKey: 'character:7' } } })
+  assert.deepEqual(plan.embedded, { Item: [{ _id: 'i1', name: 'Kick' }], ActiveEffect: [{ name: 'Buff' }] })
+  assert.deepEqual(reimportUpdate('JournalEntry', { name: 'Clue', pages: [{ name: 'Page' }] }).embedded, { JournalEntryPage: [{ name: 'Page' }] })
+  assert.deepEqual(reimportUpdate('RollTable', { name: 'T', results: [] }).embedded, { TableResult: [] })
+  assert.deepEqual(reimportUpdate('Macro', { name: 'M', command: 'x' }), { update: { name: 'M', command: 'x' }, embedded: {} })
 })

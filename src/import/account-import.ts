@@ -392,6 +392,7 @@ export function convertScene(scene: ExportParty['scenes'][number], objects: Expo
     } else if (object.kind === 'drawing' && object.layer === 'journals') {
       const entry = record(item.entry) ? item.entry : {}
       result.notes.push({
+        key: String((object as { id?: string }).id ?? item.id ?? `${result.notes.length}`),
         ...point(item.x, item.y),
         text: typeof item.hoverText === 'string' && item.hoverText ? item.hoverText : entry.name ?? '',
         hidden: item.hidden === true,
@@ -513,3 +514,28 @@ export function macroToFoundry(macro: Record<string, any>) {
 
 /** Stable Foundry ids for re-imports of the same export. */
 export const importId = (...parts: (string | number)[]) => stableId(`crawlspace-import-${parts.join('-')}`)
+
+/** The key that finds an imported document again when the same export is imported later. */
+export const importKey = (...parts: (string | number)[]) => parts.join(':')
+
+const embeddedFields: Record<string, Record<string, string>> = {
+  Actor: { items: 'Item', effects: 'ActiveEffect' },
+  Item: { effects: 'ActiveEffect' },
+  JournalEntry: { pages: 'JournalEntryPage' },
+  RollTable: { results: 'TableResult' },
+}
+
+/**
+ * How a re-import refreshes a document it made before: its content is replaced, its embedded
+ * documents are recreated, and the folder, ownership and sort the GM gave it are kept.
+ */
+export function reimportUpdate(documentName: string, data: Record<string, any>) {
+  const { _id, folder, ownership, sort, ...update } = data
+  const embedded: Record<string, any[]> = {}
+  for (const [field, name] of Object.entries(embeddedFields[documentName] ?? {})) {
+    if (!(field in update)) continue
+    embedded[name] = Array.isArray(update[field]) ? update[field] : []
+    delete update[field]
+  }
+  return { update, embedded }
+}
