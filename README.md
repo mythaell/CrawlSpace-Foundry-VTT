@@ -1,59 +1,68 @@
 # CrawlSpace for Foundry VTT
 
-A Foundry VTT **V14** game system for CrawlSpace: health slots, ranked skills and spells, typed damage with resistances, the 27 standard debuffs, and five-phase Mob/Crawler combat.
+A game system for **Foundry Virtual Tabletop V14** that plays CrawlSpace. It covers:
 
-## What's in the box
+- health and shield slots;
+- ranked skills and spells;
+- typed damage with resistances;
+- stacking debuffs;
+- five-phase Mob/Crawler combat.
 
-| Part | Where | Committed? |
-| --- | --- | --- |
-| System code (TypeScript → `dist/crawlspace.mjs`) | `src/` | yes (source); `dist/` is built |
-| Sheets, chat cards, dialogs | `templates/`, `styles/`, `lang/` | yes |
-| Homebrew skills, spells and items | `packs-src/` → `packs/` | JSON source yes; LevelDB built |
-| Game-database content module (`crawlspace-content`) | `build/crawlspace-content` | **no**: book text, built locally |
+It also has the CrawlSpace app's party tools: crawler frames, upkeep and advancement, time and countdowns, grinding, awards, loot boxes and a character builder.
 
-## Setup
+**Documentation is in the [wiki](https://github.com/mythaell/CrawlSpace-Foundry-VTT/wiki).**
+
+## Install
+
+In Foundry's setup screen:
+
+1. Open **Game Systems** and choose **Install System**.
+2. Paste this manifest URL and click **Install**:
+
+```
+https://github.com/mythaell/CrawlSpace-Foundry-VTT/releases/latest/download/system.json
+```
+
+Foundry checks the same URL for updates. Hosts that install systems from a manifest URL (Forge, Molten and others) work the same way. See [Installing](https://github.com/mythaell/CrawlSpace-Foundry-VTT/wiki/Installing).
+
+The system ships with homebrew skills, spells and items, plus Actions and Interrupt Actions compendiums. Published book content is not included. Import your own from the CrawlSpace app instead: see [Importing from CrawlSpace](https://github.com/mythaell/CrawlSpace-Foundry-VTT/wiki/Importing-from-CrawlSpace).
+
+## Features
+
+- **Crawler sheet:**
+  - health slots, shield slots and mana;
+  - enhanced stats;
+  - skills and spells with rank caps, cooldowns and advancement marks;
+  - an Attacks table built from weapons, unarmed skills and attack spells;
+  - hotlist, Actions and Interrupt Actions;
+  - a paper doll for equipment;
+  - pets, mounts and minions.
+- **Mob, boss and NPC sheets:** stat budgets, attacks with areas and on-hit debuffs, and NPCs that borrow a mob's stat block.
+- **Combat:** Foundry's tracker stepping through Mob Declaration, Crawler Reaction, Mob Resolution, Crawler Action and Clean Up. Mobs declare attacks; crawlers answer with Evade, Tank, Shield Block or Blade Clap.
+- **Damage:** chat-card Apply, Heal and Undo. Damage passes through shields, Shield Block, DR, resistances and immunities.
+- **Effects:** Active Effects edited through rule elements:
+  - stat, rank, health, mana and DR bonuses;
+  - resistances and immunities;
+  - advantage and disadvantage;
+  - triggers on hits, misses, crits and Clean Up;
+  - auras, light and raised minions.
+- **GM tools:**
+  - party membership and crawler frames;
+  - Party Upkeep (rests, safe-room, session and floor advancement, level up, stat points);
+  - Time & Timers with the floor-collapse countdown;
+  - grinding;
+  - Crawler Awards;
+  - loot boxes, auto-loot and the item generator;
+  - grid calibration from a printed map.
+- **Import:** CrawlSpace character, party and account exports. Importing again updates what was imported before.
+- **Macros:** drag items, attacks and actions to the hotbar, or script with `game.crawlspace`.
+
+## Development
 
 ```bash
 npm install
-npm run build         # dist/crawlspace.mjs
-npm run packs         # homebrew packs + the content module (reads CrawlSpace's Postgres)
-npm run link          # junction into %LOCALAPPDATA%/FoundryVTT/Data
+npm run build
+npm test
 ```
 
-- The pack builders read the database URLs from CrawlSpace's `.env` (`../Dungeon Crawler Carl RPG/.env`). Point `CRAWLSPACE_ENV` at another file to override.
-- `npm run packs:homebrew -- --offline` compiles the committed `packs-src` without a database.
-- Stop Foundry (or close the world) before rebuilding packs: Foundry locks the LevelDB files.
-- `npm run watch` rebuilds the bundle on save. Reload Foundry (F5) to pick it up.
-- `npm test` runs the rules tests; `npm run typecheck` checks the TypeScript.
-
-## How CrawlSpace maps onto Foundry
-
-- **Effects** are Foundry ActiveEffects. Plain bonuses use core `add` changes on `system.*` paths. Rank, health-slot, percent, roll-mode and special bonuses use custom change types (`crawlspace.skillRank`, `crawlspace.healthBonus`...). Item effects apply while the item is held, weapons, equipment and tattoos only when equipped, and rank-gated effects only from their rank on.
-- **Debuffs** replace core status effects. Stacks, Clean Up damage, check penalties and immunities follow CrawlSpace's rules.
-- **Combat** keeps Foundry's Combat document. "Next turn" steps through the five phases, a phase strip sits in the tracker, mobs declare attacks to chat, and crawlers answer with Evade, Tank, Shield Block or Samurai Blade Clap buttons.
-- **Damage and healing** use chat-card buttons (Apply ×½ / ×1 / ×2, Heal, Undo). Players can apply to tokens they don't own through a GM relay.
-- **Characters** from CrawlSpace backups import with the *Import CrawlSpace character* button in the Actors sidebar.
-
-## Not done yet
-
-Pets and mounts, the loot generator, character builders, reference tables as RollTables, inherent spells, light orbs and minions (stored as specials only).
-
-## Time and timers
-
-The GM is prompted to set the floor-collapse countdown when the world has none. The floor clock and visible secondary countdowns stay on screen; click them, or choose **Time & Timers** in the Actors directory or Upkeep, to open the controls. Timer entry accepts overflowing fields: 90 minutes becomes 1 hour 30 minutes, and 30 hours becomes 1 day. Individual countdowns can be paused, adjusted, or removed.
-
-**Start** enables real-time exploration while a GM is connected. Foundry's pause stops it, and active combat uses the tracker instead: one complete five-phase round advances ten seconds. The clock does not charge disconnected time. Time skips advance Foundry's world clock once for the whole party, so cooldowns, effects, regeneration and countdowns share the same elapsed time. Select participating crawlers for recovery: short rests take 2 hours, long rests 8 hours, and full rests 30 hours. Safe-room visits can include an explicit stay. Grinding tracks productive hours, overtime Endurance checks and fatigue, map/guide aid, banked skill/spell progress, daily advancement attempts and automatic level gains. Days are 30 hours long.
-
-Cooldowns begin only after a completed skill/spell use, including weapon-linked skills and inherent grants. Active cooldowns appear on the Actions tab and can be reset there. Conditional durations such as safe-room entry, long rest, leaving a floor, healing and combat end use Foundry effect expiry; unsupported conditional prose remains manual. Editing an effect's duration text starts its newly entered duration. Existing embedded item copies retain their data; consuming a potion resolves its duration text using the corrected time rules.
-
-`tests/foundry-time.mjs` exports integration checks intended only for the isolated Foundry copy on port 30001. They create disposable documents, verify time behavior, and remove their own documents and chat messages afterward. Never run them in a live campaign.
-
-## GM upkeep and awards
-
-The token-controls submenu has a **Party Upkeep** button for GMs. Select participating crawlers and choose a rest, safe-room visit, End Session, End Floor, grinding, stat allocation, level gain or Crawler Awards. Party rests and grinding advance time once for the whole group. The GM resolves grinding allocations and checks; canceled preparation does not spend time or award progress. Starting a new grinding day preserves banked skill/spell hours.
-
-Under **Configure Settings > CrawlSpace**, **Allow player upkeep without time skips** defaults off. When enabled, owners can request upkeep through the active GM. Player requests never advance world time, even for rests or grinding; any required grinding or untrained-skill choices open for the GM. Only GMs get clock controls and the party controls button.
-
-Rank caps are 15 unless a matching race/class exception permits 20 from Floor 7. Explosives use their linked skill for the attack check, their own damage, and consume one unit after the check is accepted. Plain checks offer a floor-check option (skill DC 10 + twice the floor; stat DC 10 + the floor). Killing-blow spell bonuses are spell-specific and expire on the source rules' long-rest, week or floor boundary. Immunities remove matching conditions and post the System AI response.
-
-**Crawler Awards** accepts absolute or signed AI Favor/popularity values, creates achievement items, and awards sealed loot boxes with an optional achievement link. This dialog awards named boxes; random loot generation remains a separate unported feature.
+See [Development](https://github.com/mythaell/CrawlSpace-Foundry-VTT/wiki/Development) for packs, linking into Foundry, and releasing.
