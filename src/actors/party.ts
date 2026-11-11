@@ -2,6 +2,7 @@
  * Party membership. The GM adds or removes a crawler from the Actors list's right-click menu; members get a
  * small party mark in the list. The crawler frames and the auto-loot timer use this party.
  */
+import { TokenMakerApp } from '../apps/token-maker'
 import { partyFlag, pickParty } from '../rules/party'
 
 /** The party's crawlers, by name. */
@@ -30,6 +31,12 @@ export function registerParty() {
         icon: 'fa-solid fa-user-minus',
         visible: (li: HTMLElement) => crawler(li) && inParty(actorOf(li)),
         onClick: (_event: Event, li: HTMLElement) => actorOf(li).setFlag('crawlspace', 'inParty', false),
+      },
+      {
+        label: 'CRAWLSPACE.TokenMaker.Open',
+        icon: 'fa-solid fa-circle-user',
+        visible: (li: HTMLElement) => !!actorOf(li)?.isOwner,
+        onClick: (_event: Event, li: HTMLElement) => TokenMakerApp.open(actorOf(li)),
       },
     )
   })

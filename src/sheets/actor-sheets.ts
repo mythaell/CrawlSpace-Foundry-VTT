@@ -15,6 +15,7 @@ import { castInherent, inherentSpellRows } from '../actors/inherent'
 import { CrawlRowConfig, type RowKind } from '../apps/row-config'
 import { fillActorDamage } from '../import/fill-damage'
 import { PaperDollApp } from '../apps/paper-doll-app'
+import { TokenMakerApp } from '../apps/token-maker'
 import { moveInOrder } from '../rules/row-order'
 import { applyBackground, applyBuildItem, openBuildPacks } from '../apps/build-drop'
 import { ActionsConfig, actionRowsOf, addActionRow, addToHotlist, HotlistConfig, hotlistOf, openActionPack, postAction, runAction } from '../apps/actions-config'
@@ -65,6 +66,7 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     form: { submitOnChange: true },
     window: { resizable: true },
     actions: {
+      makeToken: CrawlActorSheet.#onMakeToken,
       rollStat: CrawlActorSheet.#onRollStat,
       useItem: CrawlActorSheet.#onUseItem,
       editItem: CrawlActorSheet.#onEditItem,
@@ -91,6 +93,17 @@ class CrawlActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   }
 
   /** Edit Immunities / Vulnerabilities / Resistances as damage-type checkboxes. */
+  /** Every actor sheet's menu offers the token maker (sheets that set their own controls keep this one too). */
+  _getHeaderControls() {
+    const controls = super._getHeaderControls()
+    if (this.actor.isOwner) controls.push({ icon: 'fa-solid fa-circle-user', label: 'CRAWLSPACE.TokenMaker.Open', action: 'makeToken' })
+    return controls
+  }
+
+  static #onMakeToken(this: CrawlActorSheet) {
+    return TokenMakerApp.open(this.actor)
+  }
+
   static async #onEditTraits(this: CrawlActorSheet, _event: PointerEvent, target: HTMLElement) {
     const key = target.dataset.trait as (typeof TRAIT_SECTIONS)[number]
     const selected = new Set<string>(this.actor._source.system.traits[key] ?? [])

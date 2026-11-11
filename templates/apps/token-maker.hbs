@@ -1,0 +1,45 @@
+{{!-- The token maker (token-maker.ts): the CrawlSpace app's token dialog as a Foundry window. --}}
+<section class="token-maker-body">
+  {{#if error}}<p class="token-maker-error" role="alert">{{error}}</p>{{/if}}
+  {{#if ready}}
+  <canvas class="token-maker-preview" width="{{size}}" height="{{size}}" tabindex="0" aria-label="{{localize 'CRAWLSPACE.TokenMaker.PreviewLabel'}}"></canvas>
+  <p class="hint">{{localize "CRAWLSPACE.TokenMaker.Hint"}}</p>
+  <div class="token-maker-row">
+    <label>{{localize "CRAWLSPACE.TokenMaker.Ring"}} <input type="color" data-field="ring" value="{{look.ringColor}}"></label>
+    <label class="grow">{{localize "CRAWLSPACE.TokenMaker.Zoom"}} <input type="range" data-field="zoom" min="0.5" max="4" step="0.01" value="{{look.zoom}}"></label>
+  </div>
+  <div class="token-maker-row">
+    <label>{{localize "CRAWLSPACE.TokenMaker.BorderLabel"}} <select data-field="border">{{selectOptions borders selected=look.border}}</select></label>
+    <label>{{localize "CRAWLSPACE.TokenMaker.Fill"}} <input type="color" data-field="fill" value="{{look.fill}}"></label>
+    <label>{{localize "CRAWLSPACE.TokenMaker.Size"}} <select data-field="output">{{selectOptions outputs selected=output}}</select></label>
+  </div>
+  {{#if canPop}}
+  <details class="token-maker-pop">
+    <summary>{{localize "CRAWLSPACE.TokenMaker.PopOut"}}</summary>
+    <label class="check"><input type="checkbox" data-field="pop" {{checked look.popOut}}> {{localize "CRAWLSPACE.TokenMaker.PopOutToggle"}}</label>
+    <div data-pop-tools {{#unless look.popOut}}hidden{{/unless}}>
+      <p class="hint">{{localize "CRAWLSPACE.TokenMaker.PopOutHint"}}</p>
+      <div class="token-maker-row">
+        <button type="button" data-action="autoSelect"><i class="fa-solid fa-wand-magic-sparkles"></i> {{localize "CRAWLSPACE.TokenMaker.AutoSelect"}}</button>
+        <button type="button" data-action="clearSelection"><i class="fa-solid fa-eraser"></i> {{localize "CRAWLSPACE.TokenMaker.Clear"}}</button>
+      </div>
+      <div class="token-maker-row">
+        <label>{{localize "CRAWLSPACE.TokenMaker.ToolLabel"}} <select data-field="tool">{{selectOptions tools selected=tool}}</select></label>
+        <label class="grow">{{localize "CRAWLSPACE.TokenMaker.Brush"}} <input type="range" data-field="brush" min="2" max="70" value="{{brush}}"></label>
+      </div>
+    </div>
+  </details>
+  {{/if}}
+  {{/if}}
+  <div class="token-maker-row token-maker-buttons">
+    <button type="button" data-action="chooseImage"><i class="fa-solid fa-image"></i> {{localize "CRAWLSPACE.TokenMaker.ChooseImage"}}</button>
+    {{#if ready}}<button type="button" data-action="fit"><i class="fa-solid fa-expand"></i> {{localize "CRAWLSPACE.TokenMaker.Fit"}}</button>{{/if}}
+  </div>
+  {{#if ready}}
+  <div class="token-maker-row token-maker-buttons end">
+    <button type="button" data-action="download"><i class="fa-solid fa-download"></i> {{localize "CRAWLSPACE.TokenMaker.Download"}}</button>
+    {{#if canUpload}}<button type="button" class="primary" data-action="useToken"><i class="fa-solid fa-check"></i> {{localize "CRAWLSPACE.TokenMaker.Use"}}</button>
+    {{else if editable}}<span class="hint">{{localize "CRAWLSPACE.TokenMaker.NoUpload"}}</span>{{/if}}
+  </div>
+  {{/if}}
+</section>

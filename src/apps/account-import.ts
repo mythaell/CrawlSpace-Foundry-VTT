@@ -85,7 +85,7 @@ export async function openAccountImport(bundle: ImportBundle) {
   }
 }
 
-async function ensureDirectory(path: string) {
+export async function ensureDirectory(path: string) {
   const FilePicker = foundry.applications.apps.FilePicker.implementation
   let current = ''
   for (const part of path.split('/')) {

@@ -3252,6 +3252,28 @@
   .crawlspace .crawl-paper-doll .doll-acc-row { display: flex; flex-wrap: wrap; gap: 8px; }
   .crawlspace .crawl-paper-doll .doll-acc-row .doll-slot { position: relative; width: 46px; height: 46px; }
   .crawlspace .crawl-paper-doll .doll-acc-row .empty-accessory { border-style: dashed; }
+  /* ---------- Token maker ---------- */
+  .crawlspace.token-maker .token-maker-body { display: flex; flex-direction: column; gap: 6px; }
+  .crawlspace.token-maker .token-maker-preview {
+    display: block; width: min(100%, 42vh); height: auto; margin: 4px auto; touch-action: none; cursor: grab;
+    border: 1px solid var(--crawl-border); border-radius: 6px;
+    background: repeating-conic-gradient(#3a5a7a 0 25%, #24405c 0 50%) 0 / 16px 16px;
+  }
+  .crawlspace.token-maker .token-maker-preview:active { cursor: grabbing; }
+  .crawlspace.token-maker .token-maker-preview.brushing { cursor: crosshair; }
+  .crawlspace.token-maker .token-maker-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .crawlspace.token-maker .token-maker-row label { display: flex; flex-direction: row; align-items: center; gap: 6px; font-weight: 700; white-space: nowrap; }
+  .crawlspace.token-maker .token-maker-row .grow { flex: 1; }
+  .crawlspace.token-maker .token-maker-row .grow input { flex: 1; }
+  .crawlspace.token-maker input[type='color'] { width: 38px; height: 26px; padding: 0; border: 1px solid var(--crawl-border); background: none; }
+  .crawlspace.token-maker .token-maker-buttons button { flex: 0 0 auto; width: auto; }
+  .crawlspace.token-maker .token-maker-buttons.end { justify-content: flex-end; }
+  .crawlspace.token-maker .token-maker-pop { border-block: 1px solid var(--crawl-border); padding: 6px 0; }
+  .crawlspace.token-maker .token-maker-pop summary { cursor: pointer; font-weight: 700; }
+  .crawlspace.token-maker .token-maker-pop > label { display: flex; gap: 6px; align-items: center; margin: 4px 0; }
+  .crawlspace.token-maker .hint { margin: 0; font-size: 12px; opacity: 0.8; }
+  .crawlspace.token-maker .token-maker-error { margin: 0; color: #ff8a80; }
+  .crawlspace.token-maker button.primary { border-color: #8cfff6; box-shadow: 0 0 8px rgb(140 255 246 / 45%); }
   .crawl-doll-tip { max-width: 260px; text-align: left; }
   .crawl-doll-tip strong { display: block; font-size: 13px; }
   .crawl-doll-tip .broken { color: #ff8a80; }
