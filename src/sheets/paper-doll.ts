@@ -1,32 +1,26 @@
 /**
- * The inventory's paper doll: the mannequin with a framed slot for each gear slot and both hands, leader lines
- * from each slot to its place on the body, and one accessory slot per accessory worn (up to 10, plus an empty one
- * to drop onto). Coordinates are in the doll's 560×490 viewBox; slots are placed in percentages of it.
+ * The inventory's paper doll: a framed slot for each gear slot and both hands, laid out like a body (head on top,
+ * arms and legs either side of the torso, hands and feet below them, the two hands at the bottom), and one
+ * accessory slot per accessory worn (up to 10, plus an empty one to drop onto). Coordinates are in the doll's
+ * 420×440 viewBox; slots are placed in percentages of it.
  */
 import { ACCESSORY_LIMIT, GEAR_SLOTS } from '../config'
 import { heldItems } from '../rules/hands'
 
-const W = 560
-const H = 490
-const SLOT = 64
-/** The mannequin image (2:3) and points on it, as fractions of the image. */
-const FIGURE = { x: 160, y: 16, w: 245, h: 368 }
-const at = (fx: number, fy: number) => ({ x: FIGURE.x + fx * FIGURE.w, y: FIGURE.y + fy * FIGURE.h })
-
-/** Worn gear down each side of the figure; the two hands in a row under it. */
-type SlotDef = { key: string; side: 'left' | 'right' | 'below'; row: number; icon: string; point: { x: number; y: number } }
-const ROWS = [72, 196, 320]
-/** Centres of the main-hand and off-hand slots under the figure. */
-const BELOW = { y: 428, x: [W / 2 - 90, W / 2 + 90] }
+const W = 420
+const H = 440
+const SLOT = 72
+/** Each slot's centre and the icon shown while it is empty. */
+type SlotDef = { key: string; x: number; y: number; icon: string }
 const SLOTS: SlotDef[] = [
-  { key: 'head', side: 'left', row: 0, icon: 'fa-helmet-safety', point: at(0.5, 0.07) },
-  { key: 'arms', side: 'left', row: 1, icon: 'fa-hand-fist', point: at(0.25, 0.32) },
-  { key: 'hands', side: 'left', row: 2, icon: 'fa-mitten', point: at(0.2, 0.56) },
-  { key: 'torso', side: 'right', row: 0, icon: 'fa-shirt', point: at(0.5, 0.3) },
-  { key: 'legs', side: 'right', row: 1, icon: 'fa-socks', point: at(0.62, 0.68) },
-  { key: 'feet', side: 'right', row: 2, icon: 'fa-shoe-prints', point: at(0.63, 0.95) },
-  { key: 'mainHand', side: 'below', row: 0, icon: 'fa-khanda', point: at(0.21, 0.5) },
-  { key: 'offHand', side: 'below', row: 1, icon: 'fa-shield-halved', point: at(0.8, 0.5) },
+  { key: 'head', x: 210, y: 58, icon: 'fa-helmet-battle' },
+  { key: 'arms', x: 84, y: 158, icon: 'fa-bicep' },
+  { key: 'torso', x: 210, y: 178, icon: 'fa-shirt' },
+  { key: 'legs', x: 336, y: 158, icon: 'fa-shorts' },
+  { key: 'hands', x: 84, y: 272, icon: 'fa-hand-fist' },
+  { key: 'feet', x: 336, y: 272, icon: 'fa-boot' },
+  { key: 'mainHand', x: 146, y: 376, icon: 'fa-sword' },
+  { key: 'offHand', x: 274, y: 376, icon: 'fa-shield' },
 ]
 
 const pct = (value: number, total: number) => `${((value / total) * 100).toFixed(3)}%`
@@ -73,39 +67,20 @@ export function paperDollContext(actor: any) {
     offHand: inHand('off') ?? (twoHanded ? actor.items.get(twoHanded.id) : undefined),
   }
   const slots = SLOTS.map((def) => {
-    let x: number
-    let y: number
-    let line: string
-    if (def.side === 'below') {
-      // Up from the slot's top edge, then across to the hand.
-      const cx = BELOW.x[def.row]
-      x = cx - SLOT / 2
-      y = BELOW.y - SLOT / 2
-      line = `${cx},${y} ${cx},${y - 18} ${def.point.x.toFixed(1)},${def.point.y.toFixed(1)}`
-    } else {
-      x = def.side === 'left' ? 34 : W - 34 - SLOT
-      y = ROWS[def.row] - SLOT / 2
-      const edge = def.side === 'left' ? x + SLOT : x
-      const elbow = def.side === 'left' ? edge + 22 : edge - 22
-      line = `${edge},${ROWS[def.row]} ${elbow},${ROWS[def.row]} ${def.point.x.toFixed(1)},${def.point.y.toFixed(1)}`
-    }
     return {
       key: def.key,
       label: game.i18n.localize(`CRAWLSPACE.Doll.${def.key}`),
       icon: def.icon,
       slot: ['mainHand', 'offHand'].includes(def.key) ? '' : def.key,
       hand: def.key === 'mainHand' ? 'main' : def.key === 'offHand' ? 'off' : '',
-      style: `left:${pct(x, W)};top:${pct(y, H)};width:${pct(SLOT, W)};height:${pct(SLOT, H)}`,
+      style: `left:${pct(def.x - SLOT / 2, W)};top:${pct(def.y - SLOT / 2, H)};width:${pct(SLOT, W)};height:${pct(SLOT, H)}`,
       item: slotItem(filled[def.key]),
       twoHandedEcho: def.key === 'offHand' && !!twoHanded && filled.offHand?.id === twoHanded.id,
-      line,
-      point: def.point,
     }
   })
   const accessories = equipped.filter((item: any) => item.type === 'equipment' && !shields.has(item.id) && !item.system.isShield && item.system.slot === 'accessory').slice(0, ACCESSORY_LIMIT)
   return {
     viewBox: `0 0 ${W} ${H}`,
-    figure: FIGURE,
     frame: `M14,2 H${W - 14} L${W - 2},14 V${H - 14} L${W - 14},${H - 2} H14 L2,${H - 14} V14 Z`,
     slots,
     accessories: accessories.map(slotItem),

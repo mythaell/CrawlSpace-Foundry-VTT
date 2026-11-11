@@ -14,6 +14,8 @@ const SRC = path.join(ROOT, 'packs-src')
 const OUT = path.join(ROOT, 'packs')
 assertPacksClosed(OUT)
 const offline = process.argv.includes('--offline')
+// Homebrew rows that stay out of the shipped packs: test entries, and content not written by the system's author.
+const LEFT_OUT = new Set(['38', '39', '40', '47', '67', '1156'])
 const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'system.json'), 'utf8')).version
 
 if (!offline) {
@@ -22,6 +24,7 @@ if (!offline) {
   const byPack = Object.fromEntries(PACKS.map((pack) => [pack, []]))
   const skipped = {}
   for (const row of rows) {
+    if (LEFT_OUT.has(String(row.id))) continue
     const converted = convertRow(row, 'homebrew')
     // The system ships homebrew skills, spells and items only; other homebrew (mobs, quests...) stays out.
     if (!converted || converted.documentName !== 'Item') {

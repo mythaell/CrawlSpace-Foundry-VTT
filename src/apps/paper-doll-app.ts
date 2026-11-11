@@ -29,7 +29,7 @@ export async function equipOnDoll(actor: any, dropped: any, zone: HTMLElement) {
 export class PaperDollApp extends ActorPopup {
   static DEFAULT_OPTIONS: any = {
     classes: ['crawlspace', 'paper-doll-app'],
-    position: { width: 600, height: 'auto' },
+    position: { width: 480, height: 'auto' },
     window: { resizable: true, icon: 'fa-solid fa-person' },
     actions: {
       editItem: PaperDollApp.#onOpen,

@@ -3222,17 +3222,10 @@
 
   /* ---------- Paper doll ---------- */
   .crawlspace .crawl-paper-doll { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
-  .crawlspace .crawl-paper-doll .doll-stage { position: relative; width: 100%; max-width: 620px; margin: 0 auto; aspect-ratio: 560 / 490; }
+  .crawlspace .crawl-paper-doll .doll-stage { position: relative; width: 100%; max-width: 460px; margin: 0 auto; aspect-ratio: 420 / 440; }
   .crawlspace .crawl-paper-doll .doll-art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
   .crawlspace .crawl-paper-doll .doll-frame-fill { fill: rgb(6 26 52 / 72%); }
   .crawlspace .crawl-paper-doll .doll-frame-edge { fill: none; stroke: #66dfff; stroke-width: 2; filter: drop-shadow(0 0 4px rgb(102 223 255 / 55%)); }
-  /* The mannequin's black backdrop drops out against the panel. */
-  .crawlspace .crawl-paper-doll .doll-figure { mix-blend-mode: screen; opacity: 0.92; }
-  .crawlspace .crawl-paper-doll .doll-floor { fill: rgb(140 255 246 / 18%); }
-  .crawlspace .crawl-paper-doll .doll-link polyline { fill: none; stroke: rgb(140 255 246 / 35%); stroke-width: 1.2; stroke-dasharray: 3 3; }
-  .crawlspace .crawl-paper-doll .doll-link circle { fill: rgb(6 26 52 / 90%); stroke: rgb(140 255 246 / 45%); stroke-width: 1.2; }
-  .crawlspace .crawl-paper-doll .doll-link.filled polyline { stroke: #8cfff6; stroke-dasharray: none; filter: drop-shadow(0 0 2px rgb(140 255 246 / 80%)); }
-  .crawlspace .crawl-paper-doll .doll-link.filled circle { fill: #8cfff6; stroke: #ffffff; }
   .crawlspace .crawl-paper-doll .doll-slot {
     position: absolute; display: grid; place-items: center;
     background: radial-gradient(circle at 50% 40%, rgb(40 110 170 / 55%), rgb(8 30 58 / 92%));
@@ -3244,7 +3237,7 @@
   .crawlspace .crawl-paper-doll .doll-slot.echo img { opacity: 0.4; filter: grayscale(0.6); }
   .crawlspace .crawl-paper-doll .doll-slot:hover { border-color: #ffffff; }
   .crawlspace .crawl-paper-doll .doll-slot img { width: 84%; height: 84%; object-fit: contain; border: 0; cursor: pointer; }
-  .crawlspace .crawl-paper-doll .doll-placeholder { font-size: 22px; color: rgb(140 255 246 / 28%); }
+  .crawlspace .crawl-paper-doll .doll-placeholder { font-size: 30px; color: rgb(140 255 246 / 32%); }
   .crawlspace .crawl-paper-doll .doll-label {
     position: absolute; left: 50%; top: 100%; transform: translate(-50%, 2px); white-space: nowrap;
     font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #c0dfef; text-shadow: 0 1px 2px #071b35;
@@ -3254,7 +3247,7 @@
     font-size: 9px; background: #164976; border: 1px solid #8cfff6; border-radius: 50%;
   }
   .crawlspace .crawl-paper-doll .doll-slot:hover .doll-unequip { display: grid; }
-  .crawlspace .crawl-paper-doll .doll-accessories { max-width: 620px; width: 100%; margin: 0 auto; padding: 6px 10px 8px; border: 1px solid var(--crawl-border); background: rgb(6 26 52 / 55%); }
+  .crawlspace .crawl-paper-doll .doll-accessories { max-width: 460px; width: 100%; margin: 0 auto; padding: 6px 10px 8px; border: 1px solid var(--crawl-border); background: rgb(6 26 52 / 55%); }
   .crawlspace .crawl-paper-doll .doll-acc-title { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
   .crawlspace .crawl-paper-doll .doll-acc-row { display: flex; flex-wrap: wrap; gap: 8px; }
   .crawlspace .crawl-paper-doll .doll-acc-row .doll-slot { position: relative; width: 46px; height: 46px; }

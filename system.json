@@ -14,6 +14,18 @@
   "readme": "https://github.com/mythaell/CrawlSpace-Foundry-VTT/wiki",
   "bugs": "https://github.com/mythaell/CrawlSpace-Foundry-VTT/issues",
   "changelog": "https://github.com/mythaell/CrawlSpace-Foundry-VTT/releases",
+  "media": [
+    { "type": "cover", "url": "https://raw.githubusercontent.com/mythaell/CrawlSpace-Foundry-VTT/main/media/cover.webp" },
+    { "type": "screenshot", "url": "https://raw.githubusercontent.com/mythaell/CrawlSpace-Foundry-VTT/main/media/01-crawler-sheet.png", "caption": "Crawler sheet: health slots, mana, defenses and ranked skills" },
+    { "type": "screenshot", "url": "https://raw.githubusercontent.com/mythaell/CrawlSpace-Foundry-VTT/main/media/02-attacks-and-chat.png", "caption": "Attacks, hotlist and actions, with attack and damage chat cards" },
+    { "type": "screenshot", "url": "https://raw.githubusercontent.com/mythaell/CrawlSpace-Foundry-VTT/main/media/03-combat-declaration.png", "caption": "Five-phase combat: a mob declares its attack" },
+    { "type": "screenshot", "url": "https://raw.githubusercontent.com/mythaell/CrawlSpace-Foundry-VTT/main/media/04-equipment.png", "caption": "Equipment slots for worn gear, both hands and accessories" },
+    { "type": "screenshot", "url": "https://raw.githubusercontent.com/mythaell/CrawlSpace-Foundry-VTT/main/media/05-party-upkeep.png", "caption": "Party Upkeep: rests, safe rooms, advancement, awards and loot" },
+    { "type": "screenshot", "url": "https://raw.githubusercontent.com/mythaell/CrawlSpace-Foundry-VTT/main/media/06-time-and-timers.png", "caption": "Time & Timers with the floor-collapse countdown" },
+    { "type": "screenshot", "url": "https://raw.githubusercontent.com/mythaell/CrawlSpace-Foundry-VTT/main/media/07-character-builder.png", "caption": "The six-step character builder" },
+    { "type": "screenshot", "url": "https://raw.githubusercontent.com/mythaell/CrawlSpace-Foundry-VTT/main/media/08-loot-box-award.png", "caption": "Crawler Awards: generating a loot box" },
+    { "type": "screenshot", "url": "https://raw.githubusercontent.com/mythaell/CrawlSpace-Foundry-VTT/main/media/09-effect-rules.png", "caption": "Effects edited through rule elements" }
+  ],
   "esmodules": ["dist/crawlspace.mjs"],
   "styles": ["styles/crawlspace.css"],
   "languages": [{ "lang": "en", "name": "English", "path": "lang/en.json" }],
