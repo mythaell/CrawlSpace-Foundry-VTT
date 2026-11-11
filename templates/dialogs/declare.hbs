@@ -9,7 +9,7 @@
   <fieldset data-mob-attacks="{{mob.id}}">
     <legend>{{localize "CRAWLSPACE.Section.Attacks"}}</legend>
     {{#each mob.attacks as |attack|}}
-    <label class="radio"><input type="radio" name="attack-{{mob.id}}" value="{{attack.id}}" {{#if @first}}checked{{/if}}> {{attack.name}} <small>({{localize "CRAWLSPACE.Mob.ToHitShort"}} {{attack.toHit}}, {{attack.damage}})</small></label>
+    <label class="radio"><input type="radio" name="attack-{{mob.id}}" value="{{attack.id}}" {{checked attack.checked}}> {{attack.name}} <small>({{localize "CRAWLSPACE.Mob.ToHitShort"}} {{attack.toHit}}, {{attack.damage}})</small></label>
     {{else}}<p class="hint">{{localize "CRAWLSPACE.Combat.NoAttacks"}}</p>{{/each}}
   </fieldset>
   {{/each}}

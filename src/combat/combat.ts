@@ -367,8 +367,8 @@ export class CrawlCombat extends Combat {
   }
 }
 
-/** Default "Declare Attack" dialog for the GM. */
-export async function promptDeclaration(combat: CrawlCombat, mobCombatantId?: string) {
+/** Default "Declare Attack" dialog for the GM, optionally opened on one mob and one of its attacks. */
+export async function promptDeclaration(combat: CrawlCombat, mobCombatantId?: string, attackId?: string) {
   const mobs = combat.combatants.filter((c: any) => combatantSide(c) === 'mob' && c.actor?.system?.attacks?.length)
   if (!mobs.length) return ui.notifications.warn(game.i18n.localize('CRAWLSPACE.Combat.NoMobAttacks'))
   const crawlers = combat.combatants.filter((c: any) => combatantSide(c) === 'crawler' && !c.defeated)
@@ -378,7 +378,13 @@ export async function promptDeclaration(combat: CrawlCombat, mobCombatantId?: st
       id: mob.id,
       name: mob.name,
       selected: mob.id === mobCombatantId,
-      attacks: mob.actor.system.attacks.map((attack: any) => ({ id: attack.id, name: attack.name, toHit: attack.toHit ?? '—', damage: attack.damage })),
+      attacks: mob.actor.system.attacks.map((attack: any, index: number) => ({
+        id: attack.id,
+        name: attack.name,
+        toHit: attack.toHit ?? '—',
+        damage: attack.damage,
+        checked: mob.id === mobCombatantId && attackId ? attack.id === attackId : index === 0,
+      })),
     })),
     crawlers: crawlers.map((crawler: any) => ({ id: crawler.id, name: crawler.name, checked: targeted.has(crawler.tokenId) })),
   })

@@ -5,6 +5,7 @@ import { cooldownFor, cooldownLabel } from '../effects/cooldowns'
 import { CHECK_TYPES, CREATURE_SIZES, CREATURE_TYPES, DAMAGE_TYPES, GEAR_SLOTS, STATS, STAT_KEYS } from '../config'
 import { DEBUFFS } from '../rules/debuffs'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage } from '../dice/rolls'
+import { combatantSide, promptDeclaration } from '../combat/combat'
 import { levelUp, openUpkeep } from '../apps/upkeep'
 import { gmActorAction } from '../socket'
 import { createFollower, followerKind, followersOf, linkFollower, unlinkFollower } from '../actors/companions'
@@ -1264,9 +1265,30 @@ export class MobSheet extends CrawlActorSheet {
     }
   }
 
+  /** This sheet's combatant on the mob side of the current combat: its own token's, or else the first one for this actor. */
+  #combatant() {
+    const combat = game.combat
+    if (!combat) return null
+    const tokenId = this.actor.isToken ? this.actor.token?.id : null
+    const mine = combat.combatants.filter((combatant: any) => combatantSide(combatant) === 'mob' && (tokenId ? combatant.tokenId === tokenId : combatant.actorId === this.actor.id))
+    return mine.find((combatant: any) => !combatant.defeated) ?? mine[0] ?? null
+  }
+
   static async #onMobAttack(this: MobSheet, event: PointerEvent, target: HTMLElement) {
     const attack = this.actor.system.attacks[this.#attackIndex(target)]
-    if (attack) return rollAttack(this.actor, this.#mobAttackSource(attack), { fast: event.shiftKey })
+    if (!attack) return
+    // A mob or boss in combat declares the attack, as the combat tracker's Declare mob attack does; the crawlers
+    // answer it. NPCs, pets, mounts and minions (and mobs outside combat) roll their attacks.
+    const combatant = this.actor.type === 'mob' && game.user.isGM ? this.#combatant() : null
+    if (combatant) {
+      const combat = combatant.combat
+      // Shift-click with crawlers targeted declares straight away.
+      const targeted = new Set([...game.user.targets].map((token: any) => token.id))
+      const targets = combat.combatants.filter((c: any) => combatantSide(c) === 'crawler' && !c.defeated && targeted.has(c.tokenId)).map((c: any) => c.id)
+      if (event.shiftKey && targets.length) return combat.declareAttack(combatant.id, attack.id, targets)
+      return promptDeclaration(combat, combatant.id, attack.id)
+    }
+    return rollAttack(this.actor, this.#mobAttackSource(attack), { fast: event.shiftKey })
   }
 
   static async #onMobDamage(this: MobSheet, _event: PointerEvent, target: HTMLElement) {
