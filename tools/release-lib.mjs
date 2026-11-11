@@ -16,6 +16,8 @@ export function releaseManifest(system, { repo, tag }) {
 }
 
 const shippedFolders = ['dist/', 'styles/', 'templates/', 'lang/', 'assets/']
+// The license travels with every copy of the system.
+const shippedFiles = ['LICENSE']
 // LevelDB's lock and logs belong to whoever has the pack open, not to the pack.
 const packNoise = /\/(LOCK|LOG|LOG\.old)$/
 
@@ -26,6 +28,7 @@ export function releaseEntries(system, files) {
     .filter((file) => !file.endsWith('.map'))
     .filter(
       (file) =>
+        shippedFiles.includes(file) ||
         shippedFolders.some((folder) => file.startsWith(folder)) ||
         (packs.some((pack) => file.startsWith(pack)) && !packNoise.test(file)),
     )
@@ -33,5 +36,6 @@ export function releaseEntries(system, files) {
   const required = [...(system.esmodules ?? []), ...(system.styles ?? []), ...(system.languages ?? []).map((language) => language.path)]
   for (const file of required) if (!entries.includes(file)) throw new Error(`The release is missing ${file}; run the build first.`)
   for (const pack of packs) if (!entries.some((file) => file.startsWith(pack))) throw new Error(`The release is missing the compiled ${pack}; run the pack build first.`)
+  for (const file of shippedFiles) if (!entries.includes(file)) throw new Error(`The release is missing ${file}.`)
   return entries
 }

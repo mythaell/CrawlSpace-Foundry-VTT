@@ -28,7 +28,8 @@ const walk = (dir) =>
         return entry.isDirectory() ? walk(file) : [file]
       })
     : []
-const files = ['dist', 'styles', 'templates', 'lang', 'assets', 'packs'].flatMap(walk)
+const rootFiles = ['LICENSE'].filter((file) => fs.existsSync(path.join(ROOT, file)))
+const files = [...rootFiles, ...['dist', 'styles', 'templates', 'lang', 'assets', 'packs'].flatMap(walk)]
 const entries = releaseEntries(system, files)
 
 const manifestJson = `${JSON.stringify(manifest, null, 2)}\n`

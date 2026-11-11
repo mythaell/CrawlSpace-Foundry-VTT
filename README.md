@@ -66,3 +66,7 @@ npm test
 ```
 
 See [Development](https://github.com/mythaell/CrawlSpace-Foundry-VTT/wiki/Development) for packs, linking into Foundry, and releasing.
+
+## License
+
+The code is under the [MIT License](LICENSE). The Quantico fonts are under the SIL Open Font License ([assets/fonts/OFL.txt](assets/fonts/OFL.txt)).

@@ -27,6 +27,8 @@ test('a tag that does not match system.json version is refused', () => {
 test('the zip carries the built system and nothing else', () => {
   const files = [
     'system.json',
+    'LICENSE',
+    'README.md',
     'dist/crawlspace.mjs',
     'dist/crawlspace.mjs.map',
     'styles/crawlspace.css',
@@ -46,6 +48,7 @@ test('the zip carries the built system and nothing else', () => {
     '.env',
   ]
   assert.deepEqual(releaseEntries(system, files), [
+    'LICENSE',
     'assets/crawlspace-logo.png',
     'dist/crawlspace.mjs',
     'lang/en.json',
@@ -58,5 +61,6 @@ test('the zip carries the built system and nothing else', () => {
 
 test('a release missing a file system.json needs is refused', () => {
   assert.throws(() => releaseEntries(system, ['dist/crawlspace.mjs', 'lang/en.json', 'packs/actions/CURRENT']), /styles\/crawlspace\.css/)
+  assert.throws(() => releaseEntries(system, ['dist/crawlspace.mjs', 'styles/crawlspace.css', 'lang/en.json', 'packs/actions/CURRENT']), /LICENSE/)
   assert.throws(() => releaseEntries(system, ['dist/crawlspace.mjs', 'lang/en.json', 'styles/crawlspace.css']), /packs\/actions/)
 })
