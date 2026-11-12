@@ -14,8 +14,7 @@
     "packs:actions": "node tools/build-action-packs.mjs",
     "packs": "npm run packs:homebrew && npm run packs:actions && npm run packs:content",
     "link": "node tools/link-foundry.mjs",
-    "release": "node tools/package-release.mjs",
-    "bestiary": "node tools/build-bestiary-module.mjs"
+    "release": "node tools/package-release.mjs"
   },
   "repository": {
     "type": "git",
@@ -24,7 +23,6 @@
   "license": "MIT",
   "devDependencies": {
     "@foundryvtt/foundryvtt-cli": "^3.0.5",
-    "aws4fetch": "^1.0.20",
     "dotenv": "^18.0.9",
     "pg": "^8.23.1",
     "typescript": "^5.9.3",
