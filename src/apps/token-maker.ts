@@ -40,6 +40,16 @@ function loadImage(src: string) {
   })
 }
 
+/** The layer drawn at the picture's size, so it lines up pixel for pixel. */
+function sameSize(layer: HTMLImageElement, image: HTMLImageElement) {
+  if (layer.naturalWidth === image.naturalWidth && layer.naturalHeight === image.naturalHeight) return layer
+  const canvas = document.createElement('canvas')
+  canvas.width = image.naturalWidth
+  canvas.height = image.naturalHeight
+  canvas.getContext('2d')!.drawImage(layer, 0, 0, canvas.width, canvas.height)
+  return canvas
+}
+
 export class TokenMakerApp extends ActorPopup {
   static DEFAULT_OPTIONS: any = {
     classes: ['crawlspace', 'token-maker'],
@@ -59,12 +69,18 @@ export class TokenMakerApp extends ActorPopup {
 
   /**
    * Opens the token maker for an actor (a token's actor edits that token). Modules can start it from another image
-   * (source) and with pixel-art scaling; game.crawlspace.openTokenMaker calls this.
+   * (source), give the creature as its own transparent layer (foreground, the same picture without its background)
+   * and ask for pixel-art scaling; game.crawlspace.openTokenMaker calls this.
    */
-  static open(actor: any, { source, pixelArt }: { source?: string; pixelArt?: boolean } = {}) {
+  static open(actor: any, { source, foreground, pixelArt }: { source?: string; foreground?: string; pixelArt?: boolean } = {}) {
     const id = `crawl-token-maker-${actor.uuid.replace(/\./g, '-')}`
     const app = (foundry.applications.instances.get(id) as TokenMakerApp | undefined) ?? new TokenMakerApp(actor, { id })
-    if (source) app.source = source
+    if (source) {
+      app.source = source
+      app.foregroundHint = foreground
+      // Reload even when the same picture is open, so a new foreground layer is read.
+      app.image = null
+    }
     app.pixelHint = pixelArt
     return app.render({ force: true })
   }
@@ -86,6 +102,8 @@ export class TokenMakerApp extends ActorPopup {
   busy = false
   /** Set by open(): whether the next image is pixel art. Otherwise only GIFs are. */
   pixelHint: boolean | undefined
+  /** Set by open(): the creature on transparency, used instead of cutting it out of its backdrop. */
+  foregroundHint: string | undefined
 
   get title() {
     return `${t('Title')}: ${this.actor.name}`
@@ -131,7 +149,8 @@ export class TokenMakerApp extends ActorPopup {
       return
     }
     const image = this.image
-    this.cutout = cutoutFromBackdrop(image, backdropColor(image))
+    const foreground = this.foregroundHint ? await loadImage(this.foregroundHint).catch(() => null) : null
+    this.cutout = foreground ? sameSize(foreground, image) : cutoutFromBackdrop(image, backdropColor(image))
     const ring = fitArtwork(image, fitReach.ring, this.cutout)
     const popOut = fitArtwork(image, fitReach.popOut, this.cutout)
     this.homes = {
@@ -303,6 +322,7 @@ export class TokenMakerApp extends ActorPopup {
       current: this.source,
       callback: (path: string) => {
         this.source = path
+        this.foregroundHint = undefined
         this.render()
       },
     }).render({ force: true })
