@@ -2,7 +2,7 @@
   "id": "crawlspace",
   "title": "CrawlSpace",
   "description": "Rules, character sheets and combat automation for dungeon-crawling LitRPG play: health slots, ranked skills and spells, typed damage, debuffs, and five-phase Mob/Crawler combat.",
-  "version": "0.9.8",
+  "version": "0.9.8.2",
   "compatibility": {
     "minimum": "14",
     "verified": "14.370",
@@ -113,5 +113,5 @@
   "socket": true,
   "initiative": "1d20",
   "manifest": "https://github.com/mythaell/CrawlSpace-Foundry-VTT/releases/latest/download/system.json",
-  "download": "https://github.com/mythaell/CrawlSpace-Foundry-VTT/releases/download/v0.9.8/system.zip"
+  "download": "https://github.com/mythaell/CrawlSpace-Foundry-VTT/releases/download/v0.9.8.2/system.zip"
 }
