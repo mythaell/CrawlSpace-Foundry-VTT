@@ -28,6 +28,7 @@ import { CrawlItem } from './documents/item'
 import { CrawlCombat, promptDeclaration } from './combat/combat'
 import { createCombatTracker } from './combat/tracker'
 import { CrawlerSheet, MobSheet, NpcSheet } from './sheets/actor-sheets'
+import { TokenMakerApp } from './apps/token-maker'
 import { CrawlItemSheet } from './sheets/item-sheet'
 import { CrawlEffectSheet } from './sheets/effect-sheet'
 import { DEBUFFS } from './rules/debuffs'
@@ -213,7 +214,7 @@ Hooks.once('init', () => {
   registerHandRules()
   registerFlavorTooltip()
 
-  game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, importFile, openUpkeep, fillActorDamage, calibrateGrid, useAttack: useAttackRow, useAction: useActionRow, declareAttack: () => game.combat && promptDeclaration(game.combat) }
+  game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, importFile, openUpkeep, fillActorDamage, calibrateGrid, useAttack: useAttackRow, useAction: useActionRow, declareAttack: () => game.combat && promptDeclaration(game.combat), openTokenMaker: (actor: any, options?: { source?: string; pixelArt?: boolean }) => TokenMakerApp.open(actor, options) }
 })
 
 /** A new crawler's tokens are linked to it unless the creator said otherwise. */

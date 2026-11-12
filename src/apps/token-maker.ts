@@ -57,12 +57,16 @@ export class TokenMakerApp extends ActorPopup {
 
   static PARTS = { main: { template: 'systems/crawlspace/templates/apps/token-maker.hbs' } }
 
-  /** Opens the token maker for an actor (a token's actor edits that token). */
-  static open(actor: any) {
+  /**
+   * Opens the token maker for an actor (a token's actor edits that token). Modules can start it from another image
+   * (source) and with pixel-art scaling; game.crawlspace.openTokenMaker calls this.
+   */
+  static open(actor: any, { source, pixelArt }: { source?: string; pixelArt?: boolean } = {}) {
     const id = `crawl-token-maker-${actor.uuid.replace(/\./g, '-')}`
-    const existing = foundry.applications.instances.get(id)
-    if (existing) return existing.render({ force: true })
-    return new TokenMakerApp(actor, { id }).render({ force: true })
+    const app = (foundry.applications.instances.get(id) as TokenMakerApp | undefined) ?? new TokenMakerApp(actor, { id })
+    if (source) app.source = source
+    app.pixelHint = pixelArt
+    return app.render({ force: true })
   }
 
   /** The image being turned into a token: the portrait unless another was chosen. */
@@ -80,6 +84,8 @@ export class TokenMakerApp extends ActorPopup {
   brush = 18
   output = 512
   busy = false
+  /** Set by open(): whether the next image is pixel art. Otherwise only GIFs are. */
+  pixelHint: boolean | undefined
 
   get title() {
     return `${t('Title')}: ${this.actor.name}`
@@ -132,7 +138,7 @@ export class TokenMakerApp extends ActorPopup {
       ring: { scale: ring.scale, offsetX: ring.offsetX, offsetY: ring.offsetY },
       popOut: { scale: popOut.scale, offsetX: popOut.offsetX, offsetY: popOut.offsetY },
     }
-    this.look = { ...this.look, fill: rgbHex(ring.backdrop), zoom: 1, popOut: false, pixelArt: /\.(gif)$/i.test(src) }
+    this.look = { ...this.look, fill: rgbHex(ring.backdrop), zoom: 1, popOut: false, pixelArt: this.pixelHint ?? /\.(gif)$/i.test(src) }
     this.placement = { ...this.homes.ring }
     this.selection = null
     this.tool = 'move'
