@@ -17,6 +17,7 @@ import * as config from './config'
 import { CompanionData, CrawlerData, MinionData, MobData, NpcData } from './data/actors'
 import { registerMinions } from './actors/minions'
 import { registerLight } from './actors/light'
+import { registerTokenSize } from './actors/token-size'
 import { groupActorDirectory, registerCompanions } from './actors/companions'
 import { openBuilder, registerBuilder } from './apps/builder'
 import { registerDatabaseRows } from './loot/database'
@@ -203,6 +204,7 @@ Hooks.once('init', () => {
   registerTimePickers()
   registerFrames()
   registerParty()
+  registerTokenSize()
   registerCooldownIcons()
   registerConditionDrops()
   registerTriggers()

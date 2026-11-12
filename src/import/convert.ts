@@ -1,4 +1,5 @@
 import { normalizeGrinding } from '../rules/grinding.ts'
+import { tokenSquares } from '../rules/token-size.ts'
 /**
  * CrawlSpace database rows and character backups → Foundry document data.
  *
@@ -522,8 +523,8 @@ export function mobToActor(name: string, data: Record<string, any>, idSeed: stri
       actorLink: false,
       disposition: -1,
       bar1: { attribute: 'healthBar' },
-      width: Math.max(1, Math.round(int(data.size, 1) / 4)) || 1,
-      height: Math.max(1, Math.round(int(data.size, 1) / 4)) || 1,
+      width: tokenSquares(data.size) ?? 1,
+      height: tokenSquares(data.size) ?? 1,
     },
   }
 }
