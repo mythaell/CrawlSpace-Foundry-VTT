@@ -2,7 +2,7 @@
   "_id": "SA8prb4YgmqLzF8x",
   "name": "Scrapcraft",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/commodities/tech/cog-gear-crank-steel.webp",
   "system": {
     "description": "<p>Discarded odds and ends become something useful in your hands.</p><p>Craft mundane objects from junk, without moving parts, fluids or chemicals.</p>",
     "notes": "",

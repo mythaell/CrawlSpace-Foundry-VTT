@@ -2,7 +2,7 @@
   "_id": "MWp5rB5FwCBOFLAZ",
   "name": "Sidestep Instinct",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/movement/feet-winged-boots-blue.webp",
   "system": {
     "description": "<p>You shift out of danger before thought can slow the movement.</p><p>Gain +1 Evade. Advance by magical means, or training after Rank 5.</p>",
     "notes": "",
@@ -55,7 +55,7 @@
     {
       "_id": "x9HaPiTk7wmqjl7r",
       "name": "Sidestep Instinct (Rank 1)",
-      "img": "icons/svg/book.svg",
+      "img": "icons/skills/movement/feet-winged-boots-blue.webp",
       "type": "base",
       "transfer": true,
       "disabled": false,
@@ -75,7 +75,7 @@
     {
       "_id": "WurLNQ0w8FYCrRdr",
       "name": "Sidestep Instinct (Rank 5)",
-      "img": "icons/svg/book.svg",
+      "img": "icons/skills/movement/feet-winged-boots-blue.webp",
       "type": "base",
       "transfer": true,
       "disabled": false,
@@ -95,7 +95,7 @@
     {
       "_id": "JrS7HTLHpb55XJKE",
       "name": "Sidestep Instinct (Rank 10)",
-      "img": "icons/svg/book.svg",
+      "img": "icons/skills/movement/feet-winged-boots-blue.webp",
       "type": "base",
       "transfer": true,
       "disabled": false,
@@ -115,7 +115,7 @@
     {
       "_id": "rhvi3Ppy9pWtlTEd",
       "name": "Sidestep Instinct (Rank 15)",
-      "img": "icons/svg/book.svg",
+      "img": "icons/skills/movement/feet-winged-boots-blue.webp",
       "type": "base",
       "transfer": true,
       "disabled": false,

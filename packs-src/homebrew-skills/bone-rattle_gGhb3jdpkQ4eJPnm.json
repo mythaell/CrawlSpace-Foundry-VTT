@@ -2,7 +2,7 @@
   "_id": "gGhb3jdpkQ4eJPnm",
   "name": "Bone Rattle",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/commodities/bones/bone-fragments-white.webp",
   "system": {
     "description": "<p>Passive damage effect for Shoulder slam: against a creature of your size, add 1d4 base damage.</p>",
     "notes": "",

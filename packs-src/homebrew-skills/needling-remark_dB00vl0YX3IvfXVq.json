@@ -2,7 +2,7 @@
   "_id": "dB00vl0YX3IvfXVq",
   "name": "Needling Remark",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/social/theft-pickpocket-bribery-brown.webp",
   "system": {
     "description": "<p>One perfectly irritating remark can make an enemy forget its original target.</p><p>Interrupt within 30 feet, opposed by INT, to redirect an attack to yourself; higher success tiers redirect more attacks.</p>",
     "notes": "",

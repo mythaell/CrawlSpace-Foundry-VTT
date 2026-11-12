@@ -2,7 +2,7 @@
   "_id": "Gwl0RNLwICsMT5da",
   "name": "Sidearm Drill",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/guns/gun-pistol-flintlock-metal.webp",
   "system": {
     "description": "<p>You bring a compact firearm onto target with practiced, economical movement.</p><p>Attack against Evade. Requires ammunition. After a Major Fail or worse, spend an Action reloading.</p>",
     "notes": "",

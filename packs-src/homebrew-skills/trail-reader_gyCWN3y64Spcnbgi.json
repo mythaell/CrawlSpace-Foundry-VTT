@@ -2,7 +2,7 @@
   "_id": "gyCWN3y64Spcnbgi",
   "name": "Trail Reader",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/tools/navigation/map-nautical-compass.webp",
   "system": {
     "description": "<p>Bent grass and scuffed dust tell you where another traveler went.</p><p>Find and follow tracks, checking every fifteen minutes.</p>",
     "notes": "",

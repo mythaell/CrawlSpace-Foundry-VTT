@@ -2,7 +2,7 @@
   "_id": "2cDAJnvTiwIsz10D",
   "name": "Take the Hit",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/melee/shield-block-bash-blue.webp",
   "system": {
     "description": "<p>When danger reaches for a companion, you put yourself in its way.</p><p>Interrupt: take a direct, non-area attack aimed at an adjacent ally. May Step up to 10 feet to reach them; do not make your own Evade check.</p>",
     "notes": "",

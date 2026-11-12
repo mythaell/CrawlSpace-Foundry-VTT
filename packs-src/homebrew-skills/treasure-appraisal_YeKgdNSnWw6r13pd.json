@@ -2,7 +2,7 @@
   "_id": "YeKgdNSnWw6r13pd",
   "name": "Treasure Appraisal",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/commodities/gems/gem-faceted-diamond-blue.webp",
   "system": {
     "description": "<p>A glance through your belongings tells you which pieces deserve extra care.</p><p>Sort inventory by value without revealing exact prices. Ranks advance by magical means.</p>",
     "notes": "",

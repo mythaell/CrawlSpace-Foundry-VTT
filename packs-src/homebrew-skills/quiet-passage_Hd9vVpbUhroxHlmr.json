@@ -2,7 +2,7 @@
   "_id": "Hd9vVpbUhroxHlmr",
   "name": "Quiet Passage",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/movement/feet-winged-sandals-tan.webp",
   "system": {
     "description": "<p>You move through a watched space without becoming its most interesting feature.</p><p>Opposed by INT. Start out of sight. Success grants a non-attack Action before surprise; outside combat, may Move and Step.</p>",
     "notes": "",

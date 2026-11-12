@@ -2,7 +2,7 @@
   "_id": "myslFhSriY6CllIS",
   "name": "Discard Delver",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/environment/settlement/rubble-scrap-refuse-wood-metal.webp",
   "system": {
     "description": "<p>Other people throw away possibilities; you take the time to find them.</p><p>Search for an hour, once per 50-foot square, for a useful item chosen by the GM.</p>",
     "notes": "",

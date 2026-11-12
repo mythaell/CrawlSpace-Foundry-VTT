@@ -2,7 +2,7 @@
   "_id": "bVRutLzpH9HOLJQ3",
   "name": "Junkyard Design",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/commodities/tech/cog-gear-crank-steel.webp",
   "system": {
     "description": "<p>You see workable mechanisms hiding inside piles of mismatched parts.</p><p>Build mundane devices with moving parts, fluids or chemicals from junk; excludes vehicles.</p>",
     "notes": "",

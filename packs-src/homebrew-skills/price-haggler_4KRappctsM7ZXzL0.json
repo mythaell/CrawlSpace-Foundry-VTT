@@ -2,7 +2,7 @@
   "_id": "4KRappctsM7ZXzL0",
   "name": "Price Haggler",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/social/diplomacy-handshake-yellow.webp",
   "system": {
     "description": "<p>You know when to press a deal and when to let a merchant do the talking.</p><p>Opposed by INT. Negotiate five minutes for a 10% price change; Disadvantage with non-merchants. Cannot bypass minimum prices or bargain with your own party.</p>",
     "notes": "",

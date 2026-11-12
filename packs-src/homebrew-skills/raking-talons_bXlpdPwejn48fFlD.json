@@ -2,7 +2,7 @@
   "_id": "bXlpdPwejn48fFlD",
   "name": "Raking Talons",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/melee/strike-slashes-red.webp",
   "system": {
     "description": "<p>You twist into a sharp raking strike with the claws your body provides.</p><p>Melee attack against Evade.</p>",
     "notes": "",

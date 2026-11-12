@@ -2,7 +2,7 @@
   "_id": "5N66nVjO3TEY1bsx",
   "name": "Field Bow Training",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/bows/shortbow-recurve-red.webp",
   "system": {
     "description": "<p>Attack against Evade. Requires two hands and ammunition.</p>",
     "notes": "",

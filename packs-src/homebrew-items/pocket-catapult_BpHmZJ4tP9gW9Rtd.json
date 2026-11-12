@@ -2,7 +2,7 @@
   "_id": "BpHmZJ4tP9gW9Rtd",
   "name": "Pocket Catapult",
   "type": "weapon",
-  "img": "icons/svg/sword.svg",
+  "img": "icons/weapons/slings/slingshot-wood.webp",
   "system": {
     "description": "<p>A practical weapon designed for ranged use. Requires two hands.</p>",
     "notes": "",

@@ -2,7 +2,7 @@
   "_id": "Es2Gzfcgqg6WPL9j",
   "name": "Stomp Shock",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/melee/strike-hammer-destructive-orange.webp",
   "system": {
     "description": "<p>Passive damage effect for Heel Striker. Once per round against a target with 20% or less HB remaining, double total damage.</p>",
     "notes": "",

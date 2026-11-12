@@ -2,7 +2,7 @@
   "_id": "TFyqXVslTtvn5llJ",
   "name": "Palm Fighter",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/melee/unarmed-punch-fist-white.webp",
   "system": {
     "description": "<p>Attack against Evade. May use Hammer Palm. AI Favor 2 when attacking without a damage-effect skill.</p>",
     "notes": "",

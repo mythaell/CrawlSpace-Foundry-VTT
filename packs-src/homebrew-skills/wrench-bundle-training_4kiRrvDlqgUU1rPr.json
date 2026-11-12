@@ -2,7 +2,7 @@
   "_id": "4kiRrvDlqgUU1rPr",
   "name": "Wrench Bundle Training",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/tools/hand/wrench-adjustable-toothed.webp",
   "system": {
     "description": "<p>Attack against Evade. Use an object weighing 1 lb to your STR in pounds. AI Favor 1.</p>",
     "notes": "",

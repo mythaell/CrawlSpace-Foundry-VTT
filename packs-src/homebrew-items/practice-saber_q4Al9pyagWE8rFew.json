@@ -2,7 +2,7 @@
   "_id": "q4Al9pyagWE8rFew",
   "name": "Practice Saber",
   "type": "weapon",
-  "img": "icons/svg/sword.svg",
+  "img": "icons/weapons/swords/sword-guard-flanged.webp",
   "system": {
     "description": "<p>A practical weapon built for close quarters. Requires one hand.</p>",
     "notes": "",

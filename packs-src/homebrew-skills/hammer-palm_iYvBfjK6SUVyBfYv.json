@@ -2,7 +2,7 @@
   "_id": "iYvBfjK6SUVyBfYv",
   "name": "Hammer Palm",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/melee/unarmed-punch-fist-white.webp",
   "system": {
     "description": "<p>Passive damage effect for Palm Fighter: add 1d2 to base damage.</p>",
     "notes": "",

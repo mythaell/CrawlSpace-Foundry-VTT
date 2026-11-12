@@ -2,7 +2,7 @@
   "_id": "3z3Vb1f3DPjxf3m1",
   "name": "Burst Runner",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/movement/feet-winged-boots-glowing-yellow.webp",
   "system": {
     "description": "<p>You find another burst of speed just when the distance matters most.</p><p>Check every minute; add +1 per 10 feet of Move. For short bursts rather than prolonged Lasting Grit.</p>",
     "notes": "",
@@ -55,7 +55,7 @@
     {
       "_id": "LnYOx0cObc5ntVrt",
       "name": "Burst Runner (Rank 5)",
-      "img": "icons/svg/book.svg",
+      "img": "icons/skills/movement/feet-winged-boots-glowing-yellow.webp",
       "type": "base",
       "transfer": true,
       "disabled": false,
@@ -75,7 +75,7 @@
     {
       "_id": "2ozCzDhiAu0qvfTh",
       "name": "Burst Runner (Rank 10)",
-      "img": "icons/svg/book.svg",
+      "img": "icons/skills/movement/feet-winged-boots-glowing-yellow.webp",
       "type": "base",
       "transfer": true,
       "disabled": false,
@@ -95,7 +95,7 @@
     {
       "_id": "Kika7dXvsMsRfxlA",
       "name": "Burst Runner (Rank 15)",
-      "img": "icons/svg/book.svg",
+      "img": "icons/skills/movement/feet-winged-boots-glowing-yellow.webp",
       "type": "base",
       "transfer": true,
       "disabled": false,

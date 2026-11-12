@@ -2,7 +2,7 @@
   "_id": "Rtk0lDey3b0bT590",
   "name": "Shoulder Charger",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/movement/figure-running-gray.webp",
   "system": {
     "description": "<p>Attack against Evade. Lose 1 HB slot on a successful attack. May use Bone Rattle. AI Favor 1 without a damage-effect skill.</p>",
     "notes": "",

@@ -2,7 +2,7 @@
   "_id": "xHrMlx3CTvwWZPAj",
   "name": "Grapple Artist",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/melee/unarmed-punch-fist.webp",
   "system": {
     "description": "<p>Attack against Evade. Requires two hands. A hit inflicts Held. Escaping is a STR check opposed by this skill as an Interrupt. May use Ground Slam. AI Favor 1 without a damage-effect skill.</p>",
     "notes": "",

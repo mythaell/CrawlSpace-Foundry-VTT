@@ -2,7 +2,7 @@
   "_id": "I82Jz5912miGBHjz",
   "name": "Silver Bluff",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/commodities/treasure/mask-jeweled-gold.webp",
   "system": {
     "description": "<p>A convincing delivery can make a flimsy story sound perfectly ordinary.</p><p>Lie or misdirect, opposed by INT. Disadvantage against Read the Tell.</p>",
     "notes": "",

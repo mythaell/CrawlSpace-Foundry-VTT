@@ -10,6 +10,7 @@ import { debuffByName } from '../rules/debuffs.ts'
 import { raceClassGrant } from '../crawlspace-shared/shared/raceClassGrants.ts'
 import { linkedEffects } from '../rules/build-links.ts'
 import { durationSeconds, durationEvent } from '../rules/time.ts'
+import { iconFor } from './icons.ts'
 
 export type ContentRow = { id: number; content_type: string; name: string; data: Record<string, any> }
 export type Converted = { documentName: 'Item' | 'Actor' | 'JournalEntry' | 'ActiveEffect' | 'RollTable'; pack: string; data: Record<string, any> }
@@ -304,7 +305,6 @@ export function inventoryToItem(entry: Record<string, any>, contentType = '') {
               ? 'lootBox'
               : 'loot'
   const name = str(entry.name) || 'Item'
-  const img = str(properties.icon) || ICONS[type]
   const base = {
     description: toHtml([properties.details, entry.notes].filter(Boolean).join('\n\n')),
     notes: '',
@@ -353,6 +353,7 @@ export function inventoryToItem(entry: Record<string, any>, contentType = '') {
     default:
       system = base
   }
+  const img = str(properties.icon) || iconFor(type, name, system) || ICONS[type]
   // A consumable's cast-time conditions (Good Mana Refill) are applied to the user when it is used.
   const effects = [
     ...effectsFor(name, img, [...list(properties.effects), ...legacyBonusEffects(properties)]),
@@ -747,7 +748,7 @@ export function convertRow(row: ContentRow, database: 'game' | 'homebrew'): Conv
     case 'skill':
     case 'spell': {
       const kind = row.content_type
-      const img = str(data.icon) || ICONS[kind]
+      const img = str(data.icon) || iconFor(kind, name) || ICONS[kind]
       const system: Record<string, any> = { ...rankedSystem(data, kind), source }
       if (kind === 'spell') Object.assign(system, { mana: str(data.mana), range: str(data.range), duration: str(data.duration), usage: 'learned' })
       const effects = [...effectsFor(name, img, list(data.effects)), ...(kind === 'spell' ? useEffectConditions(data, img) : [])]
@@ -910,13 +911,15 @@ export function characterToActor(input: Record<string, any>) {
     const system = rankedSystem(skill, 'skill')
     const override = data.skillEnhancedOverrides?.[skill.id]
     if (str(override)) system.rank.override = nullableInt(override)
-    add({ name: str(skill.name) || 'Skill', type: 'skill', img: ICONS.skill, system, effects: effectsFor(skill.name, ICONS.skill, list(skill.effects)) }, skill.id)
+    const img = str(skill.icon) || iconFor('skill', str(skill.name)) || ICONS.skill
+    add({ name: str(skill.name) || 'Skill', type: 'skill', img, system, effects: effectsFor(skill.name, img, list(skill.effects)) }, skill.id)
   }
   for (const spell of list(data.spells)) {
     const system: Record<string, any> = { ...rankedSystem(spell, 'spell'), mana: str(spell.mana), range: str(spell.range), duration: str(spell.duration), usage: spell.inherentGrantId ? 'inherent' : 'learned' }
     const override = data.spellEnhancedOverrides?.[spell.id]
     if (str(override)) system.rank.override = nullableInt(override)
-    add({ name: str(spell.name) || 'Spell', type: 'spell', img: ICONS.spell, system, effects: [...effectsFor(spell.name, ICONS.spell, list(spell.effects)), ...useEffectConditions(spell, ICONS.spell)] }, spell.id)
+    const img = str(spell.icon) || iconFor('spell', str(spell.name)) || ICONS.spell
+    add({ name: str(spell.name) || 'Spell', type: 'spell', img, system, effects: [...effectsFor(spell.name, img, list(spell.effects)), ...useEffectConditions(spell, img)] }, spell.id)
   }
   for (const entry of list(data.inventory)) add(inventoryToItem(entry), entry.id)
   for (const box of list(data.lootBoxes))

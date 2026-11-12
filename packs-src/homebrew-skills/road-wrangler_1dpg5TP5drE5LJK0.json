@@ -2,7 +2,7 @@
   "_id": "1dpg5TP5drE5LJK0",
   "name": "Road Wrangler",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/environment/vehicles/car-automobile-classic.webp",
   "system": {
     "description": "<p>You feel a vehicle’s limits through the wheel and keep it moving inside them.</p><p>Drive a vehicle. Attacks while driving have Disadvantage.</p>",
     "notes": "",

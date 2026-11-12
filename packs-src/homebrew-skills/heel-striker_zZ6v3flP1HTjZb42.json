@@ -2,7 +2,7 @@
   "_id": "zZ6v3flP1HTjZb42",
   "name": "Heel Striker",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/melee/unarmed-punch-fist-white.webp",
   "system": {
     "description": "<p>Attack against Evade. May use Stomp Shock. AI Favor 1 when attacking without a damage-effect skill.</p>",
     "notes": "",

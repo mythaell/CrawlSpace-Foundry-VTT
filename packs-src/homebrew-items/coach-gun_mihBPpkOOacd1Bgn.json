@@ -2,7 +2,7 @@
   "_id": "mihBPpkOOacd1Bgn",
   "name": "Coach Gun",
   "type": "weapon",
-  "img": "icons/svg/sword.svg",
+  "img": "icons/weapons/guns/gun-blunderbuss-worn-brown.webp",
   "system": {
     "description": "<p>A practical weapon designed for ranged use. Requires two hands.</p>",
     "notes": "",

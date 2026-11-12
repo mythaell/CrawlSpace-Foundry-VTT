@@ -2,7 +2,7 @@
   "_id": "JHN5t3k7NbRiV3Yj",
   "name": "Gentle Nudge",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/social/diplomacy-handshake-yellow.webp",
   "system": {
     "description": "<p>You frame an idea so another person can see themselves choosing it.</p><p>Opposed by INT. Requires ten minutes in safety; Disadvantage for risky, inconvenient or improper requests. The suggestion cannot be too costly, too dangerous or against the target’s nature.</p>",
     "notes": "",

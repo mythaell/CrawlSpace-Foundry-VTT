@@ -2,7 +2,7 @@
   "_id": "35sWxxrKN355Fr4n",
   "name": "Signal Pistol Training",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/guns/gun-pistol-flintlock-metal.webp",
   "system": {
     "description": "<p>Attack against Evade. Requires ammunition. After a Major Fail or worse, spend an Action reloading.</p>",
     "notes": "",

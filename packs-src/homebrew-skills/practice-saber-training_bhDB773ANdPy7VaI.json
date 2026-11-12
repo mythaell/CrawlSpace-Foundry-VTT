@@ -2,7 +2,7 @@
   "_id": "bhDB773ANdPy7VaI",
   "name": "Practice Saber Training",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/swords/sword-guard-flanged.webp",
   "system": {
     "description": "<p>Attack against Evade.</p>",
     "notes": "",
@@ -57,7 +57,7 @@
     {
       "_id": "uouZjtH1mQqRXzKA",
       "name": "Practice Saber Training (Rank 15)",
-      "img": "icons/svg/book.svg",
+      "img": "icons/weapons/swords/sword-guard-flanged.webp",
       "type": "base",
       "transfer": true,
       "disabled": false,

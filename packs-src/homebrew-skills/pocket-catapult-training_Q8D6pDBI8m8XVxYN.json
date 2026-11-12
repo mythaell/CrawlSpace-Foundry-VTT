@@ -2,7 +2,7 @@
   "_id": "Q8D6pDBI8m8XVxYN",
   "name": "Pocket Catapult Training",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/slings/slingshot-wood.webp",
   "system": {
     "description": "<p>Attack against Evade. Requires two hands. AI Favor 2.</p>",
     "notes": "",

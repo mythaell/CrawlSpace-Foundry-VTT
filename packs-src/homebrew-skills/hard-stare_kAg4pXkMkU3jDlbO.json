@@ -2,7 +2,7 @@
   "_id": "kAg4pXkMkU3jDlbO",
   "name": "Hard Stare",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/social/intimidation-impressing.webp",
   "system": {
     "description": "<p>You can make your intentions clear without raising your voice.</p><p>Opposed by CHA; Disadvantage after hostilities begin. Success inflicts Staggered.</p>",
     "notes": "",

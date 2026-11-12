@@ -2,7 +2,7 @@
   "_id": "VJibBvSb9jEmPXoN",
   "name": "Read the Tell",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/magic/perception/orb-crystal-ball-scrying.webp",
   "system": {
     "description": "<p>You listen for the awkward pause that a polished story cannot quite conceal.</p><p>Detect deception, opposed by CHA. Disadvantage against Silver Bluff.</p>",
     "notes": "",

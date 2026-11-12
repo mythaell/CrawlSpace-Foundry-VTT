@@ -2,7 +2,7 @@
   "_id": "sAscTHVDamm8pzEv",
   "name": "Steel Throwing Stars Training",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/thrown/shuriken-blue.webp",
   "system": {
     "description": "<p>Attack against Evade. AI Favor 1.</p>",
     "notes": "",

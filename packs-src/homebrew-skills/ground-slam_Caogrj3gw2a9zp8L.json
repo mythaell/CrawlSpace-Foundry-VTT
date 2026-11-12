@@ -2,7 +2,7 @@
   "_id": "Caogrj3gw2a9zp8L",
   "name": "Ground Slam",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/melee/strike-hammer-destructive-orange.webp",
   "system": {
     "description": "<p>Passive damage effect for Grapple Artist: against a smaller Held creature, add 1d8 base damage plus STR Bludgeoning, end Held and throw it 5 feet per 5 Ranks (minimum 5 feet).</p>",
     "notes": "",

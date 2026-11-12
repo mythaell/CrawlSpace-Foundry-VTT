@@ -2,7 +2,7 @@
   "_id": "KUG9hDjXmMKnfTTi",
   "name": "Creature Rapport",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/environment/creatures/horse-white.webp",
   "system": {
     "description": "<p>You read an animal’s signals and answer with a calm, steady presence.</p><p>Opposed by INT. Handle animals and discourage friendly animals from attacking.</p>",
     "notes": "",

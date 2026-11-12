@@ -2,7 +2,7 @@
   "_id": "pxU0Pr98PJL2XzdD",
   "name": "Rotor Wrangler",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/environment/vehicles/plane.webp",
   "system": {
     "description": "<p>You keep a temperamental rotorcraft level when the sky refuses to cooperate.</p><p>Pilot rotorcraft. Attacks while piloting have Disadvantage; cannot use two-handed weapons.</p>",
     "notes": "",

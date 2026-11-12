@@ -2,7 +2,7 @@
   "_id": "3p5z51LtRxZnVdm8",
   "name": "Gap Leaper",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/movement/arrow-upward-yellow.webp",
   "system": {
     "description": "<p>You size up a gap, plant your feet, and commit to the landing.</p><p>With a 10-foot running start, jump Rank + STR modifier feet horizontally or 1 foot vertically.</p>",
     "notes": "",
@@ -55,7 +55,7 @@
     {
       "_id": "Bh5odpKkdrOsRL3t",
       "name": "Gap Leaper (Rank 10)",
-      "img": "icons/svg/book.svg",
+      "img": "icons/skills/movement/arrow-upward-yellow.webp",
       "type": "base",
       "transfer": true,
       "disabled": false,

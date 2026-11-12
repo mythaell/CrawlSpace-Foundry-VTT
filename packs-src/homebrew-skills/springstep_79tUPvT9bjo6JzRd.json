@@ -2,7 +2,7 @@
   "_id": "79tUPvT9bjo6JzRd",
   "name": "Springstep",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/movement/feet-winged-boots-glowing-yellow.webp",
   "system": {
     "description": "<p>Your animal body turns a running start into a startling leap.</p><p>Animal only. With a 10-foot running start, jump Rank × 2 feet horizontally or DEX modifier × 2 vertically.</p>",
     "notes": "",

@@ -2,7 +2,7 @@
   "_id": "qoNEBXcQOe1grfwx",
   "name": "Winning Introduction",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/social/diplomacy-handshake-yellow.webp",
   "system": {
     "description": "<p>You find the friendly opening before a stranger finds a reason to distrust you.</p><p>Opposed by INT; affects one non-hostile NPC or Mob, excluding crawlers, bosses and elites.</p>",
     "notes": "",

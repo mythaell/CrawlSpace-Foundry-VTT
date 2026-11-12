@@ -2,7 +2,7 @@
   "_id": "XLladVxO1XoC7j1b",
   "name": "Coach Gun Training",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/guns/gun-blunderbuss-worn-brown.webp",
   "system": {
     "description": "<p>Attack against Evade. Requires two hands and ammunition. After a Major Fail or worse, spend an Action reloading.</p>",
     "notes": "",

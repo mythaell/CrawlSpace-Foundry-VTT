@@ -2,7 +2,7 @@
   "_id": "qqiAJHFPqSuoVBHd",
   "name": "Waiting Pounce",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/melee/strike-dagger-skull-white.webp",
   "system": {
     "description": "<p>You choose the right approach and the right moment to become a threat.</p><p>Approach a mob unseen to gain an action before surprise; attack with Advantage.</p>",
     "notes": "",

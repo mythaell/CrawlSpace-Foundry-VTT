@@ -2,7 +2,7 @@
   "_id": "yGkZJR0CCKQPnfui",
   "name": "Close Blade",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/daggers/dagger-straight-thin-black.webp",
   "system": {
     "description": "<p>You keep a short blade moving through the smallest opening in a defense.</p><p>Attack against Evade. AI Favor 1.</p>",
     "notes": "",
@@ -57,7 +57,7 @@
     {
       "_id": "Pt2xJgCufofslNPA",
       "name": "Close Blade (Rank 5)",
-      "img": "icons/svg/book.svg",
+      "img": "icons/weapons/daggers/dagger-straight-thin-black.webp",
       "type": "base",
       "transfer": true,
       "disabled": false,

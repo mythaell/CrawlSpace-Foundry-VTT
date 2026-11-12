@@ -2,7 +2,7 @@
   "_id": "9X2CJhAaNZZatR7N",
   "name": "Survey Spear",
   "type": "weapon",
-  "img": "icons/svg/sword.svg",
+  "img": "icons/weapons/polearms/javelin-flared.webp",
   "system": {
     "description": "<p>A practical weapon designed for ranged use. Requires one hand.</p>",
     "notes": "",

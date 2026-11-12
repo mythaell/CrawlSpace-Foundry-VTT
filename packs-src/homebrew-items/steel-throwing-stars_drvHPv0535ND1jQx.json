@@ -2,7 +2,7 @@
   "_id": "drvHPv0535ND1jQx",
   "name": "Steel Throwing Stars",
   "type": "weapon",
-  "img": "icons/svg/sword.svg",
+  "img": "icons/weapons/thrown/shuriken-blue.webp",
   "system": {
     "description": "<p>A practical weapon designed for ranged use. Requires one hand.</p>",
     "notes": "",

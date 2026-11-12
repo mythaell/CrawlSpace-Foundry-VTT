@@ -2,7 +2,7 @@
   "_id": "RfFBfbBmRbX9XxlU",
   "name": "Scattergun Drill",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/guns/gun-blunderbuss-worn-brown.webp",
   "system": {
     "description": "<p>You handle a close-range firearm with a firm stance and deliberate follow-through.</p><p>Attack against Evade. Requires two hands and ammunition. After a Major Fail or worse, spend an Action reloading.</p>",
     "notes": "",

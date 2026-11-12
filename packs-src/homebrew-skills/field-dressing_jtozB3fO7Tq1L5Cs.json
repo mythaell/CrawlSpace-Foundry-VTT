@@ -2,7 +2,7 @@
   "_id": "jtozB3fO7Tq1L5Cs",
   "name": "Field Dressing",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/tools/medical/bandages-gauze.webp",
   "system": {
     "description": "<p>You steady a wounded companion and make the most of a brief chance to help.</p><p>Restore 1 HB slot plus one per higher success tier. Once per rest per patient.</p>",
     "notes": "",

@@ -2,7 +2,7 @@
   "_id": "H3QlbnsSZnQgFJpe",
   "name": "Demolition Maul",
   "type": "weapon",
-  "img": "icons/svg/sword.svg",
+  "img": "icons/weapons/hammers/hammer-war-spiked.webp",
   "system": {
     "description": "<p>A practical weapon built for close quarters. Requires two hands.</p>",
     "notes": "",

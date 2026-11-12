@@ -2,7 +2,7 @@
   "_id": "UQ979FEq8cEi7Nuu",
   "name": "Utility Knife Training",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/daggers/dagger-straight-thin-black.webp",
   "system": {
     "description": "<p>Attack against Evade. AI Favor 1.</p>",
     "notes": "",
@@ -57,7 +57,7 @@
     {
       "_id": "hVdTtkrZpU9Db5hg",
       "name": "Utility Knife Training (Rank 5)",
-      "img": "icons/svg/book.svg",
+      "img": "icons/weapons/daggers/dagger-straight-thin-black.webp",
       "type": "base",
       "transfer": true,
       "disabled": false,

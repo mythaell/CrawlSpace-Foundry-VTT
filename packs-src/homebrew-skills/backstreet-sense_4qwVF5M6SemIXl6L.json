@@ -2,7 +2,7 @@
   "_id": "4qwVF5M6SemIXl6L",
   "name": "Backstreet Sense",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/environment/settlement/watchtower-tan.webp",
   "system": {
     "description": "<p>You know which doors open for a quiet favor and which alleys end in trouble.</p><p>Find rumors and criminal contacts in a populated settlement.</p>",
     "notes": "",

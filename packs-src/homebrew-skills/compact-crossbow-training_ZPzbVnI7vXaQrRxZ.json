@@ -2,7 +2,7 @@
   "_id": "ZPzbVnI7vXaQrRxZ",
   "name": "Compact Crossbow Training",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/weapons/crossbows/crossbow-simple-brown.webp",
   "system": {
     "description": "<p>Attack against Evade. Requires two hands and ammunition; attack once per round.</p>",
     "notes": "",

@@ -2,7 +2,7 @@
   "_id": "XbwAbFJtN1XWTr5I",
   "name": "Crowd Charmer",
   "type": "skill",
-  "img": "icons/svg/book.svg",
+  "img": "icons/skills/social/diplomacy-handshake-yellow.webp",
   "system": {
     "description": "<p>You turn a practiced routine into a moment an audience wants to remember.</p><p>Choose a performance specialty. A rival performance adds their CHA to the difficulty.</p>",
     "notes": "",
