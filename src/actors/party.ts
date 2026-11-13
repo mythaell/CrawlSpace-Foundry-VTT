@@ -5,9 +5,9 @@
 import { TokenMakerApp } from '../apps/token-maker'
 import { partyFlag, pickParty } from '../rules/party'
 
-/** The party's crawlers, by name. */
+/** The party's crawlers, by name. Every user gets the whole party, including crawlers they can't open. */
 export function partyCrawlers(): any[] {
-  const crawlers = game.actors.contents.filter((actor: any) => actor.type === 'crawler' && actor.visible)
+  const crawlers = game.actors.contents.filter((actor: any) => actor.type === 'crawler')
   return pickParty(crawlers).sort((a: any, b: any) => a.name.localeCompare(b.name))
 }
 

@@ -210,7 +210,9 @@ class CrawlerFrames extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static #onOpenSheet(this: CrawlerFrames, _event: Event, target: HTMLElement) {
-    fromUuidSync(target.closest<HTMLElement>('[data-uuid]')?.dataset.uuid ?? '')?.sheet.render(true)
+    // Another player's crawler only opens for users allowed to see it.
+    const actor: any = fromUuidSync(target.closest<HTMLElement>('[data-uuid]')?.dataset.uuid ?? '')
+    if (actor?.visible) actor.sheet.render(true)
   }
 }
 
