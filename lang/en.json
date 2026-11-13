@@ -1369,6 +1369,10 @@
       "Lost": "{name}'s {shield} loses {loss} DR from the failed Shield Block ({left}/{max} left).",
       "Broke": "{name}'s {shield} loses {loss} DR from the failed Shield Block and breaks."
     },
+    "Minimap": {
+      "Title": "Minimap",
+      "Toggle": "Minimap"
+    },
     "Calibrate": {
       "Title": "Map grid calibration",
       "FromMap": "Calibrate grid from the map",

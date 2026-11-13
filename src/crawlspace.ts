@@ -45,6 +45,7 @@ import { registerHotlistUpkeep } from './rules/hotlist-upkeep'
 import { registerHomebrewSetting } from './settings/homebrew'
 import { registerHandRules } from './rules/hands-upkeep'
 import { registerFlavorTooltip } from './canvas/flavor-tooltip'
+import { registerMinimap } from './canvas/minimap'
 import { readImportFile } from './import/account-import'
 import { openAccountImport } from './apps/account-import'
 
@@ -217,6 +218,7 @@ Hooks.once('init', () => {
   registerHotlistUpkeep()
   registerHandRules()
   registerFlavorTooltip()
+  registerMinimap()
 
   game.crawlspace = { config, openGrinding, openAwards, openBuilder, performUpkeep, openTime, advanceTime, settleTime, rest, importCharacter, importFile, openUpkeep, fillActorDamage, calibrateGrid, useAttack: useAttackRow, useAction: useActionRow, declareAttack: () => game.combat && promptDeclaration(game.combat), openTokenMaker: (actor: any, options?: { source?: string; foreground?: string; pixelArt?: boolean }) => TokenMakerApp.open(actor, options) }
 })
