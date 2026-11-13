@@ -107,8 +107,8 @@
       "ManaOverride": "Max mana override",
       "ShieldDr": "Shield DR",
       "ShieldDrShort": "Shield",
-      "ShieldDrHint": "Shield DR from your equipped shield. A Shield Block that Major Fails costs it 1 DR, a Critical Fail 2; with none left it breaks.",
-      "ShieldRepair": "Repair your equipped shields: restore their DR and mend them"
+      "ShieldDrHint": "Shield DR from your equipped shield. A Shield Block that Major Fails reduces it by 1 DR, a Critical Fail reduces it by 2; it breaks when it reaches 0 DR.",
+      "ShieldRepair": "Repair your equipped shield: restore its DR and mend it"
     },
     "Trait": {
       "Resist": "Resist",
@@ -197,7 +197,7 @@
       "Unequip": "Unequip",
       "Equipped": "Equipped",
       "Broken": "Broken",
-      "BrokenHint": "Broken gear does nothing until repaired: no effects, no DR, it can't be used or attacked with, and a shield can't Shield Block. A successful Repair check (or the shield's repair button on the sheet) mends it.",
+      "BrokenHint": "Broken gear does nothing until repaired: no effects, no DR, it can't be used or attacked with, and a shield can't be used to Shield Block. A successful Repair check (or the shield's repair button on the sheet) mends it.",
       "Rank": "Rank",
       "RankHint": "Base rank; the arrow shows the rank after effects.",
       "RankOverride": "Rank override",
@@ -545,7 +545,15 @@
       "Approve": "Approve",
       "Decline": "Decline",
       "Approved": "The GM approved your {action}.",
-      "Declined": "The GM declined your {action}."
+      "Declined": "The GM declined your {action}.",
+      "AutomationSetting": "Automate upkeep",
+      "AutomationSettingHint": "Upkeep buttons apply their changes on their own: rests heal and advance the clock, advancement rolls ranks, Level Up raises the level. Turn this off and the GM is asked each time whether to automate it; if not, it's only noted in chat.",
+      "AutomateTitle": "Automate upkeep?",
+      "AutomateAsk": "Automate it? Without automation nothing changes and it's only noted in chat.",
+      "Automate": "Automate",
+      "DontAutomate": "Don't automate",
+      "Manual": "Not automated: apply any changes by hand.",
+      "ManualHint": "Your choice goes to the GM, who decides whether to automate it."
     },
     "Import": {
       "Character": "Import",
@@ -557,6 +565,10 @@
       "AutoAdvance": {
         "Name": "Auto-advance combat phases",
         "Hint": "Move to the next phase as soon as everyone on the acting side is done."
+      },
+      "Homebrew": {
+        "Name": "Homebrew compendiums",
+        "Hint": "Show the system's Homebrew Skills, Spells and Items compendiums. Turn this off to remove them from the world (their entries already on actors stay). Reloads the world."
       }
     },
     "Info": {

@@ -155,26 +155,62 @@ export async function performUpkeep(uuids: string[], kind: string, hours = 1, sk
   }
 }
 
-/** A player's upkeep request, posted for the GMs with Approve and Decline. */
-export async function postUpkeepRequest(user: any, uuids: string[], kind: string, hours: number) {
+/** Whether upkeep buttons apply their changes on their own (the "Automate upkeep" setting). */
+export const upkeepAutomated = () => game.settings.get('crawlspace', 'upkeepAutomation') !== false
+
+/** "Short Rest for Carl, Donut." */
+function describeUpkeep(kind: string, actors: any[], hours: number) {
+  const esc = foundry.utils.escapeHTML
+  const action = esc(game.i18n.localize(`CRAWLSPACE.Upkeep.Actions.${kind}`))
+  const names = actors.map((actor: any) => esc(actor.name)).join(', ')
+  return game.i18n.format(['hourly', 'grinding'].includes(kind) ? 'CRAWLSPACE.Upkeep.RequestHours' : 'CRAWLSPACE.Upkeep.RequestLine', { action, hours, names })
+}
+
+/** The action happened, but nothing was changed for it: the table applies it by hand. */
+async function noteManualUpkeep(kind: string, actors: any[], hours: number) {
+  const content = `<div class="crawlspace chat-card upkeep-card"><h3>${game.i18n.localize(`CRAWLSPACE.Upkeep.Actions.${kind}`)}</h3><p>${describeUpkeep(kind, actors, hours)}</p><p>${game.i18n.localize('CRAWLSPACE.Upkeep.Manual')}</p></div>`
+  await ChatMessage.create({ content, speaker: actors.length === 1 ? ChatMessage.getSpeaker({ actor: actors[0] }) : { alias: game.user.name } })
+}
+
+/**
+ * With automation off, the GM decides each time whether an upkeep action applies its changes. Declining notes it in
+ * chat and changes nothing (false); closing the prompt cancels it (null). Always true when automation is on.
+ */
+export async function gmAllowsAutomation(kind: string, actors: any[], hours = 1): Promise<boolean | null> {
+  if (upkeepAutomated() || !actors.length) return true
+  const answer = await foundry.applications.api.DialogV2.confirm({
+    window: { title: game.i18n.localize('CRAWLSPACE.Upkeep.AutomateTitle') }, classes: ['crawlspace'], rejectClose: false,
+    content: `<p>${describeUpkeep(kind, actors, hours)}</p><p>${game.i18n.localize('CRAWLSPACE.Upkeep.AutomateAsk')}</p>`,
+    yes: { label: game.i18n.localize('CRAWLSPACE.Upkeep.Automate'), icon: 'fa-solid fa-gears' },
+    no: { label: game.i18n.localize('CRAWLSPACE.Upkeep.DontAutomate'), icon: 'fa-solid fa-hand' },
+  })
+  if (answer === false) await noteManualUpkeep(kind, actors, hours)
+  return answer === true ? true : answer === false ? false : null
+}
+
+/**
+ * A player's upkeep, posted for the GMs. Without the "players run upkeep" setting it asks Approve or Decline; with
+ * automation off (manual) it asks whether to automate it, and declining only notes it.
+ */
+export async function postUpkeepRequest(user: any, uuids: string[], kind: string, hours: number, manual = false) {
   if (!game.user.isGM) return
   const actors = (await Promise.all(uuids.map((uuid) => fromUuid(uuid)))).filter((actor: any) => actor?.type === 'crawler')
   if (!actors.length) return
   const esc = foundry.utils.escapeHTML
-  const action = game.i18n.localize(`CRAWLSPACE.Upkeep.Actions.${kind}`)
+  const label = (key: string) => game.i18n.localize(`CRAWLSPACE.Upkeep.${key}`)
   const content = `<div class="crawl-card upkeep-request">
     <h4 class="card-title"><i class="fa-solid fa-campground"></i> ${game.i18n.format('CRAWLSPACE.Upkeep.RequestTitle', { user: esc(user.name) })}</h4>
-    <p>${game.i18n.format(['hourly', 'grinding'].includes(kind) ? 'CRAWLSPACE.Upkeep.RequestHours' : 'CRAWLSPACE.Upkeep.RequestLine', { action: esc(action), hours, names: actors.map((actor: any) => esc(actor.name)).join(', ') })}</p>
+    <p>${describeUpkeep(kind, actors, hours)}</p>${manual ? `<p>${label('AutomateAsk')}</p>` : ''}
     <div class="card-buttons">
-      <button type="button" data-crawl-action="upkeep-approve"><i class="fa-solid fa-check"></i> ${game.i18n.localize('CRAWLSPACE.Upkeep.Approve')}</button>
-      <button type="button" data-crawl-action="upkeep-decline"><i class="fa-solid fa-xmark"></i> ${game.i18n.localize('CRAWLSPACE.Upkeep.Decline')}</button>
+      <button type="button" data-crawl-action="upkeep-approve"><i class="fa-solid ${manual ? 'fa-gears' : 'fa-check'}"></i> ${label(manual ? 'Automate' : 'Approve')}</button>
+      <button type="button" data-crawl-action="upkeep-decline"><i class="fa-solid ${manual ? 'fa-hand' : 'fa-xmark'}"></i> ${label(manual ? 'DontAutomate' : 'Decline')}</button>
     </div>
   </div>`
   await ChatMessage.create({
     content,
     speaker: { alias: user.name },
     whisper: game.users.filter((entry: any) => entry.isGM).map((entry: any) => entry.id),
-    flags: { crawlspace: { kind: 'upkeepRequest', uuids: actors.map((actor: any) => actor.uuid), upkeep: kind, hours, userId: user.id } },
+    flags: { crawlspace: { kind: 'upkeepRequest', uuids: actors.map((actor: any) => actor.uuid), upkeep: kind, hours, userId: user.id, manual } },
   })
 }
 
@@ -184,6 +220,11 @@ export async function answerUpkeepRequest(message: any, approve: boolean) {
   if (!game.user.isGM || flags?.kind !== 'upkeepRequest' || flags.answered) return
   await message.update({ 'flags.crawlspace.answered': approve ? 'approved' : 'declined' })
   if (approve) await performUpkeep(flags.uuids, flags.upkeep, flags.hours)
+  // Manual upkeep: declining is "do it by hand", which everyone sees in chat.
+  if (flags.manual) {
+    if (!approve) await noteManualUpkeep(flags.upkeep, (await Promise.all(flags.uuids.map((uuid: string) => fromUuid(uuid)))).filter(Boolean), flags.hours)
+    return
+  }
   const user = game.users.get(flags.userId)
   if (user) await ChatMessage.create({ content: `<p>${game.i18n.format(approve ? 'CRAWLSPACE.Upkeep.Approved' : 'CRAWLSPACE.Upkeep.Declined', { action: game.i18n.localize(`CRAWLSPACE.Upkeep.Actions.${flags.upkeep}`) })}</p>`, whisper: [user.id] })
 }
@@ -194,7 +235,8 @@ export async function openUpkeep(actor?: any) {
   const esc = foundry.utils.escapeHTML
   const labels = ['short', 'long', 'full', 'hourly', 'safeRoom', 'session', 'floor', 'grinding', 'assign', ...(gm ? ['level', 'awards', 'autoLoot', 'generator'] : [])]
   const request = !gm && !game.settings.get('crawlspace', 'playerUpkeep')
-  const content = `<p>${game.i18n.localize(gm ? 'CRAWLSPACE.Upkeep.Hint' : request ? 'CRAWLSPACE.Upkeep.RequestHint' : 'CRAWLSPACE.Upkeep.NoTime')}</p>
+  const hint = gm ? 'Hint' : !upkeepAutomated() ? 'ManualHint' : request ? 'RequestHint' : 'NoTime'
+  const content = `<p>${game.i18n.localize(`CRAWLSPACE.Upkeep.${hint}`)}</p>
     <div class="upkeep-participants">${actors.map((entry: any) => `<label class="upkeep-participant"><input type="checkbox" name="actor" value="${esc(entry.uuid)}" checked> ${esc(entry.name)}</label>`).join('')}</div>`
   const answer = await foundry.applications.api.DialogV2.wait({
     window: { title: game.i18n.localize('CRAWLSPACE.Upkeep.Party') }, position: { width: 560 }, content, rejectClose: false,
@@ -236,6 +278,10 @@ async function askHours(title: string): Promise<number | null> {
 }
 
 export function registerUpkeep() {
+  game.settings.register('crawlspace', 'upkeepAutomation', {
+    name: 'CRAWLSPACE.Upkeep.AutomationSetting', hint: 'CRAWLSPACE.Upkeep.AutomationSettingHint',
+    scope: 'world', config: true, restricted: true, type: Boolean, default: true,
+  })
   game.settings.register('crawlspace', 'playerUpkeep', {
     name: 'CRAWLSPACE.Upkeep.PlayerSetting', hint: 'CRAWLSPACE.Upkeep.PlayerSettingHint',
     scope: 'world', config: true, restricted: true, type: Boolean, default: false,

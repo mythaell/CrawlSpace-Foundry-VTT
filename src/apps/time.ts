@@ -3,7 +3,7 @@ import { SPECIAL_DURATIONS } from '../effects/end-triggers'
 /** GM time controls and shared countdowns (partyTimers.ts); all game timers use core world time. */
 import { advanceTime } from '../time'
 import { durationSeconds, formatTime, restSeconds, timeParts, timePartsSeconds, type TimeParts } from '../rules/time'
-import { rest, advanceMarked } from './upkeep'
+import { rest, advanceMarked, gmAllowsAutomation } from './upkeep'
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
 
@@ -241,11 +241,14 @@ export class CrawlTime extends HandlebarsApplicationMixin(ApplicationV2) {
       if (!Number.isSafeInteger(hours) || hours < 0 || hours > 30000) throw new Error(game.i18n.localize('CRAWLSPACE.Time.InvalidDuration'))
       const actors = [...this.element.querySelectorAll('[name=actor]:checked')].map((input: any) => game.actors.get(input.value)).filter(Boolean)
       if (kind !== 'skip' && !actors.length) throw new Error(game.i18n.localize('CRAWLSPACE.Time.SelectActors'))
-      if (kind === 'grinding') return await openGrinding(actors, hours)
       const recovery = ['short', 'long', 'full', 'hourly'].includes(kind)
+      // With automation off the GM chooses: the clock still moves, but the activity changes nothing.
+      const automate = kind === 'skip' || await gmAllowsAutomation(kind, actors, hours)
+      if (automate === null) return
+      if (kind === 'grinding' && automate) return await openGrinding(actors, hours)
       const seconds = recovery ? restSeconds(kind, hours) : hours * 3600
       await advanceTime(seconds)
-      for (const actor of actors) {
+      for (const actor of automate ? actors : []) {
         if (recovery) await rest(actor, kind as any, hours, { advance: false })
         if (kind === 'safeRoom') {
           await advanceMarked(actor, 'safeRoom')

@@ -1,4 +1,4 @@
-import { performUpkeep, postUpkeepRequest } from './apps/upkeep'
+import { gmAllowsAutomation, performUpkeep, postUpkeepRequest, upkeepAutomated } from './apps/upkeep'
 import { createBuiltCrawler, type Draft } from './apps/builder'
 import { giveCondition, mayGive } from './effects/use-conditions'
 import { triggerRequest } from './effects/triggers'
@@ -18,7 +18,7 @@ type Request =
   | { type: 'buildCrawler'; draft: Draft; userId: string }
   | { type: 'builderError'; userId: string; error: string }
   | { type: 'condition'; effectUuid: string; targetUuid: string; userId: string }
-  | { type: 'upkeepRequest'; uuids: string[]; kind: string; hours: number; userId: string }
+  | { type: 'upkeepRequest'; uuids: string[]; kind: string; hours: number; userId: string; manual?: boolean }
   | { type: 'trigger'; actorUuid: string; events: string[]; timing: string; afterPhase: boolean; otherUuid: string; sources: string[]; messageId: string }
 
 async function perform(request: Request) {
@@ -46,12 +46,14 @@ async function perform(request: Request) {
     // A player's ask: the GMs see a card to approve or decline it.
     const user = game.users.get(request.userId)
     if (!user || !Array.isArray(request.uuids) || request.uuids.length > 100) return
-    return postUpkeepRequest(user, request.uuids, request.kind, request.hours)
+    return postUpkeepRequest(user, request.uuids, request.kind, request.hours, !!request.manual)
   }
   if (request.type === 'upkeep') {
     const user = game.users.get(request.userId)
     if (!user || !Array.isArray(request.uuids) || request.uuids.length > 100) return
     if (!user.isGM) {
+      // Automation was turned off since the player chose: the GM decides on a card instead.
+      if (!upkeepAutomated()) return postUpkeepRequest(user, request.uuids, request.kind, request.hours, true)
       if (!game.settings.get('crawlspace', 'playerUpkeep')) return
       for (const uuid of request.uuids) {
         const actor = await fromUuid(uuid)
@@ -117,7 +119,16 @@ export async function combatAction(combat: any, method: string, ...args: unknown
 /** Route party upkeep through the GM relay; players never supply the time-skip policy. */
 export async function upkeepAction(uuids: string[], kind: string, hours = 1) {
   const request: Request = { type: 'upkeep', uuids, kind, hours, userId: game.user.id }
-  if (game.user.isGM) return perform(request)
+  if (game.user.isGM) {
+    const actors = (await Promise.all(uuids.map((uuid) => fromUuid(uuid)))).filter((actor: any) => actor?.type === 'crawler')
+    if (!(await gmAllowsAutomation(kind, actors, hours))) return
+    return perform(request)
+  }
+  // With automation off, every player upkeep goes to the GM, who decides whether to automate it.
+  if (!upkeepAutomated()) {
+    relay({ ...request, type: 'upkeepRequest', manual: true })
+    return ui.notifications.info(game.i18n.localize('CRAWLSPACE.Upkeep.Requested'))
+  }
   // Without the "players run upkeep" setting, a player's upkeep is a request the GM approves.
   if (!game.settings.get('crawlspace', 'playerUpkeep')) {
     relay({ ...request, type: 'upkeepRequest' })

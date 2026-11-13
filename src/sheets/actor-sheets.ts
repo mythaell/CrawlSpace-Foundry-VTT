@@ -6,8 +6,8 @@ import { CHECK_TYPES, CREATURE_SIZES, CREATURE_TYPES, DAMAGE_TYPES, GEAR_SLOTS, 
 import { DEBUFFS } from '../rules/debuffs'
 import { penaltyModifiers, rollAttack, rollCheck, rollDamage } from '../dice/rolls'
 import { combatantSide, promptDeclaration } from '../combat/combat'
-import { levelUp, openUpkeep } from '../apps/upkeep'
-import { gmActorAction } from '../socket'
+import { openUpkeep } from '../apps/upkeep'
+import { gmActorAction, upkeepAction } from '../socket'
 import { createFollower, followerKind, followersOf, linkFollower, unlinkFollower } from '../actors/companions'
 import { pendingStatPoints } from '../rules/upkeep'
 import { attackRows, attackWithRow, damageWithRow, displayFormula, findAttackRow, resolveAttack, UNARMED_ID, unarmedRow } from '../actors/attacks'
@@ -956,7 +956,8 @@ export class CrawlerSheet extends CrawlActorSheet {
   }
 
   static async #onLevelUp(this: CrawlerSheet) {
-    return levelUp(this.actor)
+    // Through upkeep, so a player's goes to the GM and the "Automate upkeep" setting applies.
+    return upkeepAction([this.actor.uuid], 'level')
   }
 
   static async #onOpenEffects(this: CrawlerSheet) {

@@ -42,6 +42,7 @@ import { migrateShieldLoss } from './rules/repair'
 import { actionRowsOf, runAction } from './apps/actions-config'
 import { attackWithRow, findAttackRow } from './actors/attacks'
 import { registerHotlistUpkeep } from './rules/hotlist-upkeep'
+import { registerHomebrewSetting } from './settings/homebrew'
 import { registerHandRules } from './rules/hands-upkeep'
 import { registerFlavorTooltip } from './canvas/flavor-tooltip'
 import { readImportFile } from './import/account-import'
@@ -97,6 +98,7 @@ const TEMPLATES = [
 
 Hooks.once('init', () => {
   console.log('CrawlSpace | Initializing')
+  registerHomebrewSetting()
   CONFIG.CRAWLSPACE = config
   // A CrawlSpace round is 10 seconds of game time (regen effects count in it).
   CONFIG.time.roundTime = 10
