@@ -1,7 +1,7 @@
 {
   "name": "crawlspace-foundry-vtt",
   "private": true,
-  "version": "0.9.8.9",
+  "version": "0.9.8.10",
   "description": "CrawlSpace game system for Foundry Virtual Tabletop V14",
   "type": "module",
   "scripts": {
