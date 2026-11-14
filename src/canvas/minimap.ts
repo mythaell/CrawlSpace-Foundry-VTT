@@ -1,6 +1,7 @@
 /**
  * The minimap: the app's round blue radar in the corner, showing the whole viewed scene (its background image) with a
- * dot for each token that has an actor. Players see the tokens they can see on the canvas; the GM sees all of them.
+ * dot for each token that has an actor. The image is redrawn in blues, like a blueprint: dark lines deep blue, light
+ * floors near white. Players see the tokens they can see on the canvas; the GM sees all of them.
  * A toggle in the token controls hides it for this user. It can be dragged; each user's spot is remembered.
  *
  * The CrawlSpace Atlas module replaces it: with Atlas active, this minimap and its toggle aren't set up at all.
@@ -14,19 +15,52 @@ const COLORS = { own: '#44f275', crawler: '#4395ff', hostile: '#ff405e', other: 
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
-/** Scene background images, loaded once each. */
-const images = new Map<string, HTMLImageElement>()
+/** The blueprint's darkest and lightest blues, as RGB. */
+const DARK = [26, 79, 160]
+const LIGHT = [240, 245, 252]
+/** The bluescale copy is at most this many pixels on its long side; the radar is far smaller. */
+const BLUE_SIZE = 512
+
+/** Scene background images in blues, made once each. */
+const images = new Map<string, { image: HTMLImageElement; blue: HTMLCanvasElement | HTMLImageElement | null }>()
 function imageFor(src: string | null | undefined, loaded: () => void) {
   if (!src) return null
-  let image = images.get(src)
-  if (!image) {
-    image = new Image()
+  let entry = images.get(src)
+  if (!entry) {
+    const image = new Image()
+    const made: { image: HTMLImageElement; blue: HTMLCanvasElement | HTMLImageElement | null } = { image, blue: null }
+    entry = made
     image.crossOrigin = 'anonymous'
-    image.onload = loaded
+    image.onload = () => {
+      made.blue = bluescale(image)
+      loaded()
+    }
     image.src = src
-    images.set(src, image)
+    images.set(src, entry)
   }
-  return image.complete && image.naturalWidth ? image : null
+  return entry.blue
+}
+
+/** The image shrunk and recolored by brightness between the two blues. If it can't be read, the image as it is. */
+function bluescale(image: HTMLImageElement) {
+  const shrink = Math.min(1, BLUE_SIZE / Math.max(image.naturalWidth, image.naturalHeight))
+  const result = document.createElement('canvas')
+  result.width = Math.max(1, Math.round(image.naturalWidth * shrink))
+  result.height = Math.max(1, Math.round(image.naturalHeight * shrink))
+  const context = result.getContext('2d', { willReadFrequently: true })!
+  context.drawImage(image, 0, 0, result.width, result.height)
+  try {
+    const pixels = context.getImageData(0, 0, result.width, result.height)
+    const data = pixels.data
+    for (let i = 0; i < data.length; i += 4) {
+      const light = (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255
+      for (let c = 0; c < 3; c++) data[i + c] = DARK[c] + (LIGHT[c] - DARK[c]) * light
+    }
+    context.putImageData(pixels, 0, 0)
+    return result
+  } catch {
+    return image
+  }
 }
 
 class Minimap extends foundry.applications.api.ApplicationV2 {
